@@ -52,34 +52,34 @@ public class CreateAddressUseCase {
 
     private void validateRequiredFields(final CreateAddressCommand command) {
         if (command.purpose() == null) {
-            throw new BusinessRuleException("Address purpose is required");
+            throw new BusinessRuleException("A finalidade do endereco e obrigatoria");
         }
         if (command.residenceType() == null) {
-            throw new BusinessRuleException("Residence type is required");
+            throw new BusinessRuleException("O tipo de residencia e obrigatorio");
         }
         if (command.streetType() == null) {
-            throw new BusinessRuleException("Street type is required");
+            throw new BusinessRuleException("O tipo de logradouro e obrigatorio");
         }
         if (command.street() == null || command.street().isBlank()) {
-            throw new BusinessRuleException("Street is required");
+            throw new BusinessRuleException("O logradouro e obrigatorio");
         }
         if (command.number() == null || command.number().isBlank()) {
-            throw new BusinessRuleException("Number is required");
+            throw new BusinessRuleException("O numero e obrigatorio");
         }
         if (command.neighborhood() == null || command.neighborhood().isBlank()) {
-            throw new BusinessRuleException("Neighborhood is required");
+            throw new BusinessRuleException("O bairro e obrigatorio");
         }
         if (command.zipCode() == null || command.zipCode().isBlank()) {
-            throw new BusinessRuleException("ZIP code is required");
+            throw new BusinessRuleException("O CEP e obrigatorio");
         }
         if (command.city() == null || command.city().isBlank()) {
-            throw new BusinessRuleException("City is required");
+            throw new BusinessRuleException("A cidade e obrigatoria");
         }
         if (command.state() == null || command.state().isBlank()) {
-            throw new BusinessRuleException("State is required");
+            throw new BusinessRuleException("O estado e obrigatorio");
         }
         if (command.country() == null || command.country().isBlank()) {
-            throw new BusinessRuleException("Country is required");
+            throw new BusinessRuleException("O pais e obrigatorio");
         }
     }
 }

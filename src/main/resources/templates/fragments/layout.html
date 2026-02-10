@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="page(title, content)">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title} + ' | RPG Shop'">RPG Shop</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+<div class="layout">
+    <header>
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">&#9876;</span>
+                <span class="logo-text">RPG Shop</span>
+            </a>
+            <nav>
+                <a href="/products">Produtos</a>
+                <a href="/customers">Clientes</a>
+                <a href="/orders">Pedidos</a>
+                <a href="/exchanges">Trocas</a>
+                <a href="/coupons/new">Cupons</a>
+                <a href="/logs">Logs</a>
+                <a href="/analysis">Análises</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div th:replace="${content}">Conteúdo da página</div>
+    </main>
+
+    <footer>
+        &copy; 2026 RPG Shop &mdash; Sua loja de itens de RPG. Todos os direitos reservados.
+    </footer>
+</div>
+</body>
+</html>

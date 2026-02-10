@@ -85,35 +85,35 @@ public class CreateProductUseCase {
 
     private void validateRequiredFields(CreateProductCommand command) {
         if (command.name() == null || command.name().isBlank()) {
-            throw new BusinessRuleException("Product name is required");
+            throw new BusinessRuleException("O nome do produto e obrigatorio");
         }
         if (command.productTypeId() == null) {
-            throw new BusinessRuleException("Product type is required");
+            throw new BusinessRuleException("O tipo de produto e obrigatorio");
         }
         if (command.categoryIds() == null || command.categoryIds().isEmpty()) {
-            throw new BusinessRuleException("At least one category is required");
+            throw new BusinessRuleException("Pelo menos uma categoria e obrigatoria");
         }
         if (command.pricingGroupId() == null) {
-            throw new BusinessRuleException("Pricing group is required");
+            throw new BusinessRuleException("O grupo de precificacao e obrigatorio");
         }
         if (command.costPrice() == null || command.costPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessRuleException("Cost price must be greater than zero");
+            throw new BusinessRuleException("O preco de custo deve ser maior que zero");
         }
         if (command.weight() == null || command.weight().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessRuleException("Weight is required and must be greater than zero");
+            throw new BusinessRuleException("O peso e obrigatorio e deve ser maior que zero");
         }
         if ((command.barcode() == null || command.barcode().isBlank())
                 && (command.sku() == null || command.sku().isBlank())) {
-            throw new BusinessRuleException("At least one identifier is required: barcode or SKU");
+            throw new BusinessRuleException("Pelo menos um identificador e obrigatorio: codigo de barras ou SKU");
         }
     }
 
     private void validateUniqueIdentifiers(final CreateProductCommand command) {
         if (command.sku() != null && !command.sku().isBlank() && productGateway.existsBySku(command.sku())) {
-            throw new BusinessRuleException("A product with SKU '%s' already exists".formatted(command.sku()));
+            throw new BusinessRuleException("Ja existe um produto com o SKU '%s'".formatted(command.sku()));
         }
         if (command.barcode() != null && !command.barcode().isBlank() && productGateway.existsByBarcode(command.barcode())) {
-            throw new BusinessRuleException("A product with barcode '%s' already exists".formatted(command.barcode()));
+            throw new BusinessRuleException("Ja existe um produto com o codigo de barras '%s'".formatted(command.barcode()));
         }
     }
 

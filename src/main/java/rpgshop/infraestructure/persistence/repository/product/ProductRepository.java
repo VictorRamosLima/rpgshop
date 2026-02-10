@@ -22,16 +22,15 @@ import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 @RepositoryDefinition(domainClass = ProductJpaEntity.class, idClass = UUID.class)
 public interface ProductRepository {
     ProductJpaEntity save(final ProductJpaEntity entity);
+
     Optional<ProductJpaEntity> findById(final UUID id);
-    void deleteById(final UUID id);
-    boolean existsById(final UUID id);
 
     @Query("""
         SELECT DISTINCT p FROM ProductJpaEntity p
         LEFT JOIN p.productType t
         LEFT JOIN p.pricingGroup pg
         LEFT JOIN p.categories c
-        WHERE (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
+        WHERE (:name IS NULL OR LOWER(CAST(p.name AS string)) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')))
             AND (:productTypeId IS NULL OR t.id = :productTypeId)
             AND (:categoryId IS NULL OR c.id = :categoryId)
             AND (:pricingGroupId IS NULL OR pg.id = :pricingGroupId)
@@ -53,10 +52,6 @@ public interface ProductRepository {
         @Param("maxPrice") @Nullable final BigDecimal maxPrice,
         @Nullable final Pageable pageable
     );
-
-    Optional<ProductJpaEntity> findBySku(@Nonnull final String sku);
-
-    Optional<ProductJpaEntity> findByBarcode(@Nonnull final String barcode);
 
     boolean existsBySku(@Nonnull final String sku);
 
@@ -80,26 +75,4 @@ public interface ProductRepository {
         WHERE p.id IN :ids
         """)
     int bulkDeactivateByIds(final List<UUID> ids, final Instant now);
-
-    Page<ProductJpaEntity> findByIsActiveTrue(final Pageable pageable);
-
-    Page<ProductJpaEntity> findByIsActiveFalse(final Pageable pageable);
-
-    Page<ProductJpaEntity> findByStockQuantityGreaterThan(final Integer quantity, final Pageable pageable);
-
-    Page<ProductJpaEntity> findByStockQuantityEquals(final Integer quantity, final Pageable pageable);
-
-    Page<ProductJpaEntity> findByTypeId(final UUID typeId, final Pageable pageable);
-
-    Page<ProductJpaEntity> findByPricingGroupId(final UUID pricingGroupId, final Pageable pageable);
-
-    @Query("SELECT p FROM ProductJpaEntity p JOIN p.categories c WHERE c.id = :categoryId")
-    Page<ProductJpaEntity> findByCategoryId(@Param("categoryId") final UUID categoryId, final Pageable pageable);
-
-    @Query("""
-        SELECT MAX(se.costValue)
-        FROM StockEntryJpaEntity se
-        WHERE se.product.id = :productId
-        """)
-    Optional<BigDecimal> findMaxCostByProductId(@Param("productId") final UUID productId);
 }

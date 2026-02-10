@@ -34,6 +34,7 @@ public final class CreditCardJpaEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
@@ -43,7 +44,7 @@ public final class CreditCardJpaEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @ManyToOne(fetch = LAZY)
@@ -63,6 +64,7 @@ public final class CreditCardJpaEntity {
     @Column(name = "security_code", nullable = false, updatable = false)
     private String securityCode;
 
+    @Builder.Default
     @Column(name = "is_preferred", nullable = false)
     private boolean isPreferred = false;
 

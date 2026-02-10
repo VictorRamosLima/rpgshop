@@ -1,0 +1,452 @@
+{
+  "name": "E-Commerce de itens de RPG",
+  "description": "Sistema de e-commerce especializado na venda de itens de RPG. O objetivo é atender jogadores e mestres de RPG, oferecendo produtos que são essenciais para a criação e condução de campanhas. Entre os produtos disponíveis, terão dados, miniaturas de personagens, mapas riscáveis, livros de regras detalhados, escudos de mestre, entre outros.",
+  "features": [
+    {
+      "name": "Geral",
+      "nonFunctionalRequirements": [
+        {
+          "id": "RNF0011",
+          "name": "Tempo de resposta para consultas",
+          "description": "Toda consulta de usuário deve ter resposta em no máximo 1 segundo."
+        },
+        {
+          "id": "RNF0012",
+          "name": "Log de transação",
+          "description": "Para toda operação de escrita (Inserção ou Alteração) deve ser registrado data, hora, usuário responsável, além de manter os dados alterados."
+        }
+      ]
+    },
+    {
+      "name": "Cadastro de Itens de RPG",
+      "functionalRequirements": [
+        {
+          "id": "RF0011",
+          "name": "Cadastrar item",
+          "description": "O sistema deve manter um cadastro único para cada item de RPG (dados, miniaturas, mapas, livros de regras, escudos etc.)."
+        },
+        {
+          "id": "RF0012",
+          "name": "Inativar item",
+          "description": "O sistema deve possibilitar que itens sejam inativados."
+        },
+        {
+          "id": "RF0013",
+          "name": "Inativar item de forma automática",
+          "description": "O sistema deve inativar itens sem estoque e sem venda com valor inferior a um parâmetro predefinido."
+        },
+        {
+          "id": "RF0014",
+          "name": "Alterar cadastro de item",
+          "description": "O sistema deve possibilitar a alteração de dados cadastrais de itens."
+        },
+        {
+          "id": "RF0015",
+          "name": "Consulta de itens",
+          "description": "O sistema deve permitir consultar qualquer item com base em filtros definidos pelo usuário, usando qualquer campo de identificação isolado ou combinado."
+        },
+        {
+          "id": "RF0016",
+          "name": "Ativar item",
+          "description": "Deve ser possível reativar um item previamente inativado."
+        }
+      ],
+      "nonFunctionalRequirements": [
+        {
+          "id": "RNF0021",
+          "name": "Código único",
+          "description": "Todo item cadastrado deve receber um código único no sistema."
+        },
+        {
+          "id": "RNF0013",
+          "name": "Cadastro de domínios",
+          "description": "Deve existir um script de implantação inserindo registros de tabelas de domínio (grupo de precificação, fabricante/fornecedor, tipos de item etc.)."
+        }
+      ],
+      "businessRules": [
+        {
+          "id": "RN0011",
+          "name": "Dados obrigatórios",
+          "description": "Para cada item cadastrado: nome, tipo (ex.: dados, miniatura, livro), categoria(s), especificações (dimensões, peso), grupo de precificação e um identificador (código de barras ou SKU)."
+        },
+        {
+          "id": "RN0012",
+          "name": "Associação com categorias",
+          "description": "Um item pode estar associado a mais de uma categoria."
+        },
+        {
+          "id": "RN0013",
+          "name": "Definir valor de venda",
+          "description": "Cada item pertence a um grupo de precificação; o valor de venda baseia-se na margem desse grupo."
+        },
+        {
+          "id": "RN0014",
+          "name": "Validar margem de lucro",
+          "description": "Alterar preço abaixo da margem exige autorização de um gerente."
+        },
+        {
+          "id": "RN0015",
+          "name": "Motivo de inativação",
+          "description": "Itens inativados manualmente exigem justificativa e categoria de inativação."
+        },
+        {
+          "id": "RN0016",
+          "name": "Inativação automática",
+          "description": "Itens inativados automaticamente são categorizados como FORA DE MERCADO."
+        },
+        {
+          "id": "RN0017",
+          "name": "Motivo de ativação",
+          "description": "Itens reativados devem ter justificativa e categoria de ativação."
+        }
+      ]
+    },
+    {
+      "name": "Cadastro de Clientes",
+      "functionalRequirements": [
+        {
+          "id": "RF0021",
+          "name": "Cadastrar cliente",
+          "description": "O sistema deve possibilitar o cadastro de clientes."
+        },
+        {
+          "id": "RF0022",
+          "name": "Alterar cliente",
+          "description": "O sistema deve possibilitar a alteração de dados cadastrais de clientes."
+        },
+        {
+          "id": "RF0023",
+          "name": "Inativar cadastro de cliente",
+          "description": "O sistema deve possibilitar que clientes sejam inativados."
+        },
+        {
+          "id": "RF0024",
+          "name": "Consulta de clientes",
+          "description": "O sistema deve possibilitar que um cliente seja consultado com base em filtros combináveis ou isolados."
+        },
+        {
+          "id": "RF0025",
+          "name": "Consulta de transações",
+          "description": "No cadastro de clientes deve ser possível consultar todas as transações já realizadas."
+        },
+        {
+          "id": "RF0026",
+          "name": "Cadastro de endereços de entrega",
+          "description": "Permitir múltiplos endereços de entrega, cada um identificado por uma frase curta."
+        },
+        {
+          "id": "RF0027",
+          "name": "Cadastro de cartões de crédito",
+          "description": "Permitir múltiplos cartões de crédito, havendo um configurado como preferencial."
+        },
+        {
+          "id": "RF0028",
+          "name": "Alteração apenas de senha",
+          "description": "O sistema deve possibilitar alterar apenas a senha sem editar os demais dados."
+        }
+      ],
+      "nonFunctionalRequirements": [
+        {
+          "id": "RNF0031",
+          "name": "Senha forte",
+          "description": "Senha deve ter ≥ 8 caracteres, letras maiúsculas/minúsculas e caracteres especiais."
+        },
+        {
+          "id": "RNF0032",
+          "name": "Confirmação de senha",
+          "description": "O usuário deve digitar a senha duas vezes no registro."
+        },
+        {
+          "id": "RNF0033",
+          "name": "Senha criptografada",
+          "description": "A senha deve ser criptografada."
+        },
+        {
+          "id": "RNF0034",
+          "name": "Alteração apenas de endereços",
+          "description": "Endereços de entrega ou cobrança podem ser alterados/adicionados sem editar outros dados."
+        },
+        {
+          "id": "RNF0035",
+          "name": "Código de cliente",
+          "description": "Todo cliente cadastrado deve receber um código único."
+        }
+      ],
+      "businessRules": [
+        {
+          "id": "RN0021",
+          "name": "Cadastro de endereço de cobrança",
+          "description": "É obrigatório ao menos um endereço de cobrança."
+        },
+        {
+          "id": "RN0022",
+          "name": "Cadastro de endereço de entrega",
+          "description": "É obrigatório ao menos um endereço de entrega."
+        },
+        {
+          "id": "RN0023",
+          "name": "Composição do registro de endereços",
+          "description": "Endereços devem conter: Tipo de residência, Tipo Logradouro, Logradouro, Número, Bairro, CEP, Cidade, Estado, País (obrigatórios) + Observações (opcional)."
+        },
+        {
+          "id": "RN0024",
+          "name": "Composição do registro de cartões de crédito",
+          "description": "Cartão deve conter Nº, Nome impresso, Bandeira e Código de Segurança."
+        },
+        {
+          "id": "RN0025",
+          "name": "Bandeiras permitidas",
+          "description": "Cartão deve ser de bandeira registrada no sistema."
+        },
+        {
+          "id": "RN0026",
+          "name": "Dados obrigatórios do cliente",
+          "description": "Gênero, Nome, Data de Nascimento, CPF, Telefone (tipo, DDD, número), e‑mail, senha, endereço residencial."
+        },
+        {
+          "id": "RN0027",
+          "name": "Ranking de cliente",
+          "description": "Cliente recebe ranking numérico baseado no perfil de compra."
+        },
+        {
+          "id": "RN0028",
+          "name": "Validar retorno da operadora de cartão",
+          "description": "Baixa em estoque somente após aprovação; itens de compras não aprovadas voltam ao estoque."
+        }
+      ]
+    },
+    {
+      "name": "Gerenciar Vendas Eletrônicas",
+      "functionalRequirements": [
+        {
+          "id": "RF0031",
+          "name": "Gerenciar carrinho de compra",
+          "description": "Permitir adicionar, alterar, excluir e visualizar itens no carrinho."
+        },
+        {
+          "id": "RF0032",
+          "name": "Definir quantidade de itens para o carrinho",
+          "description": "Editar quantidade ao adicionar ou na visualização do carrinho."
+        },
+        {
+          "id": "RF0033",
+          "name": "Realizar compra",
+          "description": "Possibilitar compra a partir do carrinho."
+        },
+        {
+          "id": "RF0034",
+          "name": "Calcular frete",
+          "description": "Calcular frete com base nos itens e endereço do cliente."
+        },
+        {
+          "id": "RF0035",
+          "name": "Selecionar endereço de entrega",
+          "description": "Selecionar endereço existente ou cadastrar novo e opcionalmente adicioná-lo ao perfil."
+        },
+        {
+          "id": "RF0036",
+          "name": "Selecionar forma de pagamento",
+          "description": "Selecionar cartão existente ou cadastrar novo; usar cupons de troca ou promocionais; combinar cupons e cartão."
+        },
+        {
+          "id": "RF0037",
+          "name": "Finalizar compra",
+          "description": "Após endereço e pagamento, finalizar compra com status EM PROCESSAMENTO."
+        },
+        {
+          "id": "RF0038",
+          "name": "Despachar produtos para entrega",
+          "description": "Administrador seleciona vendas aprovadas; status EM TRANSITO."
+        },
+        {
+          "id": "RF0039",
+          "name": "Produtos entregues",
+          "description": "Administrador confirma entrega; status ENTREGUE."
+        },
+        {
+          "id": "RF0040",
+          "name": "Solicitar troca",
+          "description": "Cliente solicita troca de item via seus pedidos."
+        },
+        {
+          "id": "RF0041",
+          "name": "Autorizar trocas",
+          "description": "Administrador autoriza; status TROCA AUTORIZADA."
+        },
+        {
+          "id": "RF0042",
+          "name": "Visualização de trocas",
+          "description": "Administrador visualiza todos pedidos com status EM TROCA."
+        },
+        {
+          "id": "RF0043",
+          "name": "Confirmar recebimento de itens para troca",
+          "description": "Administrador confirma recebimento; decide retorno ao estoque."
+        },
+        {
+          "id": "RF0044",
+          "name": "Gerar cupom de troca após recebimento de itens",
+          "description": "Sistema gera cupom de troca para o cliente."
+        }
+      ],
+      "nonFunctionalRequirements": [
+        {
+          "id": "RNF0042",
+          "name": "Apresentar itens retirados do carrinho",
+          "description": "Listar produtos removidos por expiração; desabilitar compra; itens devem ser adicionados novamente."
+        }
+      ],
+      "businessRules": [
+        {
+          "id": "RN0031",
+          "name": "Validar estoque para adição de itens no carrinho",
+          "description": "Não permitir adicionar item indisponível; validar quantidade ≤ estoque."
+        },
+        {
+          "id": "RN0032",
+          "name": "Validar estoque para compra",
+          "description": "Garantir que itens do carrinho ainda estão em estoque no momento da compra."
+        },
+        {
+          "id": "RN0033",
+          "name": "Uso de cupom promocional",
+          "description": "Máximo um cupom promocional por compra."
+        },
+        {
+          "id": "RN0034",
+          "name": "Uso de diversos cartões de crédito",
+          "description": "Múltiplos cartões permitidos; valor mínimo R$ 10,00 por cartão."
+        },
+        {
+          "id": "RN0035",
+          "name": "Uso de cupons junto a cartão de crédito",
+          "description": "Priorizar valor máximo dos cupons; permitir cartão < R$ 10,00 somente nessa combinação."
+        },
+        {
+          "id": "RN0036",
+          "name": "Gerar cupom de troca",
+          "description": "Gerar cupom de troco quando cupons superarem valor da compra, evitando excedente desnecessário."
+        },
+        {
+          "id": "RN0037",
+          "name": "Validar forma de pagamento",
+          "description": "Validar cupons e aprovação da operadora antes de concluir."
+        },
+        {
+          "id": "RN0038",
+          "name": "Alterar status da compra conforme aprovação",
+          "description": "Se validado, status APROVADA; senão REPROVADA."
+        },
+        {
+          "id": "RN0039",
+          "name": "Alterar status da compra para transporte",
+          "description": "Selecionada para entrega → status EM TRANSPORTE."
+        },
+        {
+          "id": "RN0040",
+          "name": "Alterar status da compra após entrega",
+          "description": "Entregue → status ENTREGUE."
+        },
+        {
+          "id": "RN0041",
+          "name": "Gerar pedido de troca",
+          "description": "Item selecionado gera pedido com status EM TROCA (toda compra, se for o caso, idem)."
+        },
+        {
+          "id": "RN0042",
+          "name": "Alterar status do pedido após recebimento de troca",
+          "description": "Recebido → status TROCADO."
+        },
+        {
+          "id": "RN0043",
+          "name": "Validação para solicitar troca",
+          "description": "Somente itens de pedidos ENTREGUE podem ser trocados."
+        },
+        {
+          "id": "RN0044",
+          "name": "Bloqueio de produtos",
+          "description": "Item no carrinho fica bloqueado; desbloqueio se compra não efetivada em prazo parametrizado."
+        },
+        {
+          "id": "RNF0045",
+          "name": "Retirar item do carrinho",
+          "description": "Ao desbloquear, remover todos itens do mesmo produto do carrinho."
+        },
+        {
+          "id": "RNF0046",
+          "name": "Gerar notificação de autorização de troca",
+          "description": "Sistema notifica cliente quando troca é autorizada."
+        }
+      ]
+    },
+    {
+      "name": "Controle de Estoque",
+      "functionalRequirements": [
+        {
+          "id": "RF0051",
+          "name": "Realizar entrada em estoque",
+          "description": "Permitir entrada de itens de livros em estoque; indicar livro e quantidade."
+        },
+        {
+          "id": "RF0052",
+          "name": "Calcular valor de venda",
+          "description": "Calcular valor de venda = custo + % do grupo de precificação."
+        },
+        {
+          "id": "RF0053",
+          "name": "Dar baixa em estoque",
+          "description": "Baixar estoque na venda dos itens."
+        },
+        {
+          "id": "RF0054",
+          "name": "Realizar reentrada em estoque",
+          "description": "Reentrada de item em estoque após troca."
+        }
+      ],
+      "businessRules": [
+        {
+          "id": "RN0051",
+          "name": "Validar dados de estoque",
+          "description": "Entrada deve informar produto, quantidade, valor de custo, fornecedor e data."
+        },
+        {
+          "id": "RN005x",
+          "name": "Definir valor de item com diferentes custos",
+          "description": "Se custos diferentes, usar maior custo para todos itens ao calcular valor de venda."
+        },
+        {
+          "id": "RN0061",
+          "name": "Quantidade de itens",
+          "description": "Não permitir entrada com quantidade igual a zero."
+        },
+        {
+          "id": "RN0062",
+          "name": "Valor de custo",
+          "description": "Todo item deve ter valor de custo."
+        },
+        {
+          "id": "RNF0064",
+          "name": "Data de entrada",
+          "description": "Não permitir registro de itens sem data de entrada."
+        }
+      ]
+    },
+    {
+      "name": "Análise",
+      "functionalRequirements": [
+        {
+          "id": "RF0055",
+          "name": "Analisar histórico de vendas",
+          "description": "Permitir consulta ao histórico comparando produtos ou categorias por período (data início e fim)."
+        }
+      ],
+      "nonFunctionalRequirements": [
+        {
+          "id": "RNF0043",
+          "name": "Gráfico de linhas",
+          "description": "O sistema deve apresentar o histórico de vendas em um gráfico de linhas."
+        }
+      ]
+    }
+  ]
+}

@@ -25,7 +25,7 @@ public class ChangePasswordUseCase {
     @Transactional
     public void execute(@Nonnull final ChangePasswordCommand command) {
         if (command.newPassword() == null || command.newPassword().isBlank()) {
-            throw new BusinessRuleException("Password is required");
+            throw new BusinessRuleException("A senha e obrigatoria");
         }
         if (!STRONG_PASSWORD.matcher(command.newPassword()).matches()) {
             throw new BusinessRuleException(
@@ -33,7 +33,7 @@ public class ChangePasswordUseCase {
             );
         }
         if (!command.newPassword().equals(command.confirmPassword())) {
-            throw new BusinessRuleException("Passwords do not match");
+            throw new BusinessRuleException("As senhas nao coincidem");
         }
 
         customerGateway.findById(command.customerId())
@@ -41,7 +41,7 @@ public class ChangePasswordUseCase {
 
         final int updated = customerGateway.updatePassword(command.customerId(), command.newPassword());
         if (updated == 0) {
-            throw new BusinessRuleException("Failed to update password");
+            throw new BusinessRuleException("Falha ao atualizar a senha");
         }
     }
 }

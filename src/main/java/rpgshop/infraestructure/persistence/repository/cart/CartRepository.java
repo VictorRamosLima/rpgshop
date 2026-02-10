@@ -15,10 +15,6 @@ public interface CartRepository {
     @Nonnull
     Optional<CartJpaEntity> findById(@Nonnull final UUID id);
 
-    void deleteById(@Nonnull final UUID id);
-
-    boolean existsById(@Nonnull final UUID id);
-
     @Nonnull
     Optional<CartJpaEntity> findByCustomerId(@Nonnull final UUID customerId);
 

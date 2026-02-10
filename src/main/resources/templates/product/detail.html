@@ -1,61 +1,155 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Product Detail</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Product Detail</h1>
-    <a href="/">Home</a> | <a href="/products">Back to List</a>
-    | <a th:href="@{/stock/product/{id}(id=${product.id()})}">Stock Entries</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Detalhe do Produto', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+    <div class="breadcrumb">
+        <a href="/">Início</a> <span>/</span> <a href="/products">Produtos</a> <span>/</span> <span th:text="${product.name()}">Produto</span>
+    </div>
 
-    <h2>Info</h2>
-    <p>ID: <span th:text="${product.id()}"></span></p>
-    <p>Name: <span th:text="${product.name()}"></span></p>
-    <p>SKU: <span th:text="${product.sku()}"></span></p>
-    <p>Barcode: <span th:text="${product.barcode()}"></span></p>
-    <p>Type: <span th:text="${product.productType() != null ? product.productType().name() : ''}"></span></p>
-    <p>Sale Price: <span th:text="${product.salePrice()}"></span></p>
-    <p>Cost Price: <span th:text="${product.costPrice()}"></span></p>
-    <p>Stock Quantity: <span th:text="${product.stockQuantity()}"></span></p>
-    <p>Weight: <span th:text="${product.weight()}"></span> kg</p>
-    <p>Active: <span th:text="${product.isActive()}"></span></p>
+    <div class="page-header">
+        <h1 th:text="${product.name()}">Nome do Produto</h1>
+        <div class="btn-group">
+            <a th:href="@{/stock/product/{id}(id=${product.id()})}" class="btn btn-accent">Ver Estoque</a>
+            <span th:if="${product.isActive()}" class="badge badge-active">Ativo</span>
+            <span th:unless="${product.isActive()}" class="badge badge-inactive">Inativo</span>
+        </div>
+    </div>
 
-    <h3>Categories</h3>
-    <ul th:if="${product.categories() != null}">
-        <li th:each="cat : ${product.categories()}" th:text="${cat.name()}"></li>
-    </ul>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <h3>Dimensions</h3>
-    <p>Height: <span th:text="${product.height()}"></span></p>
-    <p>Width: <span th:text="${product.width()}"></span></p>
-    <p>Length: <span th:text="${product.length()}"></span></p>
-    <p>Depth: <span th:text="${product.depth()}"></span></p>
+    <div class="detail-grid">
+        <div class="card">
+            <div class="card-header">Informações Gerais</div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">ID</div>
+                    <div class="info-value" th:text="${product.id()}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Tipo</div>
+                    <div class="info-value" th:text="${product.productType() != null ? product.productType().name() : 'N/A'}"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">SKU</div>
+                    <div class="info-value" th:text="${product.sku() ?: 'N/A'}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Código de Barras</div>
+                    <div class="info-value" th:text="${product.barcode() ?: 'N/A'}"></div>
+                </div>
+            </div>
+        </div>
 
-    <h3>Activate/Deactivate</h3>
-    <form method="post" th:action="@{/products/{id}/activate(id=${product.id()})}" th:unless="${product.isActive()}">
-        <label>Reason: <input type="text" name="reason" required/></label>
-        <label>Category:
-            <select name="category">
-                <option th:each="c : ${statusChangeCategories}" th:value="${c}" th:text="${c}"></option>
-            </select>
-        </label>
-        <button type="submit">Activate</button>
-    </form>
+        <div class="card">
+            <div class="card-header">Preços e Estoque</div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">Preço de Venda</div>
+                    <div class="info-value price" th:text="'R$ ' + ${#numbers.formatDecimal(product.salePrice(), 1, 2)}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Preço de Custo</div>
+                    <div class="info-value" th:text="'R$ ' + ${#numbers.formatDecimal(product.costPrice(), 1, 2)}"></div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Quantidade em Estoque</div>
+                <div class="info-value" th:text="${product.stockQuantity()}"></div>
+            </div>
+        </div>
+    </div>
 
-    <h3>Status History</h3>
-    <table border="1" th:if="${product.statusChanges() != null && !product.statusChanges().isEmpty()}">
-        <thead><tr><th>Type</th><th>Reason</th><th>Category</th><th>Date</th></tr></thead>
-        <tbody>
-            <tr th:each="sc : ${product.statusChanges()}">
-                <td th:text="${sc.type()}"></td>
-                <td th:text="${sc.reason()}"></td>
-                <td th:text="${sc.category()}"></td>
-                <td th:text="${sc.changedAt()}"></td>
-            </tr>
-        </tbody>
-    </table>
-</body>
+    <div class="detail-grid">
+        <div class="card">
+            <div class="card-header">Especificações</div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">Peso</div>
+                    <div class="info-value" th:text="${product.weight()} + ' kg'"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Altura</div>
+                    <div class="info-value" th:text="${product.height()}"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">Largura</div>
+                    <div class="info-value" th:text="${product.width()}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Profundidade</div>
+                    <div class="info-value" th:text="${product.depth()}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Categorias</div>
+            <div th:if="${product.categories() != null && !product.categories().isEmpty()}" class="tag-list">
+                <span th:each="cat : ${product.categories()}" class="tag" th:text="${cat.name()}"></span>
+            </div>
+            <div th:if="${product.categories() == null || product.categories().isEmpty()}" class="empty-state">
+                <p>Nenhuma categoria associada.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" th:unless="${product.isActive()}">
+        <div class="card-header">Reativar Produto</div>
+        <p style="margin-bottom:1rem;color:var(--color-text-muted);">Este produto está inativo. Informe o motivo e a categoria para reativá-lo (RN0017).</p>
+        <form method="post" th:action="@{/products/{id}/activate(id=${product.id()})}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Motivo da Ativação *</label>
+                    <input type="text" name="reason" required placeholder="Informe o motivo da reativação"/>
+                    <div class="form-hint">Obrigatório: justificativa para reativar o item.</div>
+                </div>
+                <div class="form-group">
+                    <label>Categoria de Ativação *</label>
+                    <select name="category" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="c : ${statusChangeCategories}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Reativar Produto</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Histórico de Status</div>
+        <div th:if="${product.statusChanges() != null && !product.statusChanges().isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Motivo</th>
+                        <th>Categoria</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="sc : ${product.statusChanges()}">
+                        <td>
+                            <span th:if="${sc.type().name() == 'ACTIVATE'}" class="badge badge-active">Ativação</span>
+                            <span th:if="${sc.type().name() == 'DEACTIVATE'}" class="badge badge-inactive">Inativação</span>
+                        </td>
+                        <td th:text="${sc.reason()}"></td>
+                        <td th:text="${sc.category()}"></td>
+                        <td th:text="${sc.changedAt()}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${product.statusChanges() == null || product.statusChanges().isEmpty()}" class="empty-state">
+            <p>Nenhuma alteração de status registrada.</p>
+        </div>
+    </div>
+
+</div>
 </html>

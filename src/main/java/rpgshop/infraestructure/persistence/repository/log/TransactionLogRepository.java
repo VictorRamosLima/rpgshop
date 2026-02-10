@@ -10,7 +10,6 @@ import rpgshop.domain.entity.log.constant.OperationType;
 import rpgshop.infraestructure.persistence.entity.log.TransactionLogJpaEntity;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 
 @RepositoryDefinition(domainClass = TransactionLogJpaEntity.class, idClass = UUID.class)
@@ -19,37 +18,9 @@ public interface TransactionLogRepository {
     TransactionLogJpaEntity save(@Nonnull final TransactionLogJpaEntity entity);
 
     @Nonnull
-    Optional<TransactionLogJpaEntity> findById(@Nonnull final UUID id);
-
-    @Nonnull
     Page<TransactionLogJpaEntity> findByEntityNameAndEntityId(
         @Nonnull final String entityName,
         @Nonnull final UUID entityId,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<TransactionLogJpaEntity> findByEntityName(
-        @Nonnull final String entityName,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<TransactionLogJpaEntity> findByOperation(
-        @Nonnull final OperationType operation,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<TransactionLogJpaEntity> findByResponsibleUser(
-        @Nonnull final String responsibleUser,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<TransactionLogJpaEntity> findByTimestampBetween(
-        @Nonnull final Instant startDate,
-        @Nonnull final Instant endDate,
         @Nonnull final Pageable pageable
     );
 

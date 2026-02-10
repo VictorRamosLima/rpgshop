@@ -36,6 +36,7 @@ public final class CategoryJpaEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
@@ -56,6 +57,7 @@ public final class CategoryJpaEntity {
     @Column(name = "description")
     private String description;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "categories")
     private List<ProductJpaEntity> products = new ArrayList<>();
 

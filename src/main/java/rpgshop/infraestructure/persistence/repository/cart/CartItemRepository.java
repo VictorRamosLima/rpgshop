@@ -1,9 +1,6 @@
 package rpgshop.infraestructure.persistence.repository.cart;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -23,20 +20,11 @@ public interface CartItemRepository {
     @Nonnull
     Optional<CartItemJpaEntity> findById(@Nonnull final UUID id);
 
-    void deleteById(@Nonnull final UUID id);
-
-    boolean existsById(@Nonnull final UUID id);
-
-    @Nonnull
-    Page<CartItemJpaEntity> findByCartId(@Nonnull final UUID cartId, @Nonnull final Pageable pageable);
-
     @Nonnull
     List<CartItemJpaEntity> findByCartId(@Nonnull final UUID cartId);
 
     @Nonnull
     Optional<CartItemJpaEntity> findByCartIdAndProductId(@Nonnull final UUID cartId, @Nonnull final UUID productId);
-
-    boolean existsByCartIdAndProductId(@Nonnull final UUID cartId, @Nonnull final UUID productId);
 
     @Query("""
         SELECT ci FROM CartItemJpaEntity ci

@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -32,7 +33,10 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "coupons")
+@Entity @Table(name = "coupons", indexes = {
+    @Index(name = "idx_coupons_customer_id_is_used_expires_at", columnList = "customer_id, is_used, expires_at"),
+    @Index(name = "idx_coupons_customer_id_type_is_used", columnList = "customer_id, type, is_used")
+})
 public final class CouponJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)
@@ -45,7 +49,7 @@ public final class CouponJpaEntity {
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @Column(name = "code", nullable = false, updatable = false, unique = true)
@@ -62,6 +66,7 @@ public final class CouponJpaEntity {
     @JoinColumn(name = "customer_id", updatable = false)
     private CustomerJpaEntity customer;
 
+    @Builder.Default
     @Column(name = "is_used", nullable = false)
     private boolean isUsed = false;
 

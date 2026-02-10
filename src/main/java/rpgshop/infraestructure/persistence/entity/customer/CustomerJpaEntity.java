@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -33,7 +34,10 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "customers")
+@Entity @Table(name = "customers", indexes = {
+    @Index(name = "idx_customers_is_active", columnList = "is_active"),
+    @Index(name = "idx_customers_gender", columnList = "gender")
+})
 public final class CustomerJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)
@@ -41,6 +45,7 @@ public final class CustomerJpaEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
@@ -50,7 +55,7 @@ public final class CustomerJpaEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @Enumerated(STRING)
@@ -72,18 +77,22 @@ public final class CustomerJpaEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Builder.Default
     @Column(name = "ranking", nullable = false, precision = 5, scale = 2)
     private BigDecimal ranking = BigDecimal.ZERO;
 
     @Column(name = "customer_code", nullable = false, updatable = false, unique = true)
     private String customerCode;
 
+    @Builder.Default
     @OneToMany(mappedBy = "customer", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<PhoneJpaEntity> phones = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "customer", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<AddressJpaEntity> addresses = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "customer", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<CreditCardJpaEntity> creditCards = new ArrayList<>();
 

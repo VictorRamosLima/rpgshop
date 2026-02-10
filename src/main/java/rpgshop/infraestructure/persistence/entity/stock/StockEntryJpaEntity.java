@@ -64,6 +64,7 @@ public final class StockEntryJpaEntity {
     @Column(name = "entry_date", nullable = false, updatable = false)
     private LocalDate entryDate;
 
+    @Builder.Default
     @Column(name = "is_reentry", nullable = false, updatable = false)
     private boolean isReentry = false;
 }

@@ -27,7 +27,7 @@ public class DeliverOrderUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Order", orderId));
 
         if (order.status() != OrderStatus.IN_TRANSIT) {
-            throw new BusinessRuleException("Only orders with status IN_TRANSIT can be delivered");
+            throw new BusinessRuleException("Somente pedidos com status EM TRANSITO podem ser entregues");
         }
 
         final Order delivered = order.toBuilder()

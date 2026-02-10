@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import rpgshop.infraestructure.persistence.entity.stock.StockEntryJpaEntity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,42 +20,8 @@ public interface StockEntryRepository {
     @Nonnull
     Optional<StockEntryJpaEntity> findById(@Nonnull final UUID id);
 
-    void deleteById(@Nonnull final UUID id);
-
-    boolean existsById(@Nonnull final UUID id);
-
     @Nonnull
     Page<StockEntryJpaEntity> findByProductId(
-        @Nonnull final UUID productId,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<StockEntryJpaEntity> findBySupplierId(
-        @Nonnull final UUID supplierId,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<StockEntryJpaEntity> findByEntryDateBetween(
-        @Nonnull final LocalDate startDate,
-        @Nonnull final LocalDate endDate,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<StockEntryJpaEntity> findByProductIdAndEntryDateBetween(
-        @Nonnull final UUID productId,
-        @Nonnull final LocalDate startDate,
-        @Nonnull final LocalDate endDate,
-        @Nonnull final Pageable pageable
-    );
-
-    @Nonnull
-    Page<StockEntryJpaEntity> findByIsReentryTrue(@Nonnull final Pageable pageable);
-
-    @Nonnull
-    Page<StockEntryJpaEntity> findByProductIdAndIsReentryTrue(
         @Nonnull final UUID productId,
         @Nonnull final Pageable pageable
     );

@@ -1,44 +1,55 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Stock Entries</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Stock Entries</h1>
-    <a href="/">Home</a> | <a href="/products">Products</a>
-    | <a th:href="@{/stock/new(productId=${productId})}">New Entry</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Estoque', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Quantity</th>
-                <th>Cost Value</th>
-                <th>Supplier</th>
-                <th>Entry Date</th>
-                <th>Reentry</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="entry : ${entries.content}">
-                <td th:text="${#strings.substring(entry.id().toString(), 0, 8)}"></td>
-                <td th:text="${entry.quantity()}"></td>
-                <td th:text="${entry.costValue()}"></td>
-                <td th:text="${entry.supplier() != null ? entry.supplier().tradeName() : ''}"></td>
-                <td th:text="${entry.entryDate()}"></td>
-                <td th:text="${entry.isReentry()}"></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div th:if="${entries.totalPages > 1}">
-        <span th:each="i : ${#numbers.sequence(0, entries.totalPages - 1)}">
-            <a th:href="@{/stock/product/{productId}(productId=${productId}, page=${i})}"
-               th:text="${i + 1}"
-               th:if="${i != entries.number}"></a>
-            <strong th:text="${i + 1}" th:if="${i == entries.number}"></strong>
-        </span>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <a href="/products">Produtos</a> <span>/</span> <span>Estoque</span>
     </div>
-</body>
+
+    <div class="page-header">
+        <h1>&#128230; Historico de Estoque</h1>
+        <a th:href="@{/stock/new(productId=${productId})}" class="btn btn-primary">Nova Entrada</a>
+    </div>
+
+    <div th:if="${entries != null and !entries.content.isEmpty()}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data de Entrada</th>
+                    <th>Quantidade</th>
+                    <th>Valor de Custo</th>
+                    <th>Fornecedor</th>
+                    <th>Reentrada</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry : ${entries.content}">
+                    <td th:text="${entry.entryDate()}"></td>
+                    <td th:text="${entry.quantity()}"></td>
+                    <td th:text="'R$ ' + ${#numbers.formatDecimal(entry.costValue(), 1, 2)}"></td>
+                    <td th:text="${entry.supplier() != null ? entry.supplier().name() : 'N/A'}"></td>
+                    <td>
+                        <span th:if="${entry.isReentry()}" class="badge badge-warning">Sim</span>
+                        <span th:unless="${entry.isReentry()}" class="badge badge-active">Nao</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination" th:if="${entries.totalPages > 1}">
+            <span th:each="i : ${#numbers.sequence(0, entries.totalPages - 1)}">
+                <a th:href="@{/stock/product/{pid}(pid=${productId}, page=${i})}" th:text="${i + 1}" th:if="${i != entries.number}"></a>
+                <strong th:text="${i + 1}" th:if="${i == entries.number}"></strong>
+            </span>
+        </div>
+    </div>
+
+    <div th:if="${entries == null or entries.content.isEmpty()}" class="empty-state">
+        <div class="empty-state-icon">&#128230;</div>
+        <div class="empty-state-text">Nenhuma entrada de estoque encontrada</div>
+        <p><a th:href="@{/stock/new(productId=${productId})}">Registrar primeira entrada</a></p>
+    </div>
+
+</div>
 </html>

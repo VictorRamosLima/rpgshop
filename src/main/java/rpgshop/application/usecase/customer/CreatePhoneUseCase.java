@@ -26,13 +26,13 @@ public class CreatePhoneUseCase {
     @Transactional
     public Phone execute(@Nonnull final CreatePhoneCommand command) {
         if (command.type() == null) {
-            throw new BusinessRuleException("Phone type is required");
+            throw new BusinessRuleException("O tipo de telefone e obrigatorio");
         }
         if (command.areaCode() == null || command.areaCode().isBlank()) {
             throw new BusinessRuleException("Area code is required");
         }
         if (command.number() == null || command.number().isBlank()) {
-            throw new BusinessRuleException("Phone number is required");
+            throw new BusinessRuleException("O numero de telefone e obrigatorio");
         }
 
         customerGateway.findById(command.customerId())
@@ -41,7 +41,7 @@ public class CreatePhoneUseCase {
         if (phoneGateway.existsByCustomerIdAndAreaCodeAndNumber(
             command.customerId(), command.areaCode(), command.number()
         )) {
-            throw new BusinessRuleException("This phone number is already registered for this customer");
+            throw new BusinessRuleException("Este numero de telefone ja esta cadastrado para este cliente");
         }
 
         final Phone phone = Phone.builder()

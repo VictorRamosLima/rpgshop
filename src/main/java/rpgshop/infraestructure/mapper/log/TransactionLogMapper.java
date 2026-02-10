@@ -1,12 +1,12 @@
 package rpgshop.infraestructure.mapper.log;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 import org.springframework.util.Assert;
 import rpgshop.application.exception.IllegalInstantiationException;
 import rpgshop.domain.entity.log.TransactionLog;
 import rpgshop.infraestructure.persistence.entity.log.TransactionLogJpaEntity;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public final class TransactionLogMapper {
     private static final ObjectMapper objectMapper = new ObjectMapper();

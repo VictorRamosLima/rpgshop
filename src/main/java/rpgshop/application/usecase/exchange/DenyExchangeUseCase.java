@@ -34,7 +34,7 @@ public class DenyExchangeUseCase {
             .orElseThrow(() -> new EntityNotFoundException("ExchangeRequest", exchangeRequestId));
 
         if (request.status() != ExchangeStatus.REQUESTED) {
-            throw new BusinessRuleException("Only requests with status REQUESTED can be denied");
+            throw new BusinessRuleException("Somente solicitacoes com status SOLICITADO podem ser negadas");
         }
 
         final ExchangeRequest denied = request.toBuilder()

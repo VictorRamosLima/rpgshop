@@ -87,13 +87,13 @@ public class UpdateProductUseCase {
             && !command.sku().equals(existing.sku())
             && productGateway.existsBySku(command.sku())
         ) {
-            throw new BusinessRuleException("A product with SKU '%s' already exists".formatted(command.sku()));
+            throw new BusinessRuleException("Ja existe um produto com o SKU '%s'".formatted(command.sku()));
         }
         if (command.barcode() != null && !command.barcode().isBlank()
             && !command.barcode().equals(existing.barcode())
             && productGateway.existsByBarcode(command.barcode())
         ) {
-            throw new BusinessRuleException("A product with barcode '%s' already exists".formatted(command.barcode()));
+            throw new BusinessRuleException("Ja existe um produto com o codigo de barras '%s'".formatted(command.barcode()));
         }
     }
 

@@ -41,7 +41,7 @@ public class CreateStockReentryUseCase {
         @Nonnull final UUID supplierId
     ) {
         if (quantity <= 0) {
-            throw new BusinessRuleException("Quantity must be greater than zero");
+            throw new BusinessRuleException("A quantidade deve ser maior que zero");
         }
 
         final Product product = productGateway.findById(productId)

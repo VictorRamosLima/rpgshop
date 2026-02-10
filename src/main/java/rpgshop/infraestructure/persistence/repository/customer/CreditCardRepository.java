@@ -1,8 +1,6 @@
 package rpgshop.infraestructure.persistence.repository.customer;
 
 import jakarta.annotation.Nonnull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -20,16 +18,6 @@ public interface CreditCardRepository {
 
     @Nonnull
     Optional<CreditCardJpaEntity> findById(@Nonnull final UUID id);
-
-    void deleteById(@Nonnull final UUID id);
-
-    boolean existsById(@Nonnull final UUID id);
-
-    @Nonnull
-    Page<CreditCardJpaEntity> findByCustomerId(
-        @Nonnull final UUID customerId,
-        @Nonnull final Pageable pageable
-    );
 
     @Nonnull
     List<CreditCardJpaEntity> findByCustomerIdAndIsActiveTrue(@Nonnull final UUID customerId);

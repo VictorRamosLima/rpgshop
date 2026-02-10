@@ -51,13 +51,17 @@ public final class OrderJpaEntity {
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Column(name = "order_code", nullable = false, updatable = false, unique = true)
+    private String orderCode;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "customer_id", nullable = false, updatable = false)
     private CustomerJpaEntity customer;
 
+    @Builder.Default
     @Enumerated(STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status = PROCESSING;
@@ -84,9 +88,11 @@ public final class OrderJpaEntity {
     @Column(name = "delivered_at")
     private Instant deliveredAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<OrderItemJpaEntity> items = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<OrderPaymentJpaEntity> payments = new ArrayList<>();
 }

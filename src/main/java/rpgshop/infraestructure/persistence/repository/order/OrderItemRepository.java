@@ -21,18 +21,8 @@ public interface OrderItemRepository {
     @Nonnull
     Optional<OrderItemJpaEntity> findById(@Nonnull final UUID id);
 
-    void deleteById(@Nonnull final UUID id);
-
-    boolean existsById(@Nonnull final UUID id);
-
     @Nonnull
     List<OrderItemJpaEntity> findByOrderId(@Nonnull final UUID orderId);
-
-    @Nonnull
-    Page<OrderItemJpaEntity> findByOrderId(
-        @Nonnull final UUID orderId,
-        @Nonnull final Pageable pageable
-    );
 
     @Nonnull
     @Query("""

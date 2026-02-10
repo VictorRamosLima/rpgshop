@@ -1,59 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Exchange Requests</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Exchange Requests</h1>
-    <a href="/">Home</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Trocas', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <h2>Filter</h2>
-    <form method="get" action="/exchanges">
-        <label>Status:
-            <select name="status">
-                <option value="">All</option>
-                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${param.status != null && param.status.toString() == s.toString()}"></option>
-            </select>
-        </label>
-        <button type="submit">Filter</button>
-    </form>
-
-    <h2>Results</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Order</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Status</th>
-                <th>Reason</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="exchange : ${exchanges.content}">
-                <td th:text="${#strings.substring(exchange.id().toString(), 0, 8)}"></td>
-                <td th:text="${exchange.order() != null ? #strings.substring(exchange.order().id().toString(), 0, 8) : ''}"></td>
-                <td th:text="${exchange.orderItem() != null && exchange.orderItem().product() != null ? exchange.orderItem().product().name() : ''}"></td>
-                <td th:text="${exchange.quantity()}"></td>
-                <td th:text="${exchange.status()}"></td>
-                <td th:text="${exchange.reason()}"></td>
-                <td>
-                    <a th:href="@{/exchanges/{id}(id=${exchange.id()})}">View</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div th:if="${exchanges.totalPages > 1}">
-        <span th:each="i : ${#numbers.sequence(0, exchanges.totalPages - 1)}">
-            <a th:href="@{/exchanges(page=${i}, status=${param.status})}"
-               th:text="${i + 1}"
-               th:if="${i != exchanges.number}"></a>
-            <strong th:text="${i + 1}" th:if="${i == exchanges.number}"></strong>
-        </span>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <span>Trocas</span>
     </div>
-</body>
+
+    <div class="page-header">
+        <h1>&#128260; Solicitacoes de Troca</h1>
+    </div>
+
+    <div class="filter-bar">
+        <form method="get" action="/exchanges" class="form-inline">
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status">
+                    <option value="">Todos</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${param.status != null and param.status.toString() == s.toString()}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${exchanges != null and !exchanges.content.isEmpty()}">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Pedido</th>
+                    <th>Produto</th>
+                    <th>Qtd</th>
+                    <th>Status</th>
+                    <th>Motivo</th>
+                    <th>Data</th>
+                    <th>Acoes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="ex : ${exchanges.content}">
+                    <td th:text="${#strings.abbreviate(ex.id().toString(), 12)}"></td>
+                    <td th:text="${#strings.abbreviate(ex.order().id().toString(), 12)}"></td>
+                    <td th:text="${ex.orderItem() != null and ex.orderItem().product() != null ? ex.orderItem().product().name() : 'N/A'}"></td>
+                    <td th:text="${ex.quantity()}"></td>
+                    <td>
+                        <span class="badge" th:classappend="${ex.status().name() == 'AUTHORIZED' ? 'badge-active' : (ex.status().name() == 'DENIED' ? 'badge-inactive' : 'badge-warning')}" th:text="${ex.status()}"></span>
+                    </td>
+                    <td th:text="${#strings.abbreviate(ex.reason(), 30)}"></td>
+                    <td th:text="${ex.createdAt()}"></td>
+                    <td>
+                        <a th:href="@{/exchanges/{id}(id=${ex.id()})}" class="btn btn-sm btn-outline">Detalhes</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination" th:if="${exchanges.totalPages > 1}">
+            <span th:each="i : ${#numbers.sequence(0, exchanges.totalPages - 1)}">
+                <a th:href="@{/exchanges(page=${i}, status=${param.status})}" th:text="${i + 1}" th:if="${i != exchanges.number}"></a>
+                <strong th:text="${i + 1}" th:if="${i == exchanges.number}"></strong>
+            </span>
+        </div>
+    </div>
+
+    <div th:if="${exchanges == null or exchanges.content.isEmpty()}" class="empty-state">
+        <div class="empty-state-icon">&#128260;</div>
+        <div class="empty-state-text">Nenhuma solicitacao de troca encontrada</div>
+    </div>
+
+</div>
 </html>

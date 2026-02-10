@@ -13,17 +13,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +30,7 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 
-@SuperBuilder
+@Builder
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,6 +42,7 @@ public final class ProductJpaEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
@@ -67,8 +67,8 @@ public final class ProductJpaEntity {
     @ManyToMany
     @JoinTable(
         name = "product_categories",
-        joinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false),
-        inverseJoinColumns = @JoinColumn(name = "category_id", nullable = false, updatable = false)
+        joinColumns = @JoinColumn(name = "product_id", nullable = false),
+        inverseJoinColumns = @JoinColumn(name = "category_id", nullable = false)
     )
     private List<CategoryJpaEntity> categories;
 

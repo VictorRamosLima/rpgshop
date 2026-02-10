@@ -72,34 +72,34 @@ public class CreateCustomerUseCase {
 
     private void validateRequiredFields(final CreateCustomerCommand command) {
         if (command.gender() == null) {
-            throw new BusinessRuleException("Gender is required");
+            throw new BusinessRuleException("O genero e obrigatorio");
         }
         if (command.name() == null || command.name().isBlank()) {
-            throw new BusinessRuleException("Name is required");
+            throw new BusinessRuleException("O nome e obrigatorio");
         }
         if (command.dateOfBirth() == null) {
-            throw new BusinessRuleException("Date of birth is required");
+            throw new BusinessRuleException("A data de nascimento e obrigatoria");
         }
         if (command.cpf() == null || command.cpf().isBlank()) {
-            throw new BusinessRuleException("CPF is required");
+            throw new BusinessRuleException("O CPF e obrigatorio");
         }
         if (command.email() == null || command.email().isBlank()) {
-            throw new BusinessRuleException("Email is required");
+            throw new BusinessRuleException("O e-mail e obrigatorio");
         }
         if (command.phoneType() == null) {
-            throw new BusinessRuleException("Phone type is required");
+            throw new BusinessRuleException("O tipo de telefone e obrigatorio");
         }
         if (command.phoneAreaCode() == null || command.phoneAreaCode().isBlank()) {
-            throw new BusinessRuleException("Phone area code is required");
+            throw new BusinessRuleException("O DDD e obrigatorio");
         }
         if (command.phoneNumber() == null || command.phoneNumber().isBlank()) {
-            throw new BusinessRuleException("Phone number is required");
+            throw new BusinessRuleException("O numero de telefone e obrigatorio");
         }
     }
 
     private void validatePassword(final String password, final String confirmPassword) {
         if (password == null || password.isBlank()) {
-            throw new BusinessRuleException("Password is required");
+            throw new BusinessRuleException("A senha e obrigatoria");
         }
         if (!STRONG_PASSWORD.matcher(password).matches()) {
             throw new BusinessRuleException(
@@ -107,16 +107,16 @@ public class CreateCustomerUseCase {
             );
         }
         if (!password.equals(confirmPassword)) {
-            throw new BusinessRuleException("Passwords do not match");
+            throw new BusinessRuleException("As senhas nao coincidem");
         }
     }
 
     private void validateUniqueFields(final CreateCustomerCommand command) {
         if (customerGateway.existsByCpf(command.cpf())) {
-            throw new BusinessRuleException("A customer with CPF '%s' already exists".formatted(command.cpf()));
+            throw new BusinessRuleException("Ja existe um cliente com o CPF '%s'".formatted(command.cpf()));
         }
         if (customerGateway.existsByEmail(command.email())) {
-            throw new BusinessRuleException("A customer with email '%s' already exists".formatted(command.email()));
+            throw new BusinessRuleException("Ja existe um cliente com o e-mail '%s'".formatted(command.email()));
         }
     }
 

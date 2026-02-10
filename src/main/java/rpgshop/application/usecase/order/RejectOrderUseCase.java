@@ -26,7 +26,7 @@ public class RejectOrderUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Order", orderId));
 
         if (order.status() != OrderStatus.PROCESSING) {
-            throw new BusinessRuleException("Only orders with status PROCESSING can be rejected");
+            throw new BusinessRuleException("Somente pedidos com status EM PROCESSAMENTO podem ser rejeitados");
         }
 
         final Order rejected = order.toBuilder()

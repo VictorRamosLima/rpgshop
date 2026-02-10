@@ -1,42 +1,88 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Exchange Detail</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Exchange Detail</h1>
-    <a href="/">Home</a> | <a href="/exchanges">Back to Exchanges</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Detalhe da Troca', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
-
-    <h2>Info</h2>
-    <p>ID: <span th:text="${exchange.id()}"></span></p>
-    <p>Status: <span th:text="${exchange.status()}"></span></p>
-    <p>Quantity: <span th:text="${exchange.quantity()}"></span></p>
-    <p>Reason: <span th:text="${exchange.reason()}"></span></p>
-    <p>Order: <a th:href="@{/orders/{id}(id=${exchange.order().id()})}" th:text="${exchange.order().id()}"></a></p>
-    <p>Product: <span th:text="${exchange.orderItem() != null && exchange.orderItem().product() != null ? exchange.orderItem().product().name() : ''}"></span></p>
-    <p th:if="${exchange.authorizedAt() != null}">Authorized At: <span th:text="${exchange.authorizedAt()}"></span></p>
-    <p th:if="${exchange.receivedAt() != null}">Received At: <span th:text="${exchange.receivedAt()}"></span></p>
-    <p>Return to Stock: <span th:text="${exchange.returnToStock()}"></span></p>
-    <p th:if="${exchange.coupon() != null}">Coupon: <span th:text="${exchange.coupon().code()}"></span> (Value: <span th:text="${exchange.coupon().value()}"></span>)</p>
-
-    <h3>Actions</h3>
-    <div>
-        <form method="post" th:action="@{/exchanges/{id}/authorize(id=${exchange.id()})}" style="display:inline;"
-              th:if="${exchange.status().name() == 'REQUESTED'}">
-            <button type="submit">Authorize</button>
-        </form>
-        <form method="post" th:action="@{/exchanges/{id}/deny(id=${exchange.id()})}" style="display:inline;"
-              th:if="${exchange.status().name() == 'REQUESTED'}">
-            <button type="submit">Deny</button>
-        </form>
-        <form method="post" th:action="@{/exchanges/{id}/receive(id=${exchange.id()})}"
-              th:if="${exchange.status().name() == 'AUTHORIZED'}">
-            <label>Return to Stock: <input type="checkbox" name="returnToStock" value="true"/></label>
-            <button type="submit">Receive Items</button>
-        </form>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <a href="/exchanges">Trocas</a> <span>/</span> <span>Detalhe</span>
     </div>
-</body>
+
+    <div class="page-header">
+        <h1>Detalhes da Solicitacao de Troca</h1>
+        <span class="badge" th:classappend="${exchange.status().name() == 'AUTHORIZED' ? 'badge-active' : (exchange.status().name() == 'DENIED' ? 'badge-inactive' : 'badge-warning')}" th:text="${exchange.status()}"></span>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="detail-grid">
+        <div class="card">
+            <div class="card-header">Informacoes da Troca</div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">ID da Troca</div>
+                    <div class="info-value" th:text="${exchange.id()}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Pedido</div>
+                    <div class="info-value">
+                        <a th:href="@{/orders/{id}(id=${exchange.order().id()})}" th:text="${exchange.order().id()}"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">Produto</div>
+                    <div class="info-value" th:text="${exchange.orderItem() != null and exchange.orderItem().product() != null ? exchange.orderItem().product().name() : 'N/A'}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Quantidade</div>
+                    <div class="info-value" th:text="${exchange.quantity()}"></div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Motivo</div>
+                <div class="info-value" th:text="${exchange.reason()}"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Datas</div>
+            <div class="info-group">
+                <div class="info-label">Solicitado em</div>
+                <div class="info-value" th:text="${exchange.createdAt()}"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Autorizado em</div>
+                <div class="info-value" th:text="${exchange.authorizedAt() != null ? exchange.authorizedAt() : 'Pendente'}"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Recebido em</div>
+                <div class="info-value" th:text="${exchange.receivedAt() != null ? exchange.receivedAt() : 'Pendente'}"></div>
+            </div>
+            <div class="info-group" th:if="${exchange.coupon() != null}">
+                <div class="info-label">Cupom de Troca Gerado</div>
+                <div class="info-value" th:text="${exchange.coupon().code()}"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Acoes</div>
+        <div class="btn-group">
+            <form method="post" th:action="@{/exchanges/{id}/authorize(id=${exchange.id()})}" th:if="${exchange.status().name() == 'REQUESTED'}" style="display:inline;">
+                <button type="submit" class="btn btn-success">Autorizar Troca</button>
+            </form>
+            <form method="post" th:action="@{/exchanges/{id}/deny(id=${exchange.id()})}" th:if="${exchange.status().name() == 'REQUESTED'}" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Negar Troca</button>
+            </form>
+            <form method="post" th:action="@{/exchanges/{id}/receive(id=${exchange.id()})}" th:if="${exchange.status().name() == 'AUTHORIZED'}" style="display:inline-flex;gap:0.5rem;align-items:center;">
+                <label style="color:var(--color-text);margin:0;">
+                    <input type="checkbox" name="returnToStock" value="true"/> Devolver ao estoque
+                </label>
+                <button type="submit" class="btn btn-primary">Confirmar Recebimento</button>
+            </form>
+        </div>
+    </div>
+
+</div>
 </html>

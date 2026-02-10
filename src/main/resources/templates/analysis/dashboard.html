@@ -1,19 +1,33 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Sales Analysis</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Sales Analysis</h1>
-    <a href="/">Home</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Analises', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <nav>
-        <ul>
-            <li><a href="/analysis/sales">Sales by Period</a></li>
-            <li><a href="/analysis/by-product">Sales by Product</a></li>
-            <li><a href="/analysis/by-category">Sales by Category</a></li>
-        </ul>
-    </nav>
-</body>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <span>Analises</span>
+    </div>
+
+    <div class="page-header">
+        <h1>&#128200; Painel de Analises</h1>
+    </div>
+
+    <div class="home-cards">
+        <a href="/analysis/sales" class="home-card">
+            <div class="home-card-icon">&#128176;</div>
+            <div class="home-card-title">Vendas por Periodo</div>
+            <div class="home-card-desc">Consulte as vendas realizadas em um determinado periodo</div>
+        </a>
+        <a href="/analysis/by-product" class="home-card">
+            <div class="home-card-icon">&#127922;</div>
+            <div class="home-card-title">Vendas por Produto</div>
+            <div class="home-card-desc">Analise as vendas de um produto especifico</div>
+        </a>
+        <a href="/analysis/by-category" class="home-card">
+            <div class="home-card-icon">&#128218;</div>
+            <div class="home-card-title">Vendas por Categoria</div>
+            <div class="home-card-desc">Analise as vendas filtradas por categoria</div>
+        </a>
+    </div>
+
+</div>
 </html>

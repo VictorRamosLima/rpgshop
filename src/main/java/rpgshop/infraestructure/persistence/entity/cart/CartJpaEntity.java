@@ -45,13 +45,14 @@ public final class CartJpaEntity {
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "customer_id", nullable = false, updatable = false, unique = true)
     private CustomerJpaEntity customer;
 
+    @Builder.Default
     @OneToMany(mappedBy = "cart", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<CartItemJpaEntity> items = new ArrayList<>();
 }

@@ -27,7 +27,7 @@ public class DispatchOrderUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Order", orderId));
 
         if (order.status() != OrderStatus.APPROVED) {
-            throw new BusinessRuleException("Only orders with status APPROVED can be dispatched");
+            throw new BusinessRuleException("Somente pedidos com status APROVADO podem ser despachados");
         }
 
         final Order dispatched = order.toBuilder()

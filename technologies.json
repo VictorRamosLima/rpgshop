@@ -1,0 +1,27 @@
+{
+  "frontend": {
+    "language": "HTML",
+    "core": "Thymeleaf",
+    "styling": "Vanilla SCSS"
+  },
+  "backend": {
+    "language": "Java 25 (LTS)",
+    "buildTool": "Gradle (Kotlin DSL)",
+    "web": {
+      "framework": "Spring Boot 4.0.2"
+    },
+    "persistence": {
+      "jpa": "Spring Data JPA 4.0.2",
+      "orm": "Hibernate 7.2.3",
+      "migrations": "Flyway 12.0.0",
+      "database": {
+        "engine": "PostgreSQL"
+      }
+    },
+    "testing": {
+      "unit": ["JUnit 6.0.2", "Mockito 5.21.0"],
+      "e2e": "Testcontainers"
+    },
+    "tooling": ["Lombok 1.18.42", "Vavr 0.11.0"]
+  }
+}

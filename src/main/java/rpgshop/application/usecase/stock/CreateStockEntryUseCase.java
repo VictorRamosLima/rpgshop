@@ -67,19 +67,19 @@ public class CreateStockEntryUseCase {
 
     private void validateRequiredFields(final CreateStockEntryCommand command) {
         if (command.productId() == null) {
-            throw new BusinessRuleException("Product is required");
+            throw new BusinessRuleException("O produto e obrigatorio");
         }
         if (command.quantity() == null || command.quantity() <= 0) {
-            throw new BusinessRuleException("Quantity must be greater than zero");
+            throw new BusinessRuleException("A quantidade deve ser maior que zero");
         }
         if (command.costValue() == null || command.costValue().compareTo(ZERO) <= 0) {
-            throw new BusinessRuleException("Cost value must be greater than zero");
+            throw new BusinessRuleException("O valor de custo deve ser maior que zero");
         }
         if (command.supplierId() == null) {
-            throw new BusinessRuleException("Supplier is required");
+            throw new BusinessRuleException("O fornecedor e obrigatorio");
         }
         if (command.entryDate() == null) {
-            throw new BusinessRuleException("Entry date is required");
+            throw new BusinessRuleException("A data de entrada e obrigatoria");
         }
     }
 

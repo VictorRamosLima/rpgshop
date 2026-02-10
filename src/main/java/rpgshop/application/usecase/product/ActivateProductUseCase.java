@@ -21,10 +21,10 @@ public class ActivateProductUseCase {
     @Transactional
     public Product execute(@Nonnull final ActivateProductCommand command) {
         if (command.reason() == null || command.reason().isBlank()) {
-            throw new BusinessRuleException("Activation reason is required for activation");
+            throw new BusinessRuleException("O motivo da ativacao e obrigatorio");
         }
         if (command.category() == null) {
-            throw new BusinessRuleException("Activation category is required for reactivation");
+            throw new BusinessRuleException("A categoria da ativacao e obrigatoria para reativacao");
         }
 
         final Product product = productGateway
@@ -32,7 +32,7 @@ public class ActivateProductUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Product", command.productId()));
 
         if (product.isActive()) {
-            throw new BusinessRuleException("Product is already active");
+            throw new BusinessRuleException("O produto ja esta ativo");
         }
 
         final Product activated = product.activate(

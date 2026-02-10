@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -28,7 +29,10 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "cart_items")
+@Entity @Table(name = "cart_items", indexes = {
+    @Index(name = "idx_cart_items_cart_id", columnList = "cart_id"),
+    @Index(name = "idx_cart_items_cart_id_product_id", columnList = "cart_id, product_id")
+})
 public final class CartItemJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)
@@ -41,7 +45,7 @@ public final class CartItemJpaEntity {
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @ManyToOne(fetch = LAZY)
@@ -55,6 +59,7 @@ public final class CartItemJpaEntity {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @Builder.Default
     @Column(name = "is_blocked", nullable = false)
     private boolean isBlocked = true;
 

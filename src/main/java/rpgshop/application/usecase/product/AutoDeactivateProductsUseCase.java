@@ -23,7 +23,7 @@ public class AutoDeactivateProductsUseCase {
     @Transactional
     public int execute(final BigDecimal threshold) {
         if (threshold == null || threshold.compareTo(ZERO) <= 0) {
-            throw new BusinessRuleException("Threshold must be greater than zero");
+            throw new BusinessRuleException("O limite deve ser maior que zero");
         }
 
         final List<UUID> ids = productGateway.findEligibleForAutoDeactivation(threshold);

@@ -20,10 +20,6 @@ public interface CustomerRepository {
 
     Optional<CustomerJpaEntity> findById(@Nonnull final UUID id);
 
-    void deleteById(@Nonnull final UUID id);
-
-    boolean existsById(@Nonnull final UUID id);
-
     @Nonnull
     @Query("""
         SELECT c FROM CustomerJpaEntity c
@@ -44,20 +40,9 @@ public interface CustomerRepository {
         @Nonnull final Pageable pageable
     );
 
-    @Nonnull
-    Optional<CustomerJpaEntity> findByCpf(@Nonnull final String cpf);
-
-    @Nonnull
-    Optional<CustomerJpaEntity> findByEmail(@Nonnull final String email);
-
-    @Nonnull
-    Optional<CustomerJpaEntity> findByCustomerCode(@Nonnull final String customerCode);
-
     boolean existsByCpf(@Nonnull final String cpf);
 
     boolean existsByEmail(@Nonnull final String email);
-
-    boolean existsByCustomerCode(@Nonnull final String customerCode);
 
     @Modifying
     @Query("UPDATE CustomerJpaEntity c SET c.password = :password WHERE c.id = :id")
@@ -65,12 +50,4 @@ public interface CustomerRepository {
         @Param("id") @Nonnull final UUID id,
         @Param("password") @Nonnull final String password
     );
-
-    Page<CustomerJpaEntity> findByIsActiveTrueOrderByRankingDesc(@Nonnull final Pageable pageable);
-
-    Page<CustomerJpaEntity> findByIsActiveTrue(@Nonnull final Pageable pageable);
-
-    Page<CustomerJpaEntity> findByIsActiveFalse(@Nonnull final Pageable pageable);
-
-    Optional<CustomerJpaEntity> findByEmailAndIsActiveTrue(@Nonnull final String email);
 }

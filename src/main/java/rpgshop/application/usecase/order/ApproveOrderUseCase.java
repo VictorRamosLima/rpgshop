@@ -31,7 +31,7 @@ public class ApproveOrderUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Order", orderId));
 
         if (order.status() != OrderStatus.PROCESSING) {
-            throw new BusinessRuleException("Only orders with status PROCESSING can be approved");
+            throw new BusinessRuleException("Somente pedidos com status EM PROCESSAMENTO podem ser aprovados");
         }
 
         for (final OrderItem item : order.items()) {

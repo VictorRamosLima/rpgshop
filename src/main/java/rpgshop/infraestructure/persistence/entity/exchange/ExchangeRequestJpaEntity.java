@@ -48,7 +48,7 @@ public final class ExchangeRequestJpaEntity {
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @ManyToOne(fetch = LAZY)
@@ -62,6 +62,7 @@ public final class ExchangeRequestJpaEntity {
     @Column(name = "quantity", nullable = false, updatable = false)
     private Integer quantity;
 
+    @Builder.Default
     @Enumerated(STRING)
     @Column(name = "status", nullable = false)
     private ExchangeStatus status = REQUESTED;
@@ -75,6 +76,7 @@ public final class ExchangeRequestJpaEntity {
     @Column(name = "received_at")
     private Instant receivedAt;
 
+    @Builder.Default
     @Column(name = "return_to_stock", nullable = false)
     private boolean returnToStock = false;
 

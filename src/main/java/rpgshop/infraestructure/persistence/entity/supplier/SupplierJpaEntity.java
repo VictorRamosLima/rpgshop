@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,9 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "suppliers")
+@Entity @Table(name = "suppliers", indexes = {
+    @Index(name = "idx_suppliers_is_active", columnList = "is_active")
+})
 public final class SupplierJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

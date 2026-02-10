@@ -32,7 +32,13 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "addresses")
+@Entity @Table(name = "addresses", indexes = {
+    @Index(name = "idx_addresses_customer_id_is_active", columnList = "customer_id, is_active"),
+    @Index(
+        name = "idx_addresses_customer_id_purpose_is_active",
+        columnList = "customer_id, purpose, is_active"
+    )
+})
 public final class AddressJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

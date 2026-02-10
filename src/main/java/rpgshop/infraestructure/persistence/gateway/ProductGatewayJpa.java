@@ -1,12 +1,11 @@
 package rpgshop.infraestructure.persistence.gateway;
 
-import rpgshop.application.command.product.ProductFilter;
-import rpgshop.application.gateway.product.ProductGateway;
-import rpgshop.domain.entity.product.Product;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import rpgshop.application.command.product.ProductFilter;
+import rpgshop.application.gateway.product.ProductGateway;
+import rpgshop.domain.entity.product.Product;
 import rpgshop.infraestructure.mapper.product.ProductMapper;
 import rpgshop.infraestructure.persistence.entity.product.ProductJpaEntity;
 import rpgshop.infraestructure.persistence.repository.product.ProductRepository;
@@ -21,12 +20,12 @@ import java.util.UUID;
 public class ProductGatewayJpa implements ProductGateway {
     private final ProductRepository productRepository;
 
-    public ProductGatewayJpa(ProductRepository productRepository) {
+    public ProductGatewayJpa(final ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
     @Override
-    public Product save(Product product) {
+    public Product save(final Product product) {
         ProductJpaEntity jpaEntity = ProductMapper.toEntity(product);
         ProductJpaEntity saved = productRepository.save(jpaEntity);
         return ProductMapper.toDomain(saved);
@@ -54,17 +53,17 @@ public class ProductGatewayJpa implements ProductGateway {
     }
 
     @Override
-    public List<UUID> findEligibleForAutoDeactivation(BigDecimal threshold) {
+    public List<UUID> findEligibleForAutoDeactivation(final BigDecimal threshold) {
         return productRepository.findEligibleForAutoInactivation(threshold);
     }
 
     @Override
-    public boolean existsBySku(String sku) {
+    public boolean existsBySku(final String sku) {
         return productRepository.existsBySku(sku);
     }
 
     @Override
-    public boolean existsByBarcode(String barcode) {
+    public boolean existsByBarcode(final String barcode) {
         return productRepository.existsByBarcode(barcode);
     }
 

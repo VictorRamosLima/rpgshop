@@ -48,7 +48,13 @@ public class TransactionLogGatewayJpa implements TransactionLogGateway {
         final Pageable pageable
     ) {
         return transactionLogRepository.findByFilters(
-            entityName, entityId, operation, responsibleUser, startDate, endDate, pageable
+            entityName,
+            entityId,
+            operation,
+            responsibleUser,
+            startDate,
+            endDate,
+            pageable
         ).map(TransactionLogMapper::toDomain);
     }
 }

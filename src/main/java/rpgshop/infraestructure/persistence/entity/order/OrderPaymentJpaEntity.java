@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -30,7 +31,14 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "order_payments")
+@Entity @Table(name = "order_payments", indexes = {
+    @Index(name = "idx_order_payments_order_id", columnList = "order_id"),
+    @Index(
+        name = "idx_order_payments_coupon_id",
+        columnList = "coupon_id",
+        options = "WHERE coupon_id IS NOT NULL"
+    )
+})
 public final class OrderPaymentJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

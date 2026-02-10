@@ -39,13 +39,17 @@ public class AddressGatewayJpa implements AddressGateway {
     @Override
     public List<Address> findActiveByCustomerId(final UUID customerId) {
         return addressRepository.findByCustomerIdAndIsActiveTrue(customerId)
-            .stream().map(AddressMapper::toDomain).toList();
+            .stream()
+            .map(AddressMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<Address> findByCustomerIdAndPurpose(final UUID customerId, final AddressPurpose purpose) {
         return addressRepository.findByCustomerIdAndPurposeAndIsActiveTrue(customerId, purpose)
-            .stream().map(AddressMapper::toDomain).toList();
+            .stream()
+            .map(AddressMapper::toDomain)
+            .toList();
     }
 
     @Override

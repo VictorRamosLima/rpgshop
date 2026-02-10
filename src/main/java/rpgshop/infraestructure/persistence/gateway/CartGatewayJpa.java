@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import rpgshop.application.gateway.cart.CartGateway;
 import rpgshop.domain.entity.cart.Cart;
 import rpgshop.infraestructure.mapper.cart.CartMapper;
+import rpgshop.infraestructure.persistence.entity.cart.CartJpaEntity;
 import rpgshop.infraestructure.persistence.repository.cart.CartRepository;
 
 import java.util.Optional;
@@ -19,8 +20,8 @@ public class CartGatewayJpa implements CartGateway {
 
     @Override
     public Cart save(final Cart cart) {
-        final var entity = CartMapper.toEntity(cart);
-        final var saved = cartRepository.save(entity);
+        final CartJpaEntity entity = CartMapper.toEntity(cart);
+        final CartJpaEntity saved = cartRepository.save(entity);
         return CartMapper.toDomain(saved);
     }
 

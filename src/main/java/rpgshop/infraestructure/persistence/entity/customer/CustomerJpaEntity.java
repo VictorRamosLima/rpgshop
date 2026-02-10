@@ -36,7 +36,8 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @AllArgsConstructor
 @Entity @Table(name = "customers", indexes = {
     @Index(name = "idx_customers_is_active", columnList = "is_active"),
-    @Index(name = "idx_customers_gender", columnList = "gender")
+    @Index(name = "idx_customers_gender", columnList = "gender"),
+    @Index(name = "idx_customers_name_lower", columnList = "LOWER(name)")
 })
 public final class CustomerJpaEntity {
     @Id

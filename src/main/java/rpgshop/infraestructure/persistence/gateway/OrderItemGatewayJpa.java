@@ -41,13 +41,17 @@ public class OrderItemGatewayJpa implements OrderItemGateway {
     @Override
     public List<OrderItem> findByOrderId(final UUID orderId) {
         return orderItemRepository.findByOrderId(orderId)
-            .stream().map(OrderItemMapper::toDomain).toList();
+            .stream()
+            .map(OrderItemMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<OrderItem> findDeliveredItemsByOrderId(final UUID orderId) {
         return orderItemRepository.findDeliveredItemsByOrderId(orderId)
-            .stream().map(OrderItemMapper::toDomain).toList();
+            .stream()
+            .map(OrderItemMapper::toDomain)
+            .toList();
     }
 
     @Override

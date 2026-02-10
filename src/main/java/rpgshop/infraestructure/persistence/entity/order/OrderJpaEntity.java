@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -38,7 +39,16 @@ import static rpgshop.domain.entity.order.constant.OrderStatus.PROCESSING;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "orders")
+@Entity @Table(name = "orders", indexes = {
+    @Index(name = "idx_orders_customer_id", columnList = "customer_id"),
+    @Index(name = "idx_orders_status", columnList = "status"),
+    @Index(name = "idx_orders_customer_id_purchased_at", columnList = "customer_id, purchased_at"),
+    @Index(
+        name = "idx_orders_status_purchased_at",
+        columnList = "status, purchased_at",
+        options = "WHERE status != 'REJECTED'"
+    )
+})
 public final class OrderJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

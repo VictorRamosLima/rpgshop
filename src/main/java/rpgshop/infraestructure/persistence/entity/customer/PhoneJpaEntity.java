@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PreUpdate;
@@ -29,7 +30,13 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "phones")
+@Entity @Table(name = "phones", indexes = {
+    @Index(name = "idx_phones_customer_id_is_active", columnList = "customer_id, is_active"),
+    @Index(
+        name = "idx_phones_customer_id_area_code_number",
+        columnList = "customer_id, area_code, number"
+    )
+})
 public final class PhoneJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

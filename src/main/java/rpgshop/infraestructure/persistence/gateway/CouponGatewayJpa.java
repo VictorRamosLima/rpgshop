@@ -46,13 +46,17 @@ public class CouponGatewayJpa implements CouponGateway {
     @Override
     public List<Coupon> findAvailableByCustomerId(final UUID customerId, final Instant now) {
         return couponRepository.findAvailableByCustomerId(customerId, now)
-            .stream().map(CouponMapper::toDomain).toList();
+            .stream()
+            .map(CouponMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<Coupon> findAvailableExchangeCouponsByCustomerId(final UUID customerId, final Instant now) {
         return couponRepository.findAvailableExchangeCouponsByCustomerId(customerId, now)
-            .stream().map(CouponMapper::toDomain).toList();
+            .stream()
+            .map(CouponMapper::toDomain)
+            .toList();
     }
 
     @Override

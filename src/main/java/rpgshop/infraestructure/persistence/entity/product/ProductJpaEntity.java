@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -34,7 +35,18 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "products")
+@Entity @Table(name = "products", indexes = {
+    @Index(name = "idx_products_is_active", columnList = "is_active"),
+    @Index(name = "idx_products_type_id", columnList = "type_id"),
+    @Index(name = "idx_products_pricing_group_id", columnList = "pricing_group_id"),
+    @Index(name = "idx_products_sale_price", columnList = "sale_price"),
+    @Index(name = "idx_products_name_lower", columnList = "LOWER(name)"),
+    @Index(
+        name = "idx_products_auto_inactivation",
+        columnList = "is_active, stock_quantity, sale_price",
+        options = "WHERE is_active = TRUE AND stock_quantity = 0"
+    )
+})
 public final class ProductJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)
@@ -68,7 +80,11 @@ public final class ProductJpaEntity {
     @JoinTable(
         name = "product_categories",
         joinColumns = @JoinColumn(name = "product_id", nullable = false),
-        inverseJoinColumns = @JoinColumn(name = "category_id", nullable = false)
+        inverseJoinColumns = @JoinColumn(name = "category_id", nullable = false),
+        indexes = {
+            @Index(name = "idx_product_categories_category_id", columnList = "category_id"),
+            @Index(name = "idx_product_categories_product_id", columnList = "product_id")
+        }
     )
     private List<CategoryJpaEntity> categories;
 

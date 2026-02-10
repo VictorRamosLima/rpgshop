@@ -31,7 +31,17 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @AllArgsConstructor
 @Entity @Table(name = "cart_items", indexes = {
     @Index(name = "idx_cart_items_cart_id", columnList = "cart_id"),
-    @Index(name = "idx_cart_items_cart_id_product_id", columnList = "cart_id, product_id")
+    @Index(name = "idx_cart_items_cart_id_product_id", columnList = "cart_id, product_id"),
+    @Index(
+        name = "idx_cart_items_blocked_expires",
+        columnList = "is_blocked, expires_at",
+        options = "WHERE is_blocked = TRUE AND expires_at IS NOT NULL"
+    ),
+    @Index(
+        name = "idx_cart_items_product_id_is_blocked",
+        columnList = "product_id, is_blocked",
+        options = "WHERE is_blocked = TRUE"
+    )
 })
 public final class CartItemJpaEntity {
     @Id

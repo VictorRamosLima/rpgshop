@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -30,7 +31,9 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "status_changes")
+@Entity @Table(name = "status_changes", indexes = {
+    @Index(name = "idx_status_changes_product_id", columnList = "product_id")
+})
 public final class StatusChangeJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

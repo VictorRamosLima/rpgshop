@@ -39,7 +39,9 @@ public class CartItemGatewayJpa implements CartItemGateway {
     @Override
     public List<CartItem> findByCartId(final UUID cartId) {
         return cartItemRepository.findByCartId(cartId)
-            .stream().map(CartItemMapper::toDomain).toList();
+            .stream()
+            .map(CartItemMapper::toDomain)
+            .toList();
     }
 
     @Override
@@ -61,7 +63,9 @@ public class CartItemGatewayJpa implements CartItemGateway {
     @Override
     public List<CartItem> findExpiredBlockedItems(final Instant now) {
         return cartItemRepository.findExpiredBlockedItems(now)
-            .stream().map(CartItemMapper::toDomain).toList();
+            .stream()
+            .map(CartItemMapper::toDomain)
+            .toList();
     }
 
     @Override

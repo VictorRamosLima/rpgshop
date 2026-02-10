@@ -34,8 +34,11 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity @Table(name = "coupons", indexes = {
-    @Index(name = "idx_coupons_customer_id_is_used_expires_at", columnList = "customer_id, is_used, expires_at"),
-    @Index(name = "idx_coupons_customer_id_type_is_used", columnList = "customer_id, type, is_used")
+    @Index(name = "idx_coupons_customer_id_type_is_used", columnList = "customer_id, type, is_used"),
+    @Index(
+        name = "idx_coupons_customer_id_is_used_expires_at",
+        columnList = "customer_id, is_used, expires_at"
+    )
 })
 public final class CouponJpaEntity {
     @Id

@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,12 @@ import static org.hibernate.type.SqlTypes.JSON;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "transaction_logs")
+@Entity @Table(name = "transaction_logs", indexes = {
+    @Index(name = "idx_transaction_logs_timestamp", columnList = "timestamp"),
+    @Index(name = "idx_transaction_logs_entity_name_entity_id", columnList = "entity_name, entity_id"),
+    @Index(name = "idx_transaction_logs_operation", columnList = "operation"),
+    @Index(name = "idx_transaction_logs_responsible_user", columnList = "responsible_user")
+})
 public final class TransactionLogJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

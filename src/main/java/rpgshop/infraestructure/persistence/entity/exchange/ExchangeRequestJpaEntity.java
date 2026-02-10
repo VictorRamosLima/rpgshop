@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -35,7 +36,14 @@ import static rpgshop.domain.entity.exchange.constant.ExchangeStatus.REQUESTED;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "exchange_requests")
+@Entity @Table(name = "exchange_requests", indexes = {
+    @Index(name = "idx_exchange_requests_status", columnList = "status"),
+    @Index(name = "idx_exchange_requests_order_id", columnList = "order_id"),
+    @Index(
+        name = "idx_exchange_requests_order_item_id_status",
+        columnList = "order_item_id, status"
+    )
+})
 public final class ExchangeRequestJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

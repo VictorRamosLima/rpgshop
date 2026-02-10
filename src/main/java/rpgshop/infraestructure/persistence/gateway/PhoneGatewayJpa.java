@@ -38,7 +38,9 @@ public class PhoneGatewayJpa implements PhoneGateway {
     @Override
     public List<Phone> findActiveByCustomerId(final UUID customerId) {
         return phoneRepository.findByCustomerIdAndIsActiveTrue(customerId)
-            .stream().map(PhoneMapper::toDomain).toList();
+            .stream()
+            .map(PhoneMapper::toDomain)
+            .toList();
     }
 
     @Override

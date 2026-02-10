@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PreUpdate;
@@ -26,7 +27,17 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "credit_cards")
+@Entity @Table(name = "credit_cards", indexes = {
+    @Index(name = "idx_credit_cards_customer_id_is_active", columnList = "customer_id, is_active"),
+    @Index(
+        name = "idx_credit_cards_customer_id_is_preferred",
+        columnList = "customer_id, is_preferred"
+    ),
+    @Index(
+        name = "idx_credit_cards_customer_id_card_number",
+        columnList = "customer_id, card_number"
+    )
+})
 public final class CreditCardJpaEntity {
     @Id
     @UuidGenerator(style = VERSION_7)

@@ -18,6 +18,7 @@ public final class CartItemMapper {
 
         return CartItem.builder()
             .id(entity.getId())
+            .cartId(entity.getCart() != null ? entity.getCart().getId() : null)
             .product(ProductMapper.toDomain(entity.getProduct()))
             .quantity(entity.getQuantity())
             .isBlocked(entity.isBlocked())

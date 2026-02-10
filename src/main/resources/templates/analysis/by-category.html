@@ -33,7 +33,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>Pedido</th>
                     <th>Produto</th>
                     <th>Quantidade</th>
                     <th>Preco Unitario</th>
@@ -42,7 +41,6 @@
             </thead>
             <tbody>
                 <tr th:each="item : ${items.content}">
-                    <td th:text="${item.order() != null ? #strings.abbreviate(item.order().id().toString(), 12) : 'N/A'}"></td>
                     <td th:text="${item.product() != null ? item.product().name() : 'N/A'}"></td>
                     <td th:text="${item.quantity()}"></td>
                     <td th:text="'R$ ' + ${#numbers.formatDecimal(item.unitPrice(), 1, 2)}"></td>

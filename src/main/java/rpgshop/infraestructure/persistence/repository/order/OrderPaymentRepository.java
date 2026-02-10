@@ -25,7 +25,8 @@ public interface OrderPaymentRepository {
     @Query("""
         SELECT COUNT(op) > 0 FROM OrderPaymentJpaEntity op
         JOIN op.coupon c
-        WHERE op.order.id = :orderId AND c.type = "PROMOTIONAL"
+        WHERE op.order.id = :orderId
+            AND c.type = rpgshop.domain.entity.coupon.constant.CouponType.PROMOTIONAL
         """)
     boolean existsPromotionalCouponByOrderId(@Param("orderId") @Nonnull final UUID orderId);
 }

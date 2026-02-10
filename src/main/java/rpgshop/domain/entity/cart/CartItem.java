@@ -9,6 +9,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public record CartItem(
     UUID id,
+    UUID cartId,
     Product product,
     int quantity,
     boolean isBlocked,

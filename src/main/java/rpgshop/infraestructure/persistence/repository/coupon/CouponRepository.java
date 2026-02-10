@@ -47,7 +47,7 @@ public interface CouponRepository {
     @Query("""
         SELECT c FROM CouponJpaEntity c
         WHERE c.customer.id = :customerId
-            AND c.type = "EXCHANGE"
+            AND c.type = rpgshop.domain.entity.coupon.constant.CouponType.EXCHANGE
             AND c.isUsed = false
             AND (c.expiresAt IS NULL OR c.expiresAt > :now)
         """)

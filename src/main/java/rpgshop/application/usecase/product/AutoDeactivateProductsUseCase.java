@@ -4,9 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rpgshop.application.exception.BusinessRuleException;
 import rpgshop.application.gateway.product.ProductGateway;
+import rpgshop.domain.entity.product.constant.StatusChangeCategory;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +14,8 @@ import static java.math.BigDecimal.ZERO;
 
 @Service
 public class AutoDeactivateProductsUseCase {
+    private static final String AUTO_DEACTIVATION_REASON = "Inativacao automatica por falta de estoque e baixa venda";
+
     private final ProductGateway productGateway;
 
     public AutoDeactivateProductsUseCase(final ProductGateway productGateway) {
@@ -32,6 +34,24 @@ public class AutoDeactivateProductsUseCase {
             return 0;
         }
 
-        return productGateway.deactivateOutOfMarket(ids, Instant.now());
+        int deactivatedCount = 0;
+
+        for (final UUID id : ids) {
+            final var product = productGateway.findById(id).orElse(null);
+
+            if (product == null || !product.isActive()) {
+                continue;
+            }
+
+            final var deactivated = product.deactivate(
+                AUTO_DEACTIVATION_REASON,
+                StatusChangeCategory.OUT_OF_MARKET
+            );
+
+            productGateway.save(deactivated);
+            deactivatedCount++;
+        }
+
+        return deactivatedCount;
     }
 }

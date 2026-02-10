@@ -28,7 +28,7 @@ public final class ExchangeRequestMapper {
             .authorizedAt(entity.getAuthorizedAt())
             .receivedAt(entity.getReceivedAt())
             .returnToStock(entity.isReturnToStock())
-            .coupon(CouponMapper.toDomain(entity.getCoupon()))
+            .coupon(entity.getCoupon() != null ? CouponMapper.toDomain(entity.getCoupon()) : null)
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();
@@ -48,7 +48,7 @@ public final class ExchangeRequestMapper {
             .authorizedAt(domain.authorizedAt())
             .receivedAt(domain.receivedAt())
             .returnToStock(domain.returnToStock())
-            .coupon(CouponMapper.toEntity(domain.coupon()))
+            .coupon(domain.coupon() != null ? CouponMapper.toEntity(domain.coupon()) : null)
             .createdAt(domain.createdAt())
             .updatedAt(domain.updatedAt())
             .build();

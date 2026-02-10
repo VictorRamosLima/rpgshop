@@ -28,7 +28,8 @@ public interface OrderItemRepository {
     @Query("""
         SELECT oi FROM OrderItemJpaEntity oi
         JOIN oi.order o
-        WHERE o.id = :orderId AND o.status = "DELIVERED"
+        WHERE o.id = :orderId
+            AND o.status = rpgshop.domain.entity.order.constant.OrderStatus.DELIVERED
         """)
     List<OrderItemJpaEntity> findDeliveredItemsByOrderId(@Param("orderId") @Nonnull final UUID orderId);
 
@@ -37,7 +38,7 @@ public interface OrderItemRepository {
         SELECT oi FROM OrderItemJpaEntity oi
         JOIN oi.order o
         WHERE oi.product.id = :productId
-            AND o.status <> "REJECTED"
+            AND o.status <> rpgshop.domain.entity.order.constant.OrderStatus.REJECTED
             AND o.purchasedAt >= :startDate
             AND o.purchasedAt <= :endDate
         """)
@@ -55,7 +56,7 @@ public interface OrderItemRepository {
         JOIN oi.product p
         JOIN p.categories c
         WHERE c.id = :categoryId
-            AND o.status <> "REJECTED"
+            AND o.status <> rpgshop.domain.entity.order.constant.OrderStatus.REJECTED
             AND o.purchasedAt >= :startDate
             AND o.purchasedAt <= :endDate
         """)
@@ -70,7 +71,7 @@ public interface OrderItemRepository {
         SELECT COALESCE(SUM(oi.quantity), 0) FROM OrderItemJpaEntity oi
         JOIN oi.order o
         WHERE oi.product.id = :productId
-            AND o.status <> "REJECTED"
+            AND o.status <> rpgshop.domain.entity.order.constant.OrderStatus.REJECTED
             AND o.purchasedAt >= :startDate
             AND o.purchasedAt <= :endDate
         """)

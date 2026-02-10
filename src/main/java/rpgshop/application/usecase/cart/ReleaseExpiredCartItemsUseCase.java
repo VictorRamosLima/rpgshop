@@ -21,8 +21,11 @@ public class ReleaseExpiredCartItemsUseCase {
         final List<CartItem> expiredItems = cartItemGateway.findExpiredBlockedItems(Instant.now());
 
         for (final CartItem item : expiredItems) {
+            if (item.cartId() == null) {
+                continue;
+            }
             cartItemGateway.deleteByCartIdAndProductId(
-                item.id(),
+                item.cartId(),
                 item.product().id()
             );
         }

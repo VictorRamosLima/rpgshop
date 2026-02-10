@@ -33,7 +33,7 @@ public interface OrderRepository {
     @Nonnull
     @Query("""
         SELECT o FROM OrderJpaEntity o
-        WHERE o.status <> "REJECTED"
+        WHERE o.status <> rpgshop.domain.entity.order.constant.OrderStatus.REJECTED
             AND o.purchasedAt >= :startDate
             AND o.purchasedAt <= :endDate
         """)

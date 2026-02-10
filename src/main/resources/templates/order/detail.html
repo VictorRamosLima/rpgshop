@@ -98,16 +98,16 @@
     <div class="card">
         <div class="card-header">Acoes do Pedido</div>
         <div class="btn-group">
-            <form method="post" th:action="@{/orders/{id}/approve(id=${order.id()})}" th:if="${order.status().name() == 'PENDING'}" style="display:inline;">
+            <form method="post" th:action="@{/orders/{id}/approve(id=${order.id()})}" th:if="${order.status().name() == 'PROCESSING'}" style="display:inline;">
                 <button type="submit" class="btn btn-success">Aprovar</button>
             </form>
-            <form method="post" th:action="@{/orders/{id}/reject(id=${order.id()})}" th:if="${order.status().name() == 'PENDING'}" style="display:inline;">
+            <form method="post" th:action="@{/orders/{id}/reject(id=${order.id()})}" th:if="${order.status().name() == 'PROCESSING'}" style="display:inline;">
                 <button type="submit" class="btn btn-danger">Rejeitar</button>
             </form>
             <form method="post" th:action="@{/orders/{id}/dispatch(id=${order.id()})}" th:if="${order.status().name() == 'APPROVED'}" style="display:inline;">
                 <button type="submit" class="btn btn-primary">Despachar</button>
             </form>
-            <form method="post" th:action="@{/orders/{id}/deliver(id=${order.id()})}" th:if="${order.status().name() == 'DISPATCHED'}" style="display:inline;">
+            <form method="post" th:action="@{/orders/{id}/deliver(id=${order.id()})}" th:if="${order.status().name() == 'IN_TRANSIT'}" style="display:inline;">
                 <button type="submit" class="btn btn-success">Confirmar Entrega</button>
             </form>
             <a th:href="@{/exchanges/new(orderId=${order.id()})}" class="btn btn-warning" th:if="${order.status().name() == 'DELIVERED'}">Solicitar Troca</a>

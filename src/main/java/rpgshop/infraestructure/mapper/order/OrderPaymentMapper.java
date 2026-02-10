@@ -19,8 +19,8 @@ public final class OrderPaymentMapper {
 
         return OrderPayment.builder()
             .id(entity.getId())
-            .creditCard(CreditCardMapper.toDomain(entity.getCreditCard()))
-            .coupon(CouponMapper.toDomain(entity.getCoupon()))
+            .creditCard(entity.getCreditCard() != null ? CreditCardMapper.toDomain(entity.getCreditCard()) : null)
+            .coupon(entity.getCoupon() != null ? CouponMapper.toDomain(entity.getCoupon()) : null)
             .amount(entity.getAmount())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
@@ -33,8 +33,8 @@ public final class OrderPaymentMapper {
 
         return OrderPaymentJpaEntity.builder()
             .id(domain.id())
-            .creditCard(CreditCardMapper.toEntity(domain.creditCard()))
-            .coupon(CouponMapper.toEntity(domain.coupon()))
+            .creditCard(domain.creditCard() != null ? CreditCardMapper.toEntity(domain.creditCard()) : null)
+            .coupon(domain.coupon() != null ? CouponMapper.toEntity(domain.coupon()) : null)
             .amount(domain.amount())
             .createdAt(domain.createdAt())
             .updatedAt(domain.updatedAt())

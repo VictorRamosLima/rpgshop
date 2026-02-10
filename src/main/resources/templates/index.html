@@ -1,47 +1,208 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('Início', ~{::main-content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('Inicio', ~{::main-content})}">
 <div th:fragment="main-content">
-    <div class="home-hero">
-        <h1>&#9876; RPG Shop</h1>
-        <p>Sua loja especializada em itens de RPG. Dados, miniaturas, mapas, livros de regras, escudos de mestre e muito mais para suas aventuras!</p>
-    </div>
+    <section class="hero medieval-border golden-glow">
+        <div class="medieval-border-inner hero-content">
+            <span class="hero-kicker">Dark Fantasy Commerce</span>
+            <h1 class="hero-title text-glow">Forje Sua Proxima Campanha</h1>
+            <p class="hero-subtitle">
+                Artefatos, grimorios, miniaturas e equipamentos para mesas de RPG,
+                card games e jornadas estrategicas.
+            </p>
+            <div class="form-actions">
+                <a href="/products" class="btn btn-primary btn-lg glow-pulse">Explorar Catalogo</a>
+                <a href="/analysis" class="btn btn-secondary btn-lg">Ver Inteligencia de Vendas</a>
+            </div>
+        </div>
+    </section>
 
-    <div class="home-cards">
-        <a href="/products" class="home-card">
-            <div class="home-card-icon">&#127922;</div>
-            <div class="home-card-title">Produtos</div>
-            <div class="home-card-desc">Explore nosso catálogo de itens de RPG</div>
-        </a>
-        <a href="/customers" class="home-card">
-            <div class="home-card-icon">&#128101;</div>
-            <div class="home-card-title">Clientes</div>
-            <div class="home-card-desc">Gerencie o cadastro de clientes</div>
-        </a>
-        <a href="/orders" class="home-card">
-            <div class="home-card-icon">&#128230;</div>
-            <div class="home-card-title">Pedidos</div>
-            <div class="home-card-desc">Acompanhe e gerencie os pedidos</div>
-        </a>
-        <a href="/exchanges" class="home-card">
-            <div class="home-card-icon">&#128260;</div>
-            <div class="home-card-title">Trocas</div>
-            <div class="home-card-desc">Solicitações de troca de itens</div>
-        </a>
-        <a href="/coupons/new" class="home-card">
-            <div class="home-card-icon">&#127915;</div>
-            <div class="home-card-title">Cupons</div>
-            <div class="home-card-desc">Crie cupons promocionais e de troca</div>
-        </a>
-        <a href="/logs" class="home-card">
-            <div class="home-card-icon">&#128220;</div>
-            <div class="home-card-title">Logs</div>
-            <div class="home-card-desc">Registro de transações do sistema</div>
-        </a>
-        <a href="/analysis" class="home-card">
-            <div class="home-card-icon">&#128200;</div>
-            <div class="home-card-title">Análises</div>
-            <div class="home-card-desc">Relatórios e análise de vendas</div>
-        </a>
-    </div>
+    <section class="section">
+        <header class="section-header">
+            <h2 class="section-header-title">Categorias em Destaque</h2>
+            <p class="section-header-subtitle">Selecione um dominio e avance para a proxima missao.</p>
+            <div class="section-header-decoration"><span class="section-header-decoration-dot"></span></div>
+        </header>
+        <div class="category-grid">
+            <a class="category-card" href="/products?name=RPG">
+                <div class="category-card-content">
+                    <strong class="category-card-title">RPG de Mesa</strong>
+                    <span class="category-card-text">Manuais, dados e acessorios</span>
+                </div>
+            </a>
+            <a class="category-card" href="/products?name=Card">
+                <div class="category-card-content">
+                    <strong class="category-card-title">Card Games</strong>
+                    <span class="category-card-text">Boosters, decks e sleeves</span>
+                </div>
+            </a>
+            <a class="category-card" href="/products?name=Miniatura">
+                <div class="category-card-content">
+                    <strong class="category-card-title">Miniaturas</strong>
+                    <span class="category-card-text">Escalas para combate tatico</span>
+                </div>
+            </a>
+            <a class="category-card" href="/products?name=Board">
+                <div class="category-card-content">
+                    <strong class="category-card-title">Board Games</strong>
+                    <span class="category-card-text">Campanhas cooperativas</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <div class="divider-ornate"><span class="divider-ornate-symbol"></span></div>
+
+    <section class="section">
+        <header class="section-header">
+            <h2 class="section-header-title">Novidades e Artefatos</h2>
+            <p class="section-header-subtitle">Lotes recentes prontos para entrar no seu inventario.</p>
+            <div class="section-header-decoration"><span class="section-header-decoration-dot"></span></div>
+        </header>
+        <div class="product-grid">
+            <article class="product-card">
+                <div class="product-card-image-wrapper">
+                    <span class="product-badge product-badge--new">Novo</span>
+                    <button class="product-card-wishlist" aria-label="Adicionar a lista de desejos">❤</button>
+                    <div class="product-image-placeholder">Kit de Dados Runicos</div>
+                </div>
+                <div class="product-card-body">
+                    <h3 class="product-card-name">Kit de Dados Runicos</h3>
+                    <div class="product-price">
+                        <span class="product-price-current">R$ 89,90</span>
+                    </div>
+                    <div class="product-card-action">
+                        <a href="/products" class="btn btn-primary btn-sm">Adicionar ao Carrinho</a>
+                        <a href="/products" class="btn btn-outline btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card">
+                <div class="product-card-image-wrapper">
+                    <span class="product-badge badge--legendary">Lendario</span>
+                    <button class="product-card-wishlist" aria-label="Adicionar a lista de desejos">❤</button>
+                    <div class="product-image-placeholder">Manual do Mestre</div>
+                </div>
+                <div class="product-card-body">
+                    <h3 class="product-card-name">Manual do Mestre Arcano</h3>
+                    <div class="product-price">
+                        <span class="product-price-current">R$ 219,90</span>
+                    </div>
+                    <div class="product-card-action">
+                        <a href="/products" class="btn btn-primary btn-sm">Adicionar ao Carrinho</a>
+                        <a href="/products" class="btn btn-outline btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card">
+                <div class="product-card-image-wrapper">
+                    <span class="product-badge product-badge--sale">-20%</span>
+                    <button class="product-card-wishlist" aria-label="Adicionar a lista de desejos">❤</button>
+                    <div class="product-image-placeholder">Booster Mythic</div>
+                </div>
+                <div class="product-card-body">
+                    <h3 class="product-card-name">Booster Mythic Dragon</h3>
+                    <div class="product-price">
+                        <span class="product-price-current">R$ 39,90</span>
+                        <span class="product-price-original">R$ 49,90</span>
+                    </div>
+                    <div class="product-card-action">
+                        <a href="/products" class="btn btn-primary btn-sm">Adicionar ao Carrinho</a>
+                        <a href="/products" class="btn btn-outline btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card">
+                <div class="product-card-image-wrapper">
+                    <span class="product-badge badge--epic">Epico</span>
+                    <button class="product-card-wishlist" aria-label="Adicionar a lista de desejos">❤</button>
+                    <div class="product-image-placeholder">Miniatura Necromante</div>
+                </div>
+                <div class="product-card-body">
+                    <h3 class="product-card-name">Miniatura Necromante 28mm</h3>
+                    <div class="product-price">
+                        <span class="product-price-current">R$ 159,00</span>
+                    </div>
+                    <div class="product-card-action">
+                        <a href="/products" class="btn btn-primary btn-sm">Adicionar ao Carrinho</a>
+                        <a href="/products" class="btn btn-outline btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="promo-banner medieval-border">
+        <div class="medieval-border-inner">
+            <div class="section-header section-header--left">
+                <h2 class="section-header-title">Semana da Guilda: Frete Arcano</h2>
+                <p class="section-header-subtitle">
+                    Compras acima de R$ 299 recebem envio gratuito e um codigo arcano de desconto para a proxima quest.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <header class="section-header">
+            <h2 class="section-header-title">Mais Vendidos</h2>
+            <p class="section-header-subtitle">Itens lendarios com alta rotacao entre mestres e jogadores.</p>
+            <div class="section-header-decoration"><span class="section-header-decoration-dot"></span></div>
+        </header>
+        <div class="home-cards">
+            <a href="/products?name=Livro" class="home-card">
+                <span class="home-card-icon">📘</span>
+                <strong class="home-card-title">Colecao de Livros</strong>
+                <span class="home-card-desc">Manuais de jogador, mestre e aventuras completas.</span>
+            </a>
+            <a href="/products?name=Dados" class="home-card">
+                <span class="home-card-icon">🎲</span>
+                <strong class="home-card-title">Dados Premium</strong>
+                <span class="home-card-desc">Sets metalicos e resinados para criticos memoraveis.</span>
+            </a>
+            <a href="/products?name=Miniatura" class="home-card">
+                <span class="home-card-icon">🗿</span>
+                <strong class="home-card-title">Miniaturas Taticas</strong>
+                <span class="home-card-desc">Escalas variadas para combates em mapa quadriculado.</span>
+            </a>
+            <a href="/products?name=Card" class="home-card">
+                <span class="home-card-icon">🃏</span>
+                <strong class="home-card-title">Decks de Card Game</strong>
+                <span class="home-card-desc">Construcoes competitivas e colecionaveis raros.</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="section">
+        <header class="section-header">
+            <h2 class="section-header-title">Selo de Confianca</h2>
+            <p class="section-header-subtitle">Sua jornada comercial com seguranca, transparenica e suporte especializado.</p>
+            <div class="section-header-decoration"><span class="section-header-decoration-dot"></span></div>
+        </header>
+        <div class="trust-badges">
+            <article class="trust-badge">
+                <span class="trust-badge-icon">🧭</span>
+                <strong class="trust-badge-title">Frete Planejado</strong>
+                <p class="trust-badge-text">Rotas rastreadas para entrega segura em todo o territorio.</p>
+            </article>
+            <article class="trust-badge">
+                <span class="trust-badge-icon">🔒</span>
+                <strong class="trust-badge-title">Pagamento Protegido</strong>
+                <p class="trust-badge-text">Fluxo de checkout com validacao e dados criptografados.</p>
+            </article>
+            <article class="trust-badge">
+                <span class="trust-badge-icon">🛠</span>
+                <strong class="trust-badge-title">Suporte da Guilda</strong>
+                <p class="trust-badge-text">Equipe preparada para orientar trocas, pedidos e catalogo.</p>
+            </article>
+            <article class="trust-badge">
+                <span class="trust-badge-icon">🏰</span>
+                <strong class="trust-badge-title">Curadoria Nerd</strong>
+                <p class="trust-badge-text">Selecao de produtos alinhada a campanhas e comunidades.</p>
+            </article>
+        </div>
+    </section>
 </div>
 </html>

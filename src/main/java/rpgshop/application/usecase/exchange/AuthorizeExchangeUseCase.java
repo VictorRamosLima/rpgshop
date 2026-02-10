@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rpgshop.application.exception.BusinessRuleException;
 import rpgshop.application.exception.EntityNotFoundException;
+import rpgshop.application.gateway.exchange.ExchangeNotificationGateway;
 import rpgshop.application.gateway.exchange.ExchangeRequestGateway;
 import rpgshop.application.gateway.order.OrderGateway;
 import rpgshop.domain.entity.exchange.ExchangeRequest;
@@ -19,13 +20,16 @@ import java.util.UUID;
 public class AuthorizeExchangeUseCase {
     private final ExchangeRequestGateway exchangeRequestGateway;
     private final OrderGateway orderGateway;
+    private final ExchangeNotificationGateway exchangeNotificationGateway;
 
     public AuthorizeExchangeUseCase(
         final ExchangeRequestGateway exchangeRequestGateway,
-        final OrderGateway orderGateway
+        final OrderGateway orderGateway,
+        final ExchangeNotificationGateway exchangeNotificationGateway
     ) {
         this.exchangeRequestGateway = exchangeRequestGateway;
         this.orderGateway = orderGateway;
+        this.exchangeNotificationGateway = exchangeNotificationGateway;
     }
 
     @Nonnull
@@ -52,6 +56,12 @@ public class AuthorizeExchangeUseCase {
             .status(OrderStatus.EXCHANGE_AUTHORIZED)
             .build();
         orderGateway.save(updatedOrder);
+
+        exchangeNotificationGateway.notifyExchangeAuthorized(
+            order.customer().id(),
+            order.id(),
+            saved.id()
+        );
 
         return saved;
     }

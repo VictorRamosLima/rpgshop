@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface CategoryGateway {
     List<Category> findAllByIds(final List<UUID> ids);
+    List<Category> findActive();
 }

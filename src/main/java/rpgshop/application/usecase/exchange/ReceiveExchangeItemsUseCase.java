@@ -9,14 +9,13 @@ import rpgshop.application.exception.EntityNotFoundException;
 import rpgshop.application.gateway.coupon.CouponGateway;
 import rpgshop.application.gateway.exchange.ExchangeRequestGateway;
 import rpgshop.application.gateway.order.OrderGateway;
-import rpgshop.application.gateway.product.ProductGateway;
+import rpgshop.application.usecase.stock.CreateStockReentryUseCase;
 import rpgshop.domain.entity.coupon.Coupon;
 import rpgshop.domain.entity.coupon.constant.CouponType;
 import rpgshop.domain.entity.exchange.ExchangeRequest;
 import rpgshop.domain.entity.exchange.constant.ExchangeStatus;
 import rpgshop.domain.entity.order.Order;
 import rpgshop.domain.entity.order.constant.OrderStatus;
-import rpgshop.domain.entity.product.Product;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -27,19 +26,19 @@ import java.util.UUID;
 public class ReceiveExchangeItemsUseCase {
     private final ExchangeRequestGateway exchangeRequestGateway;
     private final OrderGateway orderGateway;
-    private final ProductGateway productGateway;
     private final CouponGateway couponGateway;
+    private final CreateStockReentryUseCase createStockReentryUseCase;
 
     public ReceiveExchangeItemsUseCase(
         final ExchangeRequestGateway exchangeRequestGateway,
         final OrderGateway orderGateway,
-        final ProductGateway productGateway,
-        final CouponGateway couponGateway
+        final CouponGateway couponGateway,
+        final CreateStockReentryUseCase createStockReentryUseCase
     ) {
         this.exchangeRequestGateway = exchangeRequestGateway;
         this.orderGateway = orderGateway;
-        this.productGateway = productGateway;
         this.couponGateway = couponGateway;
+        this.createStockReentryUseCase = createStockReentryUseCase;
     }
 
     @Nonnull
@@ -53,20 +52,38 @@ public class ReceiveExchangeItemsUseCase {
         }
 
         if (command.returnToStock()) {
-            returnItemToStock(request);
+            if (command.supplierId() == null) {
+                throw new BusinessRuleException("Fornecedor e obrigatorio para reentrada em estoque");
+            }
+            if (command.costValue() == null || command.costValue().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessRuleException("Valor de custo e obrigatorio para reentrada em estoque");
+            }
+
+            createStockReentryUseCase.execute(
+                request.orderItem().product().id(),
+                request.quantity(),
+                command.costValue(),
+                command.supplierId()
+            );
         }
 
-        generateExchangeCoupon(request);
+        final Coupon generatedCoupon = generateExchangeCoupon(request);
 
         final ExchangeRequest completed = request.toBuilder()
             .status(ExchangeStatus.COMPLETED)
             .receivedAt(Instant.now())
+            .returnToStock(command.returnToStock())
+            .coupon(generatedCoupon)
             .build();
 
         final ExchangeRequest saved = exchangeRequestGateway.save(completed);
 
         final Order order = orderGateway.findById(request.order().id())
             .orElseThrow(() -> new EntityNotFoundException("Order", request.order().id()));
+
+        if (order.status() != OrderStatus.EXCHANGE_AUTHORIZED && order.status() != OrderStatus.IN_EXCHANGE) {
+            throw new BusinessRuleException("Somente pedidos em troca podem ser atualizados para TROCADO");
+        }
 
         final Order updatedOrder = order.toBuilder()
             .status(OrderStatus.EXCHANGED)
@@ -76,18 +93,7 @@ public class ReceiveExchangeItemsUseCase {
         return saved;
     }
 
-    private void returnItemToStock(final ExchangeRequest request) {
-        final Product product = productGateway.findById(request.orderItem().product().id())
-            .orElseThrow(() -> new EntityNotFoundException("Product", request.orderItem().product().id()));
-
-        final Product updated = product.toBuilder()
-            .stockQuantity(product.stockQuantity() + request.quantity())
-            .build();
-
-        productGateway.save(updated);
-    }
-
-    private void generateExchangeCoupon(final ExchangeRequest request) {
+    private Coupon generateExchangeCoupon(final ExchangeRequest request) {
         final BigDecimal couponValue = request.orderItem().unitPrice()
             .multiply(BigDecimal.valueOf(request.quantity()));
 
@@ -101,6 +107,6 @@ public class ReceiveExchangeItemsUseCase {
             .expiresAt(Instant.now().plus(90, ChronoUnit.DAYS))
             .build();
 
-        couponGateway.save(coupon);
+        return couponGateway.save(coupon);
     }
 }

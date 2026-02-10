@@ -1,6 +1,7 @@
 package rpgshop.infraestructure.persistence.repository.log;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -31,16 +32,16 @@ public interface TransactionLogRepository {
             AND (:entityId IS NULL OR tl.entityId = :entityId)
             AND (:operation IS NULL OR tl.operation = :operation)
             AND (:responsibleUser IS NULL OR tl.responsibleUser = :responsibleUser)
-            AND (:startDate IS NULL OR tl.timestamp >= :startDate)
-            AND (:endDate IS NULL OR tl.timestamp <= :endDate)
+            AND tl.timestamp >= COALESCE(:startDate, tl.timestamp)
+            AND tl.timestamp <= COALESCE(:endDate, tl.timestamp)
         """)
     Page<TransactionLogJpaEntity> findByFilters(
-        @Param("entityName") @Nonnull final String entityName,
-        @Param("entityId") @Nonnull final UUID entityId,
-        @Param("operation") @Nonnull final OperationType operation,
-        @Param("responsibleUser") @Nonnull final String responsibleUser,
-        @Param("startDate") @Nonnull final Instant startDate,
-        @Param("endDate") @Nonnull final Instant endDate,
+        @Param("entityName") @Nullable final String entityName,
+        @Param("entityId") @Nullable final UUID entityId,
+        @Param("operation") @Nullable final OperationType operation,
+        @Param("responsibleUser") @Nullable final String responsibleUser,
+        @Param("startDate") @Nullable final Instant startDate,
+        @Param("endDate") @Nullable final Instant endDate,
         @Nonnull final Pageable pageable
     );
 }

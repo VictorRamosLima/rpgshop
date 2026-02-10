@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/coupons")
-public class CouponController {
+public final class CouponController {
     private final CreateCouponUseCase createCouponUseCase;
     private final QueryCouponsUseCase queryCouponsUseCase;
 
@@ -36,8 +36,8 @@ public class CouponController {
 
     @GetMapping("/customer/{customerId}")
     public String listByCustomer(
-        @PathVariable UUID customerId,
-        @RequestParam(defaultValue = "0") int page,
+        @PathVariable final UUID customerId,
+        @RequestParam(defaultValue = "0") final int page,
         Model model
     ) {
         final Page<Coupon> coupons = queryCouponsUseCase.findByCustomerId(customerId, PageRequest.of(page, 10));
@@ -48,23 +48,24 @@ public class CouponController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(Model model) {
+    public String showCreateForm(final Model model) {
         model.addAttribute("types", CouponType.values());
         return "coupon/create";
     }
 
     @PostMapping
     public String create(
-        @RequestParam String code,
-        @RequestParam CouponType type,
-        @RequestParam BigDecimal value,
-        @RequestParam(required = false) UUID customerId,
-        @RequestParam(required = false) String expiresAt,
-        Model model
+        @RequestParam final String code,
+        @RequestParam final CouponType type,
+        @RequestParam final BigDecimal value,
+        @RequestParam(required = false) final UUID customerId,
+        @RequestParam(required = false) final String expiresAt,
+        final Model model
     ) {
         try {
             final Instant expiration = expiresAt != null && !expiresAt.isBlank()
-                ? Instant.parse(expiresAt + "T23:59:59Z") : null;
+                ? Instant.parse(expiresAt + "T23:59:59Z")
+                : null;
             final var command = new CreateCouponCommand(code, type, value, customerId, expiration);
             createCouponUseCase.execute(command);
             if (customerId != null) {

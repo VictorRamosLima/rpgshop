@@ -1,95 +1,168 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: page('Carrinho', ~{::main-content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('Carrinho', ~{::main-content})}">
 <div th:fragment="main-content">
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="/customers">Clientes</a></li>
+            <li class="breadcrumb-item" aria-current="page">Carrinho</li>
+        </ol>
+    </nav>
 
-    <div class="breadcrumb">
-        <a href="/">Inicio</a> <span>/</span> <a href="/customers">Clientes</a> <span>/</span> <span>Carrinho</span>
-    </div>
-
-    <div class="page-header">
-        <h1>&#128722; Carrinho de Compras</h1>
-        <div class="btn-group">
-            <a th:href="@{/orders/checkout/{id}(id=${customerId})}" class="btn btn-primary btn-lg" th:if="${cart != null and cart.items() != null and !cart.items().isEmpty()}">Finalizar Pedido</a>
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Seu Inventario de Compra</h1>
+            <p class="page-subtitle">Gerencie quantidades e prepare o checkout.</p>
         </div>
-    </div>
+        <div class="page-actions" th:if="${cart != null and cart.items() != null and !cart.items().isEmpty()}">
+            <a th:href="@{/orders/checkout/{id}(id=${customerId})}" class="btn btn-primary btn-lg">Finalizar Compra</a>
+        </div>
+    </header>
 
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <div th:if="${cart != null and cart.items() != null and !cart.items().isEmpty()}">
-        <table>
-            <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Preco Unitario</th>
-                    <th>Quantidade</th>
-                    <th>Subtotal</th>
-                    <th>Status</th>
-                    <th>Acoes</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="item : ${cart.items()}">
-                    <td>
-                        <a th:href="@{/products/{id}(id=${item.product().id()})}" th:text="${item.product().name()}"></a>
-                    </td>
-                    <td>
-                        <span class="price" th:text="'R$ ' + ${#numbers.formatDecimal(item.product().salePrice(), 1, 2)}"></span>
-                    </td>
-                    <td>
-                        <form method="post" th:action="@{/cart/{cid}/update(cid=${customerId})}" style="display:inline-flex;gap:0.5rem;align-items:center;">
-                            <input type="hidden" name="productId" th:value="${item.product().id()}"/>
-                            <input type="number" name="quantity" th:value="${item.quantity()}" min="1" style="width:80px;"/>
-                            <button type="submit" class="btn btn-sm btn-outline">Atualizar</button>
-                        </form>
-                    </td>
-                    <td>
-                        <span class="price" th:text="'R$ ' + ${#numbers.formatDecimal(item.product().salePrice() * item.quantity(), 1, 2)}"></span>
-                    </td>
-                    <td>
-                        <span th:if="${item.isBlocked()}" class="badge badge-warning">Bloqueado</span>
-                        <span th:unless="${item.isBlocked()}" class="badge badge-active">Disponivel</span>
-                    </td>
-                    <td>
-                        <form method="post" th:action="@{/cart/{cid}/remove(cid=${customerId})}" style="display:inline;">
-                            <input type="hidden" name="productId" th:value="${item.product().id()}"/>
-                            <button type="submit" class="btn btn-sm btn-danger">Remover</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <section th:if="${cart != null and cart.items() != null and !cart.items().isEmpty()}" class="cart-layout">
+        <article class="cart-items-panel">
+            <h2 class="card-title">Itens no Carrinho</h2>
 
-        <div style="margin-top:1rem;display:flex;gap:1rem;justify-content:space-between;align-items:center;">
-            <form method="post" th:action="@{/cart/{cid}/clear(cid=${customerId})}">
-                <button type="submit" class="btn btn-danger">Limpar Carrinho</button>
-            </form>
-            <a th:href="@{/orders/checkout/{id}(id=${customerId})}" class="btn btn-primary btn-lg">Finalizar Pedido</a>
-        </div>
-    </div>
+            <div th:each="item : ${cart.items()}" class="cart-item">
+                <div class="cart-item-image">Loot</div>
 
-    <div th:if="${cart == null or cart.items() == null or cart.items().isEmpty()}" class="empty-state">
-        <div class="empty-state-icon">&#128722;</div>
-        <div class="empty-state-text">Seu carrinho esta vazio</div>
-        <p><a href="/products">Explorar produtos</a></p>
-    </div>
-
-    <div class="card" style="margin-top:2rem;">
-        <div class="card-header">Adicionar Produto ao Carrinho</div>
-        <form method="post" th:action="@{/cart/{cid}/add(cid=${customerId})}">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>ID do Produto *</label>
-                    <input type="text" name="productId" required placeholder="UUID do produto"/>
+                <div class="cart-item-body">
+                    <a class="cart-item-name" th:href="@{/products/{id}(id=${item.product().id()})}" th:text="${item.product().name()}">Produto</a>
+                    <span class="cart-item-variant" th:text="'Preco unitario: R$ ' + ${#numbers.formatDecimal(item.product().salePrice(), 1, 2)}">R$ 0,00</span>
+                    <span th:if="${item.isBlocked()}" class="badge badge-warning">Bloqueado</span>
+                    <span th:unless="${item.isBlocked()}" class="badge badge-active">Disponivel</span>
                 </div>
-                <div class="form-group">
-                    <label>Quantidade *</label>
-                    <input type="number" name="quantity" required min="1" value="1"/>
+
+                <div class="cart-item-actions">
+                    <form method="post" th:action="@{/cart/{cid}/update(cid=${customerId})}" class="inline-actions"
+                          hx-target="#page-content"
+                          hx-select="#page-content"
+                          hx-swap="outerHTML"
+                          hx-indicator="#global-indicator">
+                        <input type="hidden" name="productId" th:value="${item.product().id()}"/>
+                        <div class="quantity-selector">
+                            <button type="button" class="quantity-btn" th:attr="data-item-id=${item.product().id()}" data-dec>-</button>
+                            <input class="quantity-input"
+                                   type="number"
+                                   min="1"
+                                   name="quantity"
+                                   th:attr="id='qty-' + ${item.product().id()}"
+                                   th:value="${item.quantity()}"/>
+                            <button type="button" class="quantity-btn" th:attr="data-item-id=${item.product().id()}" data-inc>+</button>
+                        </div>
+                        <button type="submit" class="btn btn-outline btn-sm">Atualizar</button>
+                    </form>
+
+                    <span class="cart-item-subtotal"
+                          th:text="'R$ ' + ${#numbers.formatDecimal(item.product().salePrice() * item.quantity(), 1, 2)}">R$ 0,00</span>
+
+                    <form method="post" th:action="@{/cart/{cid}/remove(cid=${customerId})}"
+                          hx-target="#page-content"
+                          hx-select="#page-content"
+                          hx-swap="outerHTML swap:200ms"
+                          hx-confirm="Remover este item do carrinho?"
+                          hx-indicator="#global-indicator">
+                        <input type="hidden" name="productId" th:value="${item.product().id()}"/>
+                        <button type="submit" class="cart-item-remove" aria-label="Remover item">×</button>
+                    </form>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Adicionar ao Carrinho</button>
-        </form>
-    </div>
 
+            <div class="form-actions">
+                <form method="post" th:action="@{/cart/{cid}/clear(cid=${customerId})}"
+                      hx-target="#page-content"
+                      hx-select="#page-content"
+                      hx-swap="outerHTML"
+                      hx-confirm="Limpar todo o carrinho?"
+                      hx-indicator="#global-indicator">
+                    <button type="submit" class="btn btn-danger">Limpar Carrinho</button>
+                </form>
+                <a href="/products" class="btn btn-outline">Continuar Comprando</a>
+            </div>
+        </article>
+
+        <aside class="cart-summary" id="cart-summary" aria-live="polite">
+            <h2 class="card-title">Resumo da Missao</h2>
+            <div class="cart-summary-row">
+                <span>Subtotal</span>
+                <span>Calculado no checkout</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>Frete</span>
+                <span>R$ 2,50/kg (regra de negocio)</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>Cupom</span>
+                <span>A aplicar na etapa final</span>
+            </div>
+            <div class="cart-summary-total">
+                <span>Total</span>
+                <span>Finalizado no checkout</span>
+            </div>
+            <div class="form-actions cart-summary-actions">
+                <a th:href="@{/orders/checkout/{id}(id=${customerId})}" class="btn btn-primary btn-lg">Finalizar Compra</a>
+            </div>
+        </aside>
+    </section>
+
+    <section th:if="${cart == null or cart.items() == null or cart.items().isEmpty()}" class="empty-state">
+        <div class="empty-state-icon">⚔️</div>
+        <h2 class="empty-state-title">Sua Bolsa de Inventario esta Vazia</h2>
+        <p class="empty-state-text">
+            Nenhum item foi adicionado a jornada ainda.
+            Explore o catalogo e equipe sua party com novos artefatos.
+        </p>
+        <a href="/products" class="btn btn-primary">Explorar Catalogo</a>
+    </section>
+
+    <section class="card">
+        <div class="card-title">Adicionar Produto por ID</div>
+        <form method="post" th:action="@{/cart/{cid}/add(cid=${customerId})}"
+              hx-target="#page-content"
+              hx-select="#page-content"
+              hx-swap="outerHTML"
+              hx-indicator="#global-indicator">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="quick-product">ID do produto (obrigatorio)</label>
+                    <input id="quick-product" type="text" name="productId" required placeholder="UUID do produto"/>
+                </div>
+                <div class="form-group">
+                    <label for="quick-quantity">Quantidade (obrigatorio)</label>
+                    <input id="quick-quantity" type="number" name="quantity" required min="1" value="1"/>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Adicionar ao Carrinho</button>
+            </div>
+        </form>
+    </section>
+
+    <script>
+        (function () {
+            function updateQuantity(input, delta) {
+                const value = Number(input.value || 1);
+                input.value = Math.max(1, value + delta);
+            }
+
+            document.querySelectorAll("[data-dec]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    const id = button.getAttribute("data-item-id");
+                    const input = document.getElementById("qty-" + id);
+                    if (input) updateQuantity(input, -1);
+                });
+            });
+
+            document.querySelectorAll("[data-inc]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    const id = button.getAttribute("data-item-id");
+                    const input = document.getElementById("qty-" + id);
+                    if (input) updateQuantity(input, 1);
+                });
+            });
+        })();
+    </script>
 </div>
 </html>

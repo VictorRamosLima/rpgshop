@@ -3,6 +3,7 @@ package rpgshop.application.usecase.cart;
 import jakarta.annotation.Nonnull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rpgshop.infraestructure.config.CartBlockingProperties;
 import rpgshop.application.command.cart.AddCartItemCommand;
 import rpgshop.application.exception.BusinessRuleException;
 import rpgshop.application.exception.EntityNotFoundException;
@@ -23,19 +24,20 @@ import java.util.UUID;
 
 @Service
 public class AddCartItemUseCase {
-    private static final int BLOCK_DURATION_MINUTES = 30;
-
+    private final CartBlockingProperties cartBlockingProperties;
     private final CartGateway cartGateway;
     private final CartItemGateway cartItemGateway;
     private final ProductGateway productGateway;
     private final CustomerGateway customerGateway;
 
     public AddCartItemUseCase(
+        final CartBlockingProperties cartBlockingProperties,
         final CartGateway cartGateway,
         final CartItemGateway cartItemGateway,
         final ProductGateway productGateway,
         final CustomerGateway customerGateway
     ) {
+        this.cartBlockingProperties = cartBlockingProperties;
         this.cartGateway = cartGateway;
         this.cartItemGateway = cartItemGateway;
         this.productGateway = productGateway;
@@ -88,7 +90,7 @@ public class AddCartItemUseCase {
                 .quantity(existingItem.get().quantity() + command.quantity())
                 .isBlocked(true)
                 .blockedAt(now)
-                .expiresAt(now.plus(BLOCK_DURATION_MINUTES, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(resolveBlockDurationMinutes(), ChronoUnit.MINUTES))
                 .build();
             cartItemGateway.save(updated, cart.id());
         } else {
@@ -98,11 +100,18 @@ public class AddCartItemUseCase {
                 .quantity(command.quantity())
                 .isBlocked(true)
                 .blockedAt(now)
-                .expiresAt(now.plus(BLOCK_DURATION_MINUTES, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(resolveBlockDurationMinutes(), ChronoUnit.MINUTES))
                 .build();
             cartItemGateway.save(newItem, cart.id());
         }
 
         return cartGateway.findById(cart.id()).orElse(cart);
+    }
+
+    private int resolveBlockDurationMinutes() {
+        if (cartBlockingProperties.getTimeoutMinutes() <= 0) {
+            throw new BusinessRuleException("O timeout de bloqueio do carrinho deve ser maior que zero");
+        }
+        return cartBlockingProperties.getTimeoutMinutes();
     }
 }

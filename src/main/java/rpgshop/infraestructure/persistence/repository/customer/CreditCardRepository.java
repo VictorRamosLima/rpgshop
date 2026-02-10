@@ -33,4 +33,9 @@ public interface CreditCardRepository {
         @Nonnull final UUID customerId,
         @Nonnull final String cardNumber
     );
+
+    boolean existsByIdAndCustomerIdAndIsActiveTrue(
+        @Nonnull final UUID creditCardId,
+        @Nonnull final UUID customerId
+    );
 }

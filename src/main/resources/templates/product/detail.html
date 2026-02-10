@@ -1,155 +1,248 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: page('Detalhe do Produto', ~{::main-content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('Detalhe do Produto', ~{::main-content})}">
 <div th:fragment="main-content">
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="/products">Produtos</a></li>
+            <li class="breadcrumb-item" aria-current="page" th:text="${product.name()}">Produto</li>
+        </ol>
+    </nav>
 
-    <div class="breadcrumb">
-        <a href="/">Início</a> <span>/</span> <a href="/products">Produtos</a> <span>/</span> <span th:text="${product.name()}">Produto</span>
-    </div>
+    <section class="pdp-layout">
+        <aside class="product-gallery">
+            <div class="product-gallery-main">
+                <div class="product-image-placeholder" th:text="${product.productType() != null ? product.productType().name() : 'Artefato'}">Artefato</div>
+            </div>
+            <div class="product-gallery-thumbs" role="tablist" aria-label="Miniaturas do produto">
+                <button class="product-gallery-thumb" aria-selected="true" type="button"></button>
+                <button class="product-gallery-thumb" type="button"></button>
+                <button class="product-gallery-thumb" type="button"></button>
+                <button class="product-gallery-thumb" type="button"></button>
+            </div>
+        </aside>
 
-    <div class="page-header">
-        <h1 th:text="${product.name()}">Nome do Produto</h1>
-        <div class="btn-group">
-            <a th:href="@{/stock/product/{id}(id=${product.id()})}" class="btn btn-accent">Ver Estoque</a>
-            <span th:if="${product.isActive()}" class="badge badge-active">Ativo</span>
-            <span th:unless="${product.isActive()}" class="badge badge-inactive">Inativo</span>
-        </div>
-    </div>
+        <article class="product-info-panel">
+            <header class="page-intro">
+                <div class="tag-list">
+                    <span class="badge" th:classappend="${product.isActive()} ? 'badge--new' : 'badge--sale'"
+                          th:text="${product.isActive()} ? 'Disponivel' : 'Inativo'">Disponivel</span>
+                    <span class="badge badge--rare" th:text="${product.productType() != null ? product.productType().name() : 'Categoria'}">Categoria</span>
+                </div>
+                <h1 class="page-title" th:text="${product.name()}">Nome do Produto</h1>
+                <div class="rating-summary">
+                    <div class="rating-stars" aria-hidden="true">
+                        <span class="rating-star rating-star--filled">★</span>
+                        <span class="rating-star rating-star--filled">★</span>
+                        <span class="rating-star rating-star--filled">★</span>
+                        <span class="rating-star rating-star--filled">★</span>
+                        <span class="rating-star">★</span>
+                    </div>
+                    <span class="rating-count">4.0 (128 avaliacoes)</span>
+                </div>
+            </header>
 
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div class="card">
+                <div class="card-title">Preco e Estoque</div>
+                <div class="product-price">
+                    <span class="product-price-current" th:text="'R$ ' + ${#numbers.formatDecimal(product.salePrice(), 1, 2)}">R$ 0,00</span>
+                    <span class="product-price-original" th:text="'R$ ' + ${#numbers.formatDecimal(product.costPrice(), 1, 2)}">R$ 0,00</span>
+                </div>
+                <p class="card-muted" th:text="'Estoque atual: ' + ${product.stockQuantity()} + ' unidades.'">Estoque atual</p>
+                <p class="card-muted">
+                    SKU: <span th:text="${product.sku() != null ? product.sku() : '-'}">-</span> |
+                    Codigo de barras: <span th:text="${product.barcode() != null ? product.barcode() : '-'}">-</span>
+                </p>
+            </div>
 
-    <div class="detail-grid">
-        <div class="card">
-            <div class="card-header">Informações Gerais</div>
+            <div class="card">
+                <div class="card-title">Adicionar ao Carrinho</div>
+                <form id="pdp-add-form" method="post" action="/cart/__CID__/add" class="product-actions-sticky"
+                      hx-target="#page-content"
+                      hx-select="#page-content"
+                      hx-swap="outerHTML"
+                      hx-indicator="#global-indicator">
+                    <div class="form-group">
+                        <label for="pdp-customer-id">ID do cliente (obrigatorio)</label>
+                        <input id="pdp-customer-id" type="text" placeholder="UUID do cliente" required/>
+                        <span class="form-hint">Use um cliente ativo para registrar o item no carrinho.</span>
+                    </div>
+
+                    <input type="hidden" name="productId" th:value="${product.id()}"/>
+
+                    <div class="form-group">
+                        <label for="pdp-quantity">Quantidade (obrigatorio)</label>
+                        <div class="quantity-selector">
+                            <button type="button" class="quantity-btn" aria-label="Diminuir quantidade" data-qty-dec>-</button>
+                            <input id="pdp-quantity" class="quantity-input" name="quantity" type="number" min="1" value="1" required/>
+                            <button type="button" class="quantity-btn" aria-label="Aumentar quantidade" data-qty-inc>+</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="add-to-cart-btn">Adicionar ao Carrinho</button>
+                </form>
+                <div class="form-actions">
+                    <a th:href="@{/stock/product/{id}(id=${product.id()})}" class="btn btn-outline">Ver historico de estoque</a>
+                </div>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div class="form-actions">
+                <a th:href="@{/products/{id}/edit(id=${product.id()})}" class="btn btn-primary">Editar Cadastro</a>
+                <a href="/products" class="btn btn-outline">Voltar para Lista</a>
+            </div>
+        </article>
+    </section>
+
+    <section class="detail-grid">
+        <article class="card">
+            <div class="card-title">Especificacoes Tecnicas</div>
             <div class="form-row">
                 <div class="info-group">
-                    <div class="info-label">ID</div>
-                    <div class="info-value" th:text="${product.id()}"></div>
+                    <span class="info-label">Tipo</span>
+                    <span class="info-value" th:text="${product.productType() != null ? product.productType().name() : 'N/A'}">N/A</span>
                 </div>
                 <div class="info-group">
-                    <div class="info-label">Tipo</div>
-                    <div class="info-value" th:text="${product.productType() != null ? product.productType().name() : 'N/A'}"></div>
+                    <span class="info-label">Peso</span>
+                    <span class="info-value" th:text="${product.weight()} + ' kg'">0 kg</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">Altura</span>
+                    <span class="info-value" th:text="${product.height()}">0</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">Largura</span>
+                    <span class="info-value" th:text="${product.width()}">0</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">Profundidade</span>
+                    <span class="info-value" th:text="${product.depth()}">0</span>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="info-group">
-                    <div class="info-label">SKU</div>
-                    <div class="info-value" th:text="${product.sku() ?: 'N/A'}"></div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Código de Barras</div>
-                    <div class="info-value" th:text="${product.barcode() ?: 'N/A'}"></div>
-                </div>
-            </div>
-        </div>
+        </article>
 
-        <div class="card">
-            <div class="card-header">Preços e Estoque</div>
-            <div class="form-row">
-                <div class="info-group">
-                    <div class="info-label">Preço de Venda</div>
-                    <div class="info-value price" th:text="'R$ ' + ${#numbers.formatDecimal(product.salePrice(), 1, 2)}"></div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Preço de Custo</div>
-                    <div class="info-value" th:text="'R$ ' + ${#numbers.formatDecimal(product.costPrice(), 1, 2)}"></div>
-                </div>
-            </div>
-            <div class="info-group">
-                <div class="info-label">Quantidade em Estoque</div>
-                <div class="info-value" th:text="${product.stockQuantity()}"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="detail-grid">
-        <div class="card">
-            <div class="card-header">Especificações</div>
-            <div class="form-row">
-                <div class="info-group">
-                    <div class="info-label">Peso</div>
-                    <div class="info-value" th:text="${product.weight()} + ' kg'"></div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Altura</div>
-                    <div class="info-value" th:text="${product.height()}"></div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="info-group">
-                    <div class="info-label">Largura</div>
-                    <div class="info-value" th:text="${product.width()}"></div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Profundidade</div>
-                    <div class="info-value" th:text="${product.depth()}"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">Categorias</div>
+        <article class="card">
+            <div class="card-title">Categorias</div>
             <div th:if="${product.categories() != null && !product.categories().isEmpty()}" class="tag-list">
-                <span th:each="cat : ${product.categories()}" class="tag" th:text="${cat.name()}"></span>
+                <span th:each="cat : ${product.categories()}" class="badge badge--uncommon" th:text="${cat.name()}">Categoria</span>
             </div>
             <div th:if="${product.categories() == null || product.categories().isEmpty()}" class="empty-state">
-                <p>Nenhuma categoria associada.</p>
+                <div class="empty-state-icon">📜</div>
+                <h2 class="empty-state-title">Sem Vinculos</h2>
+                <p class="empty-state-text">Este artefato ainda nao recebeu categorias.</p>
             </div>
-        </div>
-    </div>
+        </article>
+    </section>
 
-    <div class="card" th:unless="${product.isActive()}">
-        <div class="card-header">Reativar Produto</div>
-        <p style="margin-bottom:1rem;color:var(--color-text-muted);">Este produto está inativo. Informe o motivo e a categoria para reativá-lo (RN0017).</p>
+    <section class="card" th:unless="${product.isActive()}">
+        <div class="card-title">Reativar Produto</div>
+        <p class="card-muted">Produto inativo. Informe motivo e categoria para liberar novamente a venda.</p>
         <form method="post" th:action="@{/products/{id}/activate(id=${product.id()})}">
             <div class="form-row">
                 <div class="form-group">
-                    <label>Motivo da Ativação *</label>
-                    <input type="text" name="reason" required placeholder="Informe o motivo da reativação"/>
-                    <div class="form-hint">Obrigatório: justificativa para reativar o item.</div>
+                    <label for="reason">Motivo da ativacao (obrigatorio)</label>
+                    <input id="reason" type="text" name="reason" required placeholder="Justificativa da reativacao"/>
                 </div>
                 <div class="form-group">
-                    <label>Categoria de Ativação *</label>
-                    <select name="category" required>
+                    <label for="category">Categoria de ativacao (obrigatorio)</label>
+                    <select id="category" name="category" required>
                         <option value="">Selecione...</option>
                         <option th:each="c : ${statusChangeCategories}" th:value="${c}" th:text="${c}"></option>
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-success">Reativar Produto</button>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">Reativar Produto</button>
+            </div>
         </form>
-    </div>
+    </section>
 
-    <div class="card">
-        <div class="card-header">Histórico de Status</div>
-        <div th:if="${product.statusChanges() != null && !product.statusChanges().isEmpty()}">
+    <section class="card" th:if="${product.isActive()}">
+        <div class="card-title">Inativar Produto</div>
+        <p class="card-muted">Inativacao manual exige motivo e categoria.</p>
+        <form method="post" th:action="@{/products/{id}/deactivate(id=${product.id()})}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="deactivateReason">Motivo da inativacao (obrigatorio)</label>
+                    <input id="deactivateReason" type="text" name="reason" required placeholder="Justificativa da inativacao"/>
+                </div>
+                <div class="form-group">
+                    <label for="deactivateCategory">Categoria de inativacao (obrigatorio)</label>
+                    <select id="deactivateCategory" name="category" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="c : ${statusChangeCategories}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">Inativar Produto</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card">
+        <div class="card-title">Historico de Status</div>
+        <div th:if="${product.statusChanges() != null && !product.statusChanges().isEmpty()}" class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>Tipo</th>
-                        <th>Motivo</th>
-                        <th>Categoria</th>
-                        <th>Data</th>
-                    </tr>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Motivo</th>
+                    <th>Categoria</th>
+                    <th>Data</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="sc : ${product.statusChanges()}">
-                        <td>
-                            <span th:if="${sc.type().name() == 'ACTIVATE'}" class="badge badge-active">Ativação</span>
-                            <span th:if="${sc.type().name() == 'DEACTIVATE'}" class="badge badge-inactive">Inativação</span>
-                        </td>
-                        <td th:text="${sc.reason()}"></td>
-                        <td th:text="${sc.category()}"></td>
-                        <td th:text="${sc.changedAt()}"></td>
-                    </tr>
+                <tr th:each="sc : ${product.statusChanges()}">
+                    <td>
+                        <span th:if="${sc.type().name() == 'ACTIVATE'}" class="badge badge-active">Ativacao</span>
+                        <span th:if="${sc.type().name() == 'DEACTIVATE'}" class="badge badge-inactive">Inativacao</span>
+                    </td>
+                    <td th:text="${sc.reason()}">Motivo</td>
+                    <td th:text="${sc.category()}">Categoria</td>
+                    <td th:text="${sc.createdAt()}">Data</td>
+                </tr>
                 </tbody>
             </table>
         </div>
         <div th:if="${product.statusChanges() == null || product.statusChanges().isEmpty()}" class="empty-state">
-            <p>Nenhuma alteração de status registrada.</p>
+            <div class="empty-state-icon">🕯</div>
+            <h2 class="empty-state-title">Sem Registro</h2>
+            <p class="empty-state-text">Nao ha alteracoes de status registradas para este produto.</p>
         </div>
-    </div>
+    </section>
 
+    <script>
+        (function () {
+            const form = document.getElementById("pdp-add-form");
+            if (!form) return;
+
+            const customerInput = document.getElementById("pdp-customer-id");
+            const quantityInput = document.getElementById("pdp-quantity");
+            const dec = form.querySelector("[data-qty-dec]");
+            const inc = form.querySelector("[data-qty-inc]");
+
+            dec.addEventListener("click", function () {
+                const current = Number(quantityInput.value || 1);
+                quantityInput.value = Math.max(1, current - 1);
+            });
+
+            inc.addEventListener("click", function () {
+                const current = Number(quantityInput.value || 1);
+                quantityInput.value = current + 1;
+            });
+
+            form.addEventListener("submit", function (event) {
+                const customerId = (customerInput.value || "").trim();
+                if (!customerId) {
+                    event.preventDefault();
+                    customerInput.focus();
+                    return;
+                }
+                form.action = "/cart/" + encodeURIComponent(customerId) + "/add";
+            });
+        })();
+    </script>
 </div>
 </html>

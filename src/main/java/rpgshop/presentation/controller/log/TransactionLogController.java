@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/logs")
-public class TransactionLogController {
+public final class TransactionLogController {
     private final QueryTransactionLogsUseCase queryTransactionLogsUseCase;
 
     public TransactionLogController(final QueryTransactionLogsUseCase queryTransactionLogsUseCase) {
@@ -25,22 +25,30 @@ public class TransactionLogController {
 
     @GetMapping
     public String list(
-        @RequestParam(required = false) String entityName,
-        @RequestParam(required = false) UUID entityId,
-        @RequestParam(required = false) OperationType operation,
-        @RequestParam(required = false) String responsibleUser,
-        @RequestParam(required = false) String startDate,
-        @RequestParam(required = false) String endDate,
-        @RequestParam(defaultValue = "0") int page,
-        Model model
+        @RequestParam(required = false) final String entityName,
+        @RequestParam(required = false) final UUID entityId,
+        @RequestParam(required = false) final OperationType operation,
+        @RequestParam(required = false) final String responsibleUser,
+        @RequestParam(required = false) final String startDate,
+        @RequestParam(required = false) final String endDate,
+        @RequestParam(defaultValue = "0") final int page,
+        final Model model
     ) {
         final Instant start = startDate != null && !startDate.isBlank()
-            ? Instant.parse(startDate + "T00:00:00Z") : null;
+            ? Instant.parse(startDate + "T00:00:00Z")
+            : null;
         final Instant end = endDate != null && !endDate.isBlank()
-            ? Instant.parse(endDate + "T23:59:59Z") : null;
+            ? Instant.parse(endDate + "T23:59:59Z")
+            : null;
 
         final Page<TransactionLog> logs = queryTransactionLogsUseCase.findByFilters(
-            entityName, entityId, operation, responsibleUser, start, end, PageRequest.of(page, 20)
+            entityName,
+            entityId,
+            operation,
+            responsibleUser,
+            start,
+            end,
+            PageRequest.of(page, 20)
         );
         model.addAttribute("logs", logs);
         model.addAttribute("operations", OperationType.values());

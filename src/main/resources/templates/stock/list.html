@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: page('Estoque', ~{::main-content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('Estoque', ~{::main-content})}">
 <div th:fragment="main-content">
-
     <div class="breadcrumb">
         <a href="/">Inicio</a> <span>/</span> <a href="/products">Produtos</a> <span>/</span> <span>Estoque</span>
     </div>
@@ -50,6 +48,5 @@
         <div class="empty-state-text">Nenhuma entrada de estoque encontrada</div>
         <p><a th:href="@{/stock/new(productId=${productId})}">Registrar primeira entrada</a></p>
     </div>
-
 </div>
 </html>

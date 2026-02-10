@@ -60,7 +60,7 @@ public final class AddressJpaEntity {
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false, updatable = false)
+    @JoinColumn(name = "customer_id", nullable = true, updatable = false)
     private CustomerJpaEntity customer;
 
     @Enumerated(STRING)

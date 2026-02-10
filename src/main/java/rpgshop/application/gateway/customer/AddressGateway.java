@@ -9,8 +9,11 @@ import java.util.UUID;
 
 public interface AddressGateway {
     Address save(final Address address, final UUID customerId);
+    Address saveDetached(final Address address);
     Optional<Address> findById(final UUID id);
     List<Address> findActiveByCustomerId(final UUID customerId);
     List<Address> findByCustomerIdAndPurpose(final UUID customerId, final AddressPurpose purpose);
     boolean existsByCustomerIdAndPurpose(final UUID customerId, final AddressPurpose purpose);
+    boolean existsByIdAndCustomerId(final UUID addressId, final UUID customerId);
+    boolean existsByIdAndCustomerIdOrWithoutCustomer(final UUID addressId, final UUID customerId);
 }

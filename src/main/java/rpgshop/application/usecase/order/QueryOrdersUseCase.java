@@ -25,6 +25,11 @@ public class QueryOrdersUseCase {
     }
 
     @Transactional(readOnly = true)
+    public Page<Order> findAll(final Pageable pageable) {
+        return orderGateway.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<Order> findByCustomerId(final UUID customerId, final Pageable pageable) {
         return orderGateway.findByCustomerId(customerId, pageable);
     }

@@ -43,6 +43,8 @@ public class UpdateProductUseCase {
     @Nonnull
     @Transactional
     public Product execute(@Nonnull final UpdateProductCommand command) {
+        validateRequiredFields(command);
+
         Product existing = productGateway
             .findById(command.id())
             .orElseThrow(() -> new EntityNotFoundException("Product", command.id()));
@@ -80,6 +82,41 @@ public class UpdateProductUseCase {
             .build();
 
         return productGateway.save(updated);
+    }
+
+    private void validateRequiredFields(final UpdateProductCommand command) {
+        if (command.name() == null || command.name().isBlank()) {
+            throw new BusinessRuleException("O nome do produto e obrigatorio");
+        }
+        if (command.productTypeId() == null) {
+            throw new BusinessRuleException("O tipo de produto e obrigatorio");
+        }
+        if (command.categoryIds() == null || command.categoryIds().isEmpty()) {
+            throw new BusinessRuleException("Pelo menos uma categoria e obrigatoria");
+        }
+        if (command.pricingGroupId() == null) {
+            throw new BusinessRuleException("O grupo de precificacao e obrigatorio");
+        }
+        if (command.costPrice() == null || command.costPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("O preco de custo deve ser maior que zero");
+        }
+        if (command.weight() == null || command.weight().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("O peso e obrigatorio e deve ser maior que zero");
+        }
+        if (command.height() == null || command.height().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("A altura e obrigatoria e deve ser maior que zero");
+        }
+        if (command.width() == null || command.width().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("A largura e obrigatoria e deve ser maior que zero");
+        }
+        if (command.depth() == null || command.depth().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("A profundidade e obrigatoria e deve ser maior que zero");
+        }
+        if ((command.barcode() == null || command.barcode().isBlank())
+            && (command.sku() == null || command.sku().isBlank())
+        ) {
+            throw new BusinessRuleException("Pelo menos um identificador e obrigatorio: codigo de barras ou SKU");
+        }
     }
 
     private void validateUniqueIdentifiers(final UpdateProductCommand command, final Product existing) {

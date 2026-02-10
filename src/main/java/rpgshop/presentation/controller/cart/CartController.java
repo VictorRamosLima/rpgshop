@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/cart")
-public class CartController {
+public final class CartController {
     private final ViewCartUseCase viewCartUseCase;
     private final AddCartItemUseCase addCartItemUseCase;
     private final UpdateCartItemQuantityUseCase updateCartItemQuantityUseCase;
@@ -44,7 +44,7 @@ public class CartController {
     }
 
     @GetMapping("/{customerId}")
-    public String viewCart(@PathVariable UUID customerId, Model model) {
+    public String viewCart(@PathVariable final UUID customerId, final Model model) {
         final Optional<Cart> cart = viewCartUseCase.execute(customerId);
         cart.ifPresent(c -> model.addAttribute("cart", c));
         model.addAttribute("customerId", customerId);
@@ -53,10 +53,10 @@ public class CartController {
 
     @PostMapping("/{customerId}/add")
     public String addItem(
-        @PathVariable UUID customerId,
-        @RequestParam UUID productId,
-        @RequestParam int quantity,
-        Model model
+        @PathVariable final UUID customerId,
+        @RequestParam final UUID productId,
+        @RequestParam final int quantity,
+        final Model model
     ) {
         try {
             final var command = new AddCartItemCommand(customerId, productId, quantity);
@@ -71,10 +71,10 @@ public class CartController {
 
     @PostMapping("/{customerId}/update")
     public String updateItem(
-        @PathVariable UUID customerId,
-        @RequestParam UUID productId,
-        @RequestParam int quantity,
-        Model model
+        @PathVariable final UUID customerId,
+        @RequestParam final UUID productId,
+        @RequestParam final int quantity,
+        final Model model
     ) {
         try {
             final var command = new UpdateCartItemCommand(customerId, productId, quantity);
@@ -88,15 +88,15 @@ public class CartController {
 
     @PostMapping("/{customerId}/remove")
     public String removeItem(
-        @PathVariable UUID customerId,
-        @RequestParam UUID productId
+        @PathVariable final UUID customerId,
+        @RequestParam final UUID productId
     ) {
         removeCartItemUseCase.execute(customerId, productId);
         return "redirect:/cart/" + customerId;
     }
 
     @PostMapping("/{customerId}/clear")
-    public String clearCart(@PathVariable UUID customerId) {
+    public String clearCart(@PathVariable final UUID customerId) {
         clearCartUseCase.execute(customerId);
         return "redirect:/cart/" + customerId;
     }

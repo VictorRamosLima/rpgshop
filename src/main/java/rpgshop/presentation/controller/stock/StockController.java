@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/stock")
-public class StockController {
+public final class StockController {
     private final CreateStockEntryUseCase createStockEntryUseCase;
     private final StockEntryGateway stockEntryGateway;
 
@@ -35,8 +35,8 @@ public class StockController {
 
     @GetMapping("/product/{productId}")
     public String listByProduct(
-        @PathVariable UUID productId,
-        @RequestParam(defaultValue = "0") int page,
+        @PathVariable final UUID productId,
+        @RequestParam(defaultValue = "0") final int page,
         Model model
     ) {
         final Page<StockEntry> entries = stockEntryGateway.findByProductId(productId, PageRequest.of(page, 10));
@@ -46,23 +46,27 @@ public class StockController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(@RequestParam(required = false) UUID productId, Model model) {
+    public String showCreateForm(@RequestParam(required = false) final UUID productId, final Model model) {
         model.addAttribute("productId", productId);
         return "stock/create";
     }
 
     @PostMapping
     public String create(
-        @RequestParam UUID productId,
-        @RequestParam Integer quantity,
-        @RequestParam BigDecimal costValue,
-        @RequestParam UUID supplierId,
-        @RequestParam String entryDate,
+        @RequestParam final UUID productId,
+        @RequestParam final Integer quantity,
+        @RequestParam final BigDecimal costValue,
+        @RequestParam final UUID supplierId,
+        @RequestParam final String entryDate,
         Model model
     ) {
         try {
             final var command = new CreateStockEntryCommand(
-                productId, quantity, costValue, supplierId, LocalDate.parse(entryDate)
+                productId,
+                quantity,
+                costValue,
+                supplierId,
+                LocalDate.parse(entryDate)
             );
             createStockEntryUseCase.execute(command);
             return "redirect:/stock/product/" + productId;

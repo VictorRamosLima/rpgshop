@@ -1,91 +1,187 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: page('Produtos', ~{::main-content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('Produtos', ~{::main-content})}">
 <div th:fragment="main-content">
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item" aria-current="page">Produtos</li>
+        </ol>
+    </nav>
 
-    <div class="breadcrumb">
-        <a href="/">Início</a> <span>/</span> <span>Produtos</span>
-    </div>
-
-    <div class="page-header">
-        <h1>&#127922; Catálogo de Produtos</h1>
-    </div>
-
-    <div class="filter-bar">
-        <form method="get" action="/products" class="form-inline">
-            <div class="form-group">
-                <label>Nome</label>
-                <input type="text" name="name" th:value="${param.name}" placeholder="Buscar por nome..."/>
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select name="isActive">
-                    <option value="">Todos</option>
-                    <option value="true" th:selected="${param.isActive != null && param.isActive.toString() == 'true'}">Ativo</option>
-                    <option value="false" th:selected="${param.isActive != null && param.isActive.toString() == 'false'}">Inativo</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Preço Mín.</label>
-                <input type="number" step="0.01" name="minPrice" th:value="${param.minPrice}" placeholder="R$ 0,00"/>
-            </div>
-            <div class="form-group">
-                <label>Preço Máx.</label>
-                <input type="number" step="0.01" name="maxPrice" th:value="${param.maxPrice}" placeholder="R$ 999,99"/>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Filtrar</button>
-            </div>
-        </form>
-    </div>
-
-    <div th:if="${products != null && !products.content.isEmpty()}">
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>SKU</th>
-                    <th>Preço de Venda</th>
-                    <th>Estoque</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="product : ${products.content}">
-                    <td th:text="${product.name()}"></td>
-                    <td th:text="${product.sku()}"></td>
-                    <td>
-                        <span class="info-value price" th:text="'R$ ' + ${#numbers.formatDecimal(product.salePrice(), 1, 2)}"></span>
-                    </td>
-                    <td th:text="${product.stockQuantity()}"></td>
-                    <td>
-                        <span th:if="${product.isActive()}" class="badge badge-active">Ativo</span>
-                        <span th:unless="${product.isActive()}" class="badge badge-inactive">Inativo</span>
-                    </td>
-                    <td class="actions-cell">
-                        <a th:href="@{/products/{id}(id=${product.id()})}" class="btn btn-sm btn-outline">Detalhes</a>
-                        <a th:href="@{/stock/product/{id}(id=${product.id()})}" class="btn btn-sm btn-accent">Estoque</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="pagination" th:if="${products.totalPages > 1}">
-            <span th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}">
-                <a th:href="@{/products(page=${i}, name=${param.name}, isActive=${param.isActive}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}"
-                   th:text="${i + 1}"
-                   th:if="${i != products.number}"></a>
-                <strong th:text="${i + 1}" th:if="${i == products.number}"></strong>
-            </span>
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Catalogo de Artefatos</h1>
+            <p class="page-subtitle">Consulta por filtros combinados e gestao completa do cadastro.</p>
         </div>
-    </div>
+        <div class="page-actions">
+            <a href="/products/new" class="btn btn-primary">Novo Produto</a>
+        </div>
+    </header>
 
-    <div th:if="${products == null || products.content.isEmpty()}" class="empty-state">
-        <div class="empty-state-icon">&#128270;</div>
-        <div class="empty-state-text">Nenhum produto encontrado</div>
-        <p>Tente ajustar os filtros de busca.</p>
-    </div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
+    <section class="plp-layout">
+        <aside class="filters-sidebar">
+            <form method="get"
+                  action="/products"
+                  class="filter-panel"
+                  hx-get="/products"
+                  hx-target="#page-content"
+                  hx-select="#page-content"
+                  hx-push-url="true"
+                  hx-indicator="#global-indicator">
+                <div class="filter-group">
+                    <h2 class="filter-group-title">Busca</h2>
+                    <div class="form-group">
+                        <label for="filter-name">Nome do produto</label>
+                        <input id="filter-name" type="text" name="name" th:value="${param.name}" placeholder="Ex: dados, miniatura..."/>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-sku">SKU</label>
+                        <input id="filter-sku" type="text" name="sku" th:value="${param.sku}" placeholder="Identificador SKU"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-barcode">Codigo de barras</label>
+                        <input id="filter-barcode" type="text" name="barcode" th:value="${param.barcode}" placeholder="EAN/UPC"/>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h2 class="filter-group-title">Classificacao</h2>
+                    <div class="form-group">
+                        <label for="filter-product-type">Tipo de produto</label>
+                        <select id="filter-product-type" name="productTypeId">
+                            <option value="">Todos</option>
+                            <option th:each="pt : ${productTypes}"
+                                    th:value="${pt.id()}"
+                                    th:text="${pt.name()}"
+                                    th:selected="${param.productTypeId != null and param.productTypeId.toString() == pt.id().toString()}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-category">Categoria</label>
+                        <select id="filter-category" name="categoryId">
+                            <option value="">Todas</option>
+                            <option th:each="cat : ${categories}"
+                                    th:value="${cat.id()}"
+                                    th:text="${cat.name()}"
+                                    th:selected="${param.categoryId != null and param.categoryId.toString() == cat.id().toString()}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-pricing-group">Grupo de precificacao</label>
+                        <select id="filter-pricing-group" name="pricingGroupId">
+                            <option value="">Todos</option>
+                            <option th:each="pg : ${pricingGroups}"
+                                    th:value="${pg.id()}"
+                                    th:text="${pg.name()}"
+                                    th:selected="${param.pricingGroupId != null and param.pricingGroupId.toString() == pg.id().toString()}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h2 class="filter-group-title">Disponibilidade</h2>
+                    <label class="filter-option" for="active-all">
+                        <input id="active-all" type="radio" name="isActive" value="" th:checked="${param.isActive == null}"/>
+                        <span>Todos</span>
+                    </label>
+                    <label class="filter-option" for="active-yes">
+                        <input id="active-yes" type="radio" name="isActive" value="true" th:checked="${param.isActive != null and param.isActive.toString() == 'true'}"/>
+                        <span>Ativos</span>
+                    </label>
+                    <label class="filter-option" for="active-no">
+                        <input id="active-no" type="radio" name="isActive" value="false" th:checked="${param.isActive != null and param.isActive.toString() == 'false'}"/>
+                        <span>Inativos</span>
+                    </label>
+                </div>
+
+                <div class="filter-group">
+                    <h2 class="filter-group-title">Faixa de preco</h2>
+                    <div class="form-group">
+                        <label for="filter-min-price">Preco minimo</label>
+                        <input id="filter-min-price" type="number" step="0.01" name="minPrice" th:value="${param.minPrice}" placeholder="0.00"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-max-price">Preco maximo</label>
+                        <input id="filter-max-price" type="number" step="0.01" name="maxPrice" th:value="${param.maxPrice}" placeholder="999.99"/>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+                    <a href="/products" class="btn btn-outline">Limpar</a>
+                </div>
+            </form>
+
+            <form method="post" action="/products/auto-deactivate" class="filter-panel">
+                <h2 class="filter-group-title">Inativacao automatica</h2>
+                <div class="form-group">
+                    <label for="auto-threshold">Limite de valor (obrigatorio)</label>
+                    <input id="auto-threshold" type="number" step="0.01" min="0.01" name="threshold" required placeholder="Ex: 50.00"/>
+                    <span class="form-hint">Inativa produtos sem estoque e com valor abaixo do limite informado.</span>
+                </div>
+                <button type="submit" class="btn btn-warning">Executar agora</button>
+            </form>
+        </aside>
+
+        <div class="section">
+            <div class="plp-controls">
+                <div class="results-count" th:text="${products != null ? products.totalElements + ' produtos encontrados' : 'Nenhum produto encontrado'}">
+                    0 produtos encontrados
+                </div>
+            </div>
+
+            <div th:if="${products != null and !products.content.isEmpty()}" class="product-grid" aria-live="polite">
+                <article th:each="product : ${products.content}" class="product-card">
+                    <div class="product-card-image-wrapper">
+                        <span class="product-badge" th:classappend="${product.isActive()} ? 'product-badge--new' : 'product-badge--out-of-stock'"
+                              th:text="${product.isActive()} ? 'Disponivel' : 'Inativo'">
+                            Disponivel
+                        </span>
+                        <div class="product-image-placeholder" th:text="${product.productType() != null ? product.productType().name() : 'Artefato'}">Artefato</div>
+                    </div>
+
+                    <div class="product-card-body">
+                        <h2 class="product-card-name" th:text="${product.name()}">Nome do Produto</h2>
+                        <div class="product-price">
+                            <span class="product-price-current" th:text="'R$ ' + ${#numbers.formatDecimal(product.salePrice(), 1, 2)}">R$ 0,00</span>
+                        </div>
+                        <div class="product-card-meta">
+                            <span th:text="'SKU: ' + ${product.sku() != null ? product.sku() : '-'}">SKU</span>
+                            <span th:text="'Estoque: ' + ${product.stockQuantity()}">Estoque</span>
+                        </div>
+                        <div class="product-card-action">
+                            <a th:href="@{/products/{id}(id=${product.id()})}" class="btn btn-primary btn-sm">Detalhes</a>
+                            <a th:href="@{/products/{id}/edit(id=${product.id()})}" class="btn btn-outline btn-sm">Editar</a>
+                            <a th:href="@{/stock/product/{id}(id=${product.id()})}" class="btn btn-outline btn-sm">Estoque</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div th:if="${products == null or products.content.isEmpty()}" class="empty-state">
+                <div class="empty-state-icon">??</div>
+                <h2 class="empty-state-title">Nenhum Artefato Encontrado</h2>
+                <p class="empty-state-text">
+                    Ajuste os filtros para localizar produtos por identificadores e classificacoes.
+                </p>
+                <a href="/products" class="btn btn-primary">Limpar filtros</a>
+            </div>
+
+            <nav class="pagination" th:if="${products != null and products.totalPages > 1}" aria-label="Paginacao de produtos">
+                <span th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}">
+                    <a th:href="@{/products(page=${i}, name=${param.name}, productTypeId=${param.productTypeId}, categoryId=${param.categoryId}, pricingGroupId=${param.pricingGroupId}, sku=${param.sku}, barcode=${param.barcode}, isActive=${param.isActive}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}"
+                       th:text="${i + 1}"
+                       th:if="${i != products.number}">1</a>
+                    <strong th:text="${i + 1}" th:if="${i == products.number}" aria-current="page">1</strong>
+                </span>
+            </nav>
+        </div>
+    </section>
 </div>
 </html>

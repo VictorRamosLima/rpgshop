@@ -23,9 +23,9 @@ public interface CustomerRepository {
     @Nonnull
     @Query("""
         SELECT c FROM CustomerJpaEntity c
-        WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+        WHERE (:name IS NULL OR LOWER(CAST(c.name AS string)) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')))
             AND (:cpf IS NULL OR c.cpf = :cpf)
-            AND (:email IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :email, '%')))
+            AND (:email IS NULL OR LOWER(CAST(c.email AS string)) LIKE LOWER(CONCAT('%', CAST(:email AS string), '%')))
             AND (:customerCode IS NULL OR c.customerCode = :customerCode)
             AND (:gender IS NULL OR c.gender = :gender)
             AND (:isActive IS NULL OR c.isActive = :isActive)

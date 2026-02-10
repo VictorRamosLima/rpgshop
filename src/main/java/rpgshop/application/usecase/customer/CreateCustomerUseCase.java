@@ -5,10 +5,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rpgshop.application.command.customer.CreateCustomerCommand;
 import rpgshop.application.exception.BusinessRuleException;
+import rpgshop.application.gateway.customer.AddressGateway;
 import rpgshop.application.gateway.customer.CustomerGateway;
 import rpgshop.application.gateway.customer.PhoneGateway;
+import rpgshop.domain.entity.customer.Address;
 import rpgshop.domain.entity.customer.Customer;
 import rpgshop.domain.entity.customer.Phone;
+import rpgshop.domain.entity.customer.constant.AddressPurpose;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -21,10 +24,16 @@ public class CreateCustomerUseCase {
         "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$"
     );
 
+    private final AddressGateway addressGateway;
     private final CustomerGateway customerGateway;
     private final PhoneGateway phoneGateway;
 
-    public CreateCustomerUseCase(final CustomerGateway customerGateway, final PhoneGateway phoneGateway) {
+    public CreateCustomerUseCase(
+        final AddressGateway addressGateway,
+        final CustomerGateway customerGateway,
+        final PhoneGateway phoneGateway
+    ) {
+        this.addressGateway = addressGateway;
         this.customerGateway = customerGateway;
         this.phoneGateway = phoneGateway;
     }
@@ -67,7 +76,41 @@ public class CreateCustomerUseCase {
 
         phoneGateway.save(phone, saved.id());
 
+        addressGateway.save(buildAddress(command, AddressPurpose.RESIDENTIAL, "Residencial"), saved.id());
+        addressGateway.save(buildAddress(command, AddressPurpose.BILLING, "Cobranca Principal"), saved.id());
+        addressGateway.save(buildAddress(command, AddressPurpose.DELIVERY, "Entrega Principal"), saved.id());
+
+        if (!addressGateway.existsByCustomerIdAndPurpose(saved.id(), AddressPurpose.BILLING)) {
+            throw new BusinessRuleException("E obrigatorio possuir ao menos um endereco de cobranca");
+        }
+        if (!addressGateway.existsByCustomerIdAndPurpose(saved.id(), AddressPurpose.DELIVERY)) {
+            throw new BusinessRuleException("E obrigatorio possuir ao menos um endereco de entrega");
+        }
+
         return customerGateway.findById(saved.id()).orElse(saved);
+    }
+
+    private Address buildAddress(
+        final CreateCustomerCommand command,
+        final AddressPurpose purpose,
+        final String label
+    ) {
+        return Address.builder()
+            .id(UUID.randomUUID())
+            .purpose(purpose)
+            .label(label)
+            .residenceType(command.residentialResidenceType())
+            .streetType(command.residentialStreetType())
+            .street(command.residentialStreet())
+            .number(command.residentialNumber())
+            .neighborhood(command.residentialNeighborhood())
+            .zipCode(command.residentialZipCode())
+            .city(command.residentialCity())
+            .state(command.residentialState())
+            .country(command.residentialCountry())
+            .observations(command.residentialObservations())
+            .isActive(true)
+            .build();
     }
 
     private void validateRequiredFields(final CreateCustomerCommand command) {
@@ -94,6 +137,33 @@ public class CreateCustomerUseCase {
         }
         if (command.phoneNumber() == null || command.phoneNumber().isBlank()) {
             throw new BusinessRuleException("O numero de telefone e obrigatorio");
+        }
+        if (command.residentialResidenceType() == null) {
+            throw new BusinessRuleException("O tipo de residencia do endereco residencial e obrigatorio");
+        }
+        if (command.residentialStreetType() == null) {
+            throw new BusinessRuleException("O tipo de logradouro do endereco residencial e obrigatorio");
+        }
+        if (command.residentialStreet() == null || command.residentialStreet().isBlank()) {
+            throw new BusinessRuleException("O logradouro do endereco residencial e obrigatorio");
+        }
+        if (command.residentialNumber() == null || command.residentialNumber().isBlank()) {
+            throw new BusinessRuleException("O numero do endereco residencial e obrigatorio");
+        }
+        if (command.residentialNeighborhood() == null || command.residentialNeighborhood().isBlank()) {
+            throw new BusinessRuleException("O bairro do endereco residencial e obrigatorio");
+        }
+        if (command.residentialZipCode() == null || command.residentialZipCode().isBlank()) {
+            throw new BusinessRuleException("O CEP do endereco residencial e obrigatorio");
+        }
+        if (command.residentialCity() == null || command.residentialCity().isBlank()) {
+            throw new BusinessRuleException("A cidade do endereco residencial e obrigatoria");
+        }
+        if (command.residentialState() == null || command.residentialState().isBlank()) {
+            throw new BusinessRuleException("O estado do endereco residencial e obrigatorio");
+        }
+        if (command.residentialCountry() == null || command.residentialCountry().isBlank()) {
+            throw new BusinessRuleException("O pais do endereco residencial e obrigatorio");
         }
     }
 

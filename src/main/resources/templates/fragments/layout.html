@@ -5,35 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title th:text="${title} + ' | RPG Shop'">RPG Shop</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script defer src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
-<body>
-<div class="layout">
-    <header>
-        <div class="header-inner">
-            <a href="/" class="logo">
-                <span class="logo-icon">&#9876;</span>
-                <span class="logo-text">RPG Shop</span>
-            </a>
-            <nav>
-                <a href="/products">Produtos</a>
-                <a href="/customers">Clientes</a>
-                <a href="/orders">Pedidos</a>
-                <a href="/exchanges">Trocas</a>
-                <a href="/coupons/new">Cupons</a>
-                <a href="/logs">Logs</a>
-                <a href="/analysis">Análises</a>
-            </nav>
-        </div>
-    </header>
+<!--/*@thymesVar id="#httpServletRequest" type="jakarta.servlet.http.HttpServletRequest"*/-->
+<body th:with="currentPath=${#httpServletRequest != null ? #httpServletRequest.requestURI : ''}">
+    <div class="site-root">
+        <header class="site-header" role="banner">
+            <div class="container site-header-inner">
+                <a href="/" class="site-logo" aria-label="RPG Shop - inicio">
+                    <span class="site-logo-mark">⚔</span>
+                    <span>RPG Shop</span>
+                </a>
 
-    <main>
-        <div th:replace="${content}">Conteúdo da página</div>
-    </main>
+                <nav class="site-nav" role="navigation" aria-label="Navegacao principal">
+                    <a href="/products" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/products')} ? 'page' : null">
+                        Produtos
+                    </a>
+                    <a href="/customers" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/customers')} ? 'page' : null">
+                        Clientes
+                    </a>
+                    <a href="/orders" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/orders')} ? 'page' : null">
+                        Pedidos
+                    </a>
+                    <a href="/exchanges" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/exchanges')} ? 'page' : null">
+                        Trocas
+                    </a>
+                    <a href="/coupons/new" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/coupons')} ? 'page' : null">
+                        Cupons
+                    </a>
+                    <a href="/logs" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/logs')} ? 'page' : null">
+                        Logs
+                    </a>
+                    <a href="/analysis" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/analysis')} ? 'page' : null">
+                        Analises
+                    </a>
+                </nav>
 
-    <footer>
-        &copy; 2026 RPG Shop &mdash; Sua loja de itens de RPG. Todos os direitos reservados.
-    </footer>
-</div>
+                <div class="site-actions" aria-label="Atalhos de conta">
+                    <a href="/customers" class="icon-action" aria-label="Aventureiros">👤</a>
+                    <a href="/orders" class="icon-action" aria-label="Missoes">📜</a>
+                    <a href="/products" class="icon-action" aria-label="Catalogo">🛡</a>
+                </div>
+            </div>
+
+            <div class="header-search">
+                <div class="container">
+                    <form method="get" action="/products" role="search" class="search-wrapper"
+                          hx-get="/products"
+                          hx-target="#page-content"
+                          hx-select="#page-content"
+                          hx-push-url="true"
+                          hx-indicator="#global-indicator">
+                        <label for="header-search-input" class="sr-only">Buscar produtos</label>
+                        <input id="header-search-input"
+                               class="search-input"
+                               type="search"
+                               name="name"
+                               placeholder="Buscar artefatos, livros, dados e miniaturas..."
+                               autocomplete="off"/>
+                        <button type="submit" class="btn btn-primary search-submit">Buscar</button>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+        <main class="site-main" role="main"
+              hx-boost="true"
+              hx-target="#page-content"
+              hx-select="#page-content"
+              hx-swap="outerHTML show:top"
+              hx-indicator="#global-indicator">
+            <div id="page-content" class="container page-shell" aria-live="polite" aria-atomic="true" role="region" aria-label="Conteudo da pagina">
+                <div th:replace="${content}">Conteudo da pagina</div>
+            </div>
+        </main>
+
+        <footer class="site-footer" role="contentinfo">
+            <div class="container">
+                <div class="footer-top-decoration" aria-hidden="true"></div>
+                <div class="footer-grid">
+                    <div>
+                        <h2 class="footer-heading">RPG Shop Guilda</h2>
+                        <p>
+                            Equipamentos, livros e reliquias para campanhas memoraveis.
+                            Design dark fantasy com foco em usabilidade de e-commerce.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="footer-heading">Catalogo</h3>
+                        <a class="footer-link" href="/products">Produtos</a>
+                        <a class="footer-link" href="/stock/new">Entrada de estoque</a>
+                        <a class="footer-link" href="/analysis/sales">Vendas por periodo</a>
+                    </div>
+                    <div>
+                        <h3 class="footer-heading">Operacao</h3>
+                        <a class="footer-link" href="/orders">Pedidos</a>
+                        <a class="footer-link" href="/exchanges">Trocas</a>
+                        <a class="footer-link" href="/logs">Logs de transacoes</a>
+                    </div>
+                    <div>
+                        <h3 class="footer-heading">Relacoes</h3>
+                        <a class="footer-link" href="/customers">Clientes</a>
+                        <a class="footer-link" href="/coupons/new">Cupons</a>
+                        <a class="footer-link" href="/analysis">Painel analitico</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <span>&copy; 2026 RPG Shop. Todos os direitos reservados.</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div id="global-indicator" class="global-indicator htmx-indicator" aria-hidden="true">
+        <span class="spinner"></span>
+        <span>Carregando...</span>
+    </div>
+
+    <div id="toast-container" class="toast-container" aria-live="assertive" role="alert"></div>
 </body>
 </html>

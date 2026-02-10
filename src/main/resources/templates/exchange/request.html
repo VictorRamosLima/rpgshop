@@ -22,22 +22,29 @@
                 <div class="info-label">Pedido</div>
                 <div class="info-value" th:text="${orderId}"></div>
             </div>
+
             <div class="form-row">
                 <div class="form-group">
-                    <label>ID do Item do Pedido *</label>
-                    <input type="text" name="orderItemId" required placeholder="UUID do item do pedido"/>
-                    <div class="form-hint">Informe o ID do item que deseja trocar.</div>
+                    <label for="orderItemId">Item do pedido (obrigatorio)</label>
+                    <select id="orderItemId" name="orderItemId" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="item : ${orderItems}"
+                                th:value="${item.id()}"
+                                th:text="${(item.product() != null ? item.product().name() : 'Produto') + ' - Qtd comprada: ' + item.quantity()}">
+                        </option>
+                    </select>
+                    <div class="form-hint">Apenas itens de pedidos entregues podem ser selecionados para troca.</div>
                 </div>
                 <div class="form-group">
-                    <label>Quantidade *</label>
-                    <input type="number" name="quantity" required min="1" value="1"/>
-                    <div class="form-hint">Quantidade de itens a trocar.</div>
+                    <label for="quantity">Quantidade (obrigatorio)</label>
+                    <input id="quantity" type="number" name="quantity" required min="1" value="1"/>
+                    <div class="form-hint">Informe a quantidade que deseja trocar.</div>
                 </div>
             </div>
+
             <div class="form-group">
-                <label>Motivo da Troca *</label>
-                <textarea name="reason" required placeholder="Descreva o motivo da troca..." rows="3"></textarea>
-                <div class="form-hint">Informe detalhadamente o motivo da solicitacao de troca.</div>
+                <label for="reason">Motivo da Troca (obrigatorio)</label>
+                <textarea id="reason" name="reason" required placeholder="Descreva o motivo da troca..." rows="3"></textarea>
             </div>
         </div>
 

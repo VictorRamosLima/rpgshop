@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/analysis")
-public class AnalysisController {
+public final class AnalysisController {
     private final SalesAnalysisUseCase salesAnalysisUseCase;
 
     public AnalysisController(final SalesAnalysisUseCase salesAnalysisUseCase) {
@@ -25,16 +25,16 @@ public class AnalysisController {
     }
 
     @GetMapping
-    public String dashboard(Model model) {
+    public String dashboard(final Model model) {
         return "analysis/dashboard";
     }
 
     @GetMapping("/sales")
     public String salesInPeriod(
-        @RequestParam(required = false) String startDate,
-        @RequestParam(required = false) String endDate,
-        @RequestParam(defaultValue = "0") int page,
-        Model model
+        @RequestParam(required = false) final String startDate,
+        @RequestParam(required = false) final String endDate,
+        @RequestParam(defaultValue = "0") final int page,
+        final Model model
     ) {
         if (startDate != null && !startDate.isBlank() && endDate != null && !endDate.isBlank()) {
             final Instant start = Instant.parse(startDate + "T00:00:00Z");
@@ -47,10 +47,10 @@ public class AnalysisController {
 
     @GetMapping("/by-product")
     public String byProduct(
-        @RequestParam(required = false) UUID productId,
-        @RequestParam(required = false) String startDate,
-        @RequestParam(required = false) String endDate,
-        Model model
+        @RequestParam(required = false) final UUID productId,
+        @RequestParam(required = false) final String startDate,
+        @RequestParam(required = false) final String endDate,
+        final Model model
     ) {
         if (productId != null && startDate != null && !startDate.isBlank() && endDate != null && !endDate.isBlank()) {
             final Instant start = Instant.parse(startDate + "T00:00:00Z");
@@ -66,9 +66,9 @@ public class AnalysisController {
 
     @GetMapping("/by-category")
     public String byCategory(
-        @RequestParam(required = false) UUID categoryId,
-        @RequestParam(required = false) String startDate,
-        @RequestParam(required = false) String endDate,
+        @RequestParam(required = false) final UUID categoryId,
+        @RequestParam(required = false) final String startDate,
+        @RequestParam(required = false) final String endDate,
         Model model
     ) {
         if (categoryId != null && startDate != null && !startDate.isBlank() && endDate != null && !endDate.isBlank()) {

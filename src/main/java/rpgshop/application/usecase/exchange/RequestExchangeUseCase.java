@@ -37,30 +37,30 @@ public class RequestExchangeUseCase {
     @Transactional
     public ExchangeRequest execute(@Nonnull final RequestExchangeCommand command) {
         if (command.reason() == null || command.reason().isBlank()) {
-            throw new BusinessRuleException("Exchange reason is required");
+            throw new BusinessRuleException("O motivo da troca e obrigatorio");
         }
         if (command.quantity() <= 0) {
-            throw new BusinessRuleException("Quantity must be greater than zero");
+            throw new BusinessRuleException("A quantidade deve ser maior que zero");
         }
 
         final Order order = orderGateway.findById(command.orderId())
             .orElseThrow(() -> new EntityNotFoundException("Order", command.orderId()));
 
         if (order.status() != OrderStatus.DELIVERED) {
-            throw new BusinessRuleException("Only delivered orders can have items exchanged");
+            throw new BusinessRuleException("Somente pedidos entregues podem ter itens trocados");
         }
 
         final OrderItem orderItem = orderItemGateway.findById(command.orderItemId())
             .orElseThrow(() -> new EntityNotFoundException("OrderItem", command.orderItemId()));
 
         if (command.quantity() > orderItem.quantity()) {
-            throw new BusinessRuleException("Exchange quantity exceeds purchased quantity");
+            throw new BusinessRuleException("A quantidade de troca excede a quantidade comprada");
         }
 
         if (exchangeRequestGateway.existsByOrderItemIdAndStatusNot(
             command.orderItemId(), ExchangeStatus.COMPLETED
         )) {
-            throw new BusinessRuleException("An exchange request already exists for this item");
+            throw new BusinessRuleException("Ja existe uma solicitacao de troca para este item");
         }
 
         final ExchangeRequest exchangeRequest = ExchangeRequest.builder()

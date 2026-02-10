@@ -49,7 +49,7 @@ public class ReceiveExchangeItemsUseCase {
             .orElseThrow(() -> new EntityNotFoundException("ExchangeRequest", command.exchangeRequestId()));
 
         if (request.status() != ExchangeStatus.AUTHORIZED) {
-            throw new BusinessRuleException("Only authorized exchange requests can receive items");
+            throw new BusinessRuleException("Somente solicitacoes de troca autorizadas podem receber itens");
         }
 
         if (command.returnToStock()) {

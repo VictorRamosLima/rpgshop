@@ -79,11 +79,11 @@ public class CreateOrderUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Address", command.deliveryAddressId()));
 
         final Cart cart = cartGateway.findByCustomerId(command.customerId())
-            .orElseThrow(() -> new BusinessRuleException("Cart is empty"));
+            .orElseThrow(() -> new BusinessRuleException("O carrinho esta vazio"));
 
         final List<CartItem> cartItems = cartItemGateway.findByCartId(cart.id());
         if (cartItems.isEmpty()) {
-            throw new BusinessRuleException("Cart is empty");
+            throw new BusinessRuleException("O carrinho esta vazio");
         }
 
         validateStockAvailability(cartItems);
@@ -124,7 +124,7 @@ public class CreateOrderUseCase {
                 .orElseThrow(() -> new EntityNotFoundException("Product", item.product().id()));
 
             if (!product.isActive()) {
-                throw new BusinessRuleException("Product '%s' is no longer available".formatted(product.name()));
+                throw new BusinessRuleException("O produto '%s' nao esta mais disponivel".formatted(product.name()));
             }
             if (product.stockQuantity() < item.quantity()) {
                 throw new BusinessRuleException(
@@ -172,7 +172,7 @@ public class CreateOrderUseCase {
         final UUID customerId
     ) {
         if (paymentInfos == null || paymentInfos.isEmpty()) {
-            throw new BusinessRuleException("At least one payment method is required");
+            throw new BusinessRuleException("Pelo menos uma forma de pagamento e obrigatoria");
         }
 
         final List<OrderPayment> payments = new ArrayList<>();
@@ -187,14 +187,14 @@ public class CreateOrderUseCase {
                     .orElseThrow(() -> new EntityNotFoundException("Coupon", info.couponId()));
 
                 if (coupon.isUsed()) {
-                    throw new BusinessRuleException("Coupon '%s' has already been used".formatted(coupon.code()));
+                    throw new BusinessRuleException("O cupom '%s' ja foi utilizado".formatted(coupon.code()));
                 }
                 if (coupon.expiresAt() != null && coupon.expiresAt().isBefore(Instant.now())) {
-                    throw new BusinessRuleException("Coupon '%s' has expired".formatted(coupon.code()));
+                    throw new BusinessRuleException("O cupom '%s' expirou".formatted(coupon.code()));
                 }
                 if (coupon.type() == rpgshop.domain.entity.coupon.constant.CouponType.PROMOTIONAL) {
                     if (hasPromotionalCoupon) {
-                        throw new BusinessRuleException("Only one promotional coupon is allowed per order");
+                        throw new BusinessRuleException("Apenas um cupom promocional e permitido por pedido");
                     }
                     hasPromotionalCoupon = true;
                 }

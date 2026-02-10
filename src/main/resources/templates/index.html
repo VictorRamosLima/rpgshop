@@ -1,21 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>RPG Shop</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>RPG Shop</h1>
-    <nav>
-        <ul>
-            <li><a href="/customers">Customers</a></li>
-            <li><a href="/products">Products</a></li>
-            <li><a href="/orders">Orders</a></li>
-            <li><a href="/exchanges">Exchanges</a></li>
-            <li><a href="/coupons/new">Coupons</a></li>
-            <li><a href="/logs">Transaction Logs</a></li>
-            <li><a href="/analysis">Sales Analysis</a></li>
-        </ul>
-    </nav>
-</body>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Início', ~{::main-content})}">
+<div th:fragment="main-content">
+
+    <div class="home-hero">
+        <h1>&#9876; RPG Shop</h1>
+        <p>Sua loja especializada em itens de RPG. Dados, miniaturas, mapas, livros de regras, escudos de mestre e muito mais para suas aventuras!</p>
+    </div>
+
+    <div class="home-cards">
+        <a href="/products" class="home-card">
+            <div class="home-card-icon">&#127922;</div>
+            <div class="home-card-title">Produtos</div>
+            <div class="home-card-desc">Explore nosso catálogo de itens de RPG</div>
+        </a>
+        <a href="/customers" class="home-card">
+            <div class="home-card-icon">&#128101;</div>
+            <div class="home-card-title">Clientes</div>
+            <div class="home-card-desc">Gerencie o cadastro de clientes</div>
+        </a>
+        <a href="/orders" class="home-card">
+            <div class="home-card-icon">&#128230;</div>
+            <div class="home-card-title">Pedidos</div>
+            <div class="home-card-desc">Acompanhe e gerencie os pedidos</div>
+        </a>
+        <a href="/exchanges" class="home-card">
+            <div class="home-card-icon">&#128260;</div>
+            <div class="home-card-title">Trocas</div>
+            <div class="home-card-desc">Solicitações de troca de itens</div>
+        </a>
+        <a href="/coupons/new" class="home-card">
+            <div class="home-card-icon">&#127915;</div>
+            <div class="home-card-title">Cupons</div>
+            <div class="home-card-desc">Crie cupons promocionais e de troca</div>
+        </a>
+        <a href="/logs" class="home-card">
+            <div class="home-card-icon">&#128220;</div>
+            <div class="home-card-title">Logs</div>
+            <div class="home-card-desc">Registro de transações do sistema</div>
+        </a>
+        <a href="/analysis" class="home-card">
+            <div class="home-card-icon">&#128200;</div>
+            <div class="home-card-title">Análises</div>
+            <div class="home-card-desc">Relatórios e análise de vendas</div>
+        </a>
+    </div>
+
+</div>
 </html>

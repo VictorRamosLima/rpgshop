@@ -23,16 +23,16 @@ public class CreateTransactionLogUseCase {
     @Transactional
     public TransactionLog execute(@Nonnull final CreateTransactionLogCommand command) {
         if (command.entityName() == null || command.entityName().isBlank()) {
-            throw new BusinessRuleException("Entity name is required");
+            throw new BusinessRuleException("O nome da entidade e obrigatorio");
         }
         if (command.entityId() == null) {
-            throw new BusinessRuleException("Entity ID is required");
+            throw new BusinessRuleException("O ID da entidade e obrigatorio");
         }
         if (command.operation() == null) {
-            throw new BusinessRuleException("Operation type is required");
+            throw new BusinessRuleException("O tipo de operacao e obrigatorio");
         }
         if (command.responsibleUser() == null || command.responsibleUser().isBlank()) {
-            throw new BusinessRuleException("Responsible user is required");
+            throw new BusinessRuleException("O usuario responsavel e obrigatorio");
         }
 
         final TransactionLog log = TransactionLog.builder()

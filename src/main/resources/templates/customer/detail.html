@@ -1,141 +1,315 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Customer Detail</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Customer Detail</h1>
-    <a href="/">Home</a> | <a href="/customers">Back to List</a>
-    | <a th:href="@{/cart/{id}(id=${customer.id()})}">View Cart</a>
-    | <a th:href="@{/orders/customer/{id}(id=${customer.id()})}">View Orders</a>
-    | <a th:href="@{/coupons/customer/{id}(id=${customer.id()})}">View Coupons</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Detalhe do Cliente', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <a href="/customers">Clientes</a> <span>/</span> <span th:text="${customer.name()}">Cliente</span>
+    </div>
 
-    <h2>Info</h2>
-    <p>ID: <span th:text="${customer.id()}"></span></p>
-    <p>Customer Code: <span th:text="${customer.customerCode()}"></span></p>
-    <p>Ranking: <span th:text="${customer.ranking()}"></span></p>
-    <p>Active: <span th:text="${customer.isActive()}"></span></p>
+    <div class="page-header">
+        <h1 th:text="${customer.name()}">Nome do Cliente</h1>
+        <div class="btn-group">
+            <a th:href="@{/cart/{id}(id=${customer.id()})}" class="btn btn-accent">Carrinho</a>
+            <a th:href="@{/orders/customer/{id}(id=${customer.id()})}" class="btn btn-primary">Pedidos</a>
+            <a th:href="@{/coupons/customer/{id}(id=${customer.id()})}" class="btn btn-outline">Cupons</a>
+            <span th:if="${customer.isActive()}" class="badge badge-active">Ativo</span>
+            <span th:unless="${customer.isActive()}" class="badge badge-inactive">Inativo</span>
+        </div>
+    </div>
 
-    <h3>Update Info</h3>
-    <form method="post" th:action="@{/customers/{id}/update(id=${customer.id()})}">
-        <label>Gender:
-            <select name="gender">
-                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}" th:selected="${customer.gender() == g}"></option>
-            </select>
-        </label><br/>
-        <label>Name: <input type="text" name="name" th:value="${customer.name()}" required/></label><br/>
-        <label>Date of Birth: <input type="date" name="dateOfBirth" th:value="${customer.dateOfBirth()}" required/></label><br/>
-        <label>Email: <input type="email" name="email" th:value="${customer.email()}" required/></label><br/>
-        <button type="submit">Update</button>
-    </form>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <h3>Change Password</h3>
-    <form method="post" th:action="@{/customers/{id}/change-password(id=${customer.id()})}">
-        <label>New Password: <input type="password" name="newPassword" required/></label><br/>
-        <label>Confirm: <input type="password" name="confirmPassword" required/></label><br/>
-        <button type="submit">Change Password</button>
-    </form>
+    <div class="detail-grid">
+        <div class="card">
+            <div class="card-header">Informacoes Gerais</div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">Codigo do Cliente</div>
+                    <div class="info-value" th:text="${customer.customerCode()}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Ranking</div>
+                    <div class="info-value" th:text="${customer.ranking()}"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">CPF</div>
+                    <div class="info-value" th:text="${customer.cpf()}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">E-mail</div>
+                    <div class="info-value" th:text="${customer.email()}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <form method="post" th:action="@{/customers/{id}/deactivate(id=${customer.id()})}" th:if="${customer.isActive()}">
-        <button type="submit">Deactivate Customer</button>
-    </form>
+    <div class="card">
+        <div class="card-header">Atualizar Dados</div>
+        <form method="post" th:action="@{/customers/{id}/update(id=${customer.id()})}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Genero</label>
+                    <select name="gender">
+                        <option th:each="g : ${genders}" th:value="${g}" th:text="${g}" th:selected="${customer.gender() == g}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo *</label>
+                    <input type="text" name="name" th:value="${customer.name()}" required/>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Data de Nascimento *</label>
+                    <input type="date" name="dateOfBirth" th:value="${customer.dateOfBirth()}" required/>
+                </div>
+                <div class="form-group">
+                    <label>E-mail *</label>
+                    <input type="email" name="email" th:value="${customer.email()}" required/>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Alteracoes</button>
+        </form>
+    </div>
 
-    <hr/>
-    <h2>Phones</h2>
-    <table border="1" th:if="${customer.phones() != null && !customer.phones().isEmpty()}">
-        <thead><tr><th>Type</th><th>Area Code</th><th>Number</th></tr></thead>
-        <tbody>
-            <tr th:each="phone : ${customer.phones()}">
-                <td th:text="${phone.type()}"></td>
-                <td th:text="${phone.areaCode()}"></td>
-                <td th:text="${phone.number()}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="detail-grid">
+        <div class="card">
+            <div class="card-header">Alterar Senha</div>
+            <form method="post" th:action="@{/customers/{id}/change-password(id=${customer.id()})}" id="changePasswordForm">
+                <div class="form-group">
+                    <label>Nova Senha *</label>
+                    <input type="password" name="newPassword" required minlength="8" id="newPw"/>
+                    <div class="form-hint">Minimo 8 caracteres, letras maiusculas, minusculas e caracteres especiais.</div>
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Nova Senha *</label>
+                    <input type="password" name="confirmPassword" required minlength="8" id="confirmNewPw"/>
+                </div>
+                <button type="submit" class="btn btn-warning">Alterar Senha</button>
+            </form>
+            <script>
+                document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+                    var pw = document.getElementById('newPw').value;
+                    var cpw = document.getElementById('confirmNewPw').value;
+                    if (pw !== cpw) { e.preventDefault(); alert('As senhas nao coincidem.'); return false; }
+                    if (pw.length < 8) { e.preventDefault(); alert('A senha deve ter no minimo 8 caracteres.'); return false; }
+                    if (!/[A-Z]/.test(pw)) { e.preventDefault(); alert('A senha deve conter pelo menos uma letra maiuscula.'); return false; }
+                    if (!/[a-z]/.test(pw)) { e.preventDefault(); alert('A senha deve conter pelo menos uma letra minuscula.'); return false; }
+                    if (!/[^a-zA-Z0-9]/.test(pw)) { e.preventDefault(); alert('A senha deve conter pelo menos um caractere especial.'); return false; }
+                });
+            </script>
+        </div>
 
-    <h3>Add Phone</h3>
-    <form method="post" th:action="@{/customers/{id}/phones(id=${customer.id()})}">
-        <label>Type:
-            <select name="type">
-                <option th:each="t : ${phoneTypes}" th:value="${t}" th:text="${t}"></option>
-            </select>
-        </label>
-        <label>Area Code: <input type="text" name="areaCode" required/></label>
-        <label>Number: <input type="text" name="phoneNumber" required/></label>
-        <button type="submit">Add Phone</button>
-    </form>
+        <div class="card" th:if="${customer.isActive()}">
+            <div class="card-header">Inativar Cliente</div>
+            <p style="margin-bottom:1rem;color:var(--color-text-muted);">Ao inativar, o cliente nao podera mais realizar compras.</p>
+            <form method="post" th:action="@{/customers/{id}/deactivate(id=${customer.id()})}">
+                <button type="submit" class="btn btn-danger">Inativar Cliente</button>
+            </form>
+        </div>
+    </div>
 
-    <hr/>
-    <h2>Addresses</h2>
-    <table border="1" th:if="${customer.addresses() != null && !customer.addresses().isEmpty()}">
-        <thead><tr><th>Purpose</th><th>Label</th><th>Street</th><th>Number</th><th>City</th><th>State</th><th>Active</th></tr></thead>
-        <tbody>
-            <tr th:each="addr : ${customer.addresses()}">
-                <td th:text="${addr.purpose()}"></td>
-                <td th:text="${addr.label()}"></td>
-                <td th:text="${addr.street()}"></td>
-                <td th:text="${addr.number()}"></td>
-                <td th:text="${addr.city()}"></td>
-                <td th:text="${addr.state()}"></td>
-                <td th:text="${addr.isActive()}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <hr class="section-divider"/>
 
-    <h3>Add Address</h3>
-    <form method="post" th:action="@{/customers/{id}/addresses(id=${customer.id()})}">
-        <label>Purpose:
-            <select name="purpose">
-                <option th:each="p : ${addressPurposes}" th:value="${p}" th:text="${p}"></option>
-            </select>
-        </label><br/>
-        <label>Label: <input type="text" name="label"/></label><br/>
-        <label>Residence Type:
-            <select name="residenceType">
-                <option th:each="r : ${residenceTypes}" th:value="${r}" th:text="${r}"></option>
-            </select>
-        </label><br/>
-        <label>Street Type:
-            <select name="streetType">
-                <option th:each="s : ${streetTypes}" th:value="${s}" th:text="${s}"></option>
-            </select>
-        </label><br/>
-        <label>Street: <input type="text" name="street" required/></label><br/>
-        <label>Number: <input type="text" name="number" required/></label><br/>
-        <label>Neighborhood: <input type="text" name="neighborhood" required/></label><br/>
-        <label>Zip Code: <input type="text" name="zipCode" required/></label><br/>
-        <label>City: <input type="text" name="city" required/></label><br/>
-        <label>State: <input type="text" name="state" required/></label><br/>
-        <label>Country: <input type="text" name="country" required/></label><br/>
-        <label>Observations: <textarea name="observations"></textarea></label><br/>
-        <button type="submit">Add Address</button>
-    </form>
+    <div class="card">
+        <div class="card-header">Telefones</div>
+        <div th:if="${customer.phones() != null and !customer.phones().isEmpty()}">
+            <table>
+                <thead><tr><th>Tipo</th><th>DDD</th><th>Numero</th></tr></thead>
+                <tbody>
+                    <tr th:each="phone : ${customer.phones()}">
+                        <td th:text="${phone.type()}"></td>
+                        <td th:text="${phone.areaCode()}"></td>
+                        <td th:text="${phone.number()}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${customer.phones() == null or customer.phones().isEmpty()}" class="empty-state">
+            <p>Nenhum telefone cadastrado.</p>
+        </div>
+        <div class="form-section" style="margin-top:1rem;">
+            <div class="form-section-title">Adicionar Telefone</div>
+            <form method="post" th:action="@{/customers/{id}/phones(id=${customer.id()})}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select name="type" required>
+                            <option value="">Selecione...</option>
+                            <option th:each="t : ${phoneTypes}" th:value="${t}" th:text="${t}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>DDD *</label>
+                        <input type="text" name="areaCode" required placeholder="11" maxlength="3"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Numero *</label>
+                        <input type="text" name="phoneNumber" required placeholder="99999-9999"/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Adicionar Telefone</button>
+            </form>
+        </div>
+    </div>
 
-    <hr/>
-    <h2>Credit Cards</h2>
-    <table border="1" th:if="${customer.creditCards() != null && !customer.creditCards().isEmpty()}">
-        <thead><tr><th>Number</th><th>Printed Name</th><th>Brand</th><th>Preferred</th></tr></thead>
-        <tbody>
-            <tr th:each="card : ${customer.creditCards()}">
-                <td th:text="${card.cardNumber()}"></td>
-                <td th:text="${card.printedName()}"></td>
-                <td th:text="${card.brand() != null ? card.brand().name() : ''}"></td>
-                <td th:text="${card.isPreferred()}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="card-header">Enderecos</div>
+        <div th:if="${customer.addresses() != null and !customer.addresses().isEmpty()}">
+            <table>
+                <thead><tr><th>Finalidade</th><th>Identificacao</th><th>Logradouro</th><th>Numero</th><th>Cidade</th><th>Estado</th><th>Status</th></tr></thead>
+                <tbody>
+                    <tr th:each="addr : ${customer.addresses()}">
+                        <td th:text="${addr.purpose()}"></td>
+                        <td th:text="${addr.label()}"></td>
+                        <td th:text="${addr.street()}"></td>
+                        <td th:text="${addr.number()}"></td>
+                        <td th:text="${addr.city()}"></td>
+                        <td th:text="${addr.state()}"></td>
+                        <td>
+                            <span th:if="${addr.isActive()}" class="badge badge-active">Ativo</span>
+                            <span th:unless="${addr.isActive()}" class="badge badge-inactive">Inativo</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${customer.addresses() == null or customer.addresses().isEmpty()}" class="empty-state">
+            <p>Nenhum endereco cadastrado. E obrigatorio pelo menos um endereco de cobranca e um de entrega.</p>
+        </div>
+        <div class="form-section" style="margin-top:1rem;">
+            <div class="form-section-title">Adicionar Endereco</div>
+            <form method="post" th:action="@{/customers/{id}/addresses(id=${customer.id()})}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Finalidade *</label>
+                        <select name="purpose" required>
+                            <option value="">Selecione...</option>
+                            <option th:each="p : ${addressPurposes}" th:value="${p}" th:text="${p}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Identificacao</label>
+                        <input type="text" name="label" placeholder="Ex: Casa, Trabalho"/>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de Residencia *</label>
+                        <select name="residenceType" required>
+                            <option value="">Selecione...</option>
+                            <option th:each="r : ${residenceTypes}" th:value="${r}" th:text="${r}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Logradouro *</label>
+                        <select name="streetType" required>
+                            <option value="">Selecione...</option>
+                            <option th:each="s : ${streetTypes}" th:value="${s}" th:text="${s}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Logradouro *</label>
+                        <input type="text" name="street" required placeholder="Nome da rua"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Numero *</label>
+                        <input type="text" name="number" required placeholder="123"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Bairro *</label>
+                        <input type="text" name="neighborhood" required placeholder="Nome do bairro"/>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CEP *</label>
+                        <input type="text" name="zipCode" required placeholder="00000-000"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade *</label>
+                        <input type="text" name="city" required placeholder="Nome da cidade"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado *</label>
+                        <input type="text" name="state" required placeholder="UF"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Pais *</label>
+                        <input type="text" name="country" required placeholder="Brasil"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Observacoes</label>
+                    <textarea name="observations" placeholder="Informacoes adicionais (opcional)"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Adicionar Endereco</button>
+            </form>
+        </div>
+    </div>
 
-    <h3>Add Credit Card</h3>
-    <form method="post" th:action="@{/customers/{id}/credit-cards(id=${customer.id()})}">
-        <label>Card Number: <input type="text" name="cardNumber" required/></label><br/>
-        <label>Printed Name: <input type="text" name="printedName" required/></label><br/>
-        <label>Card Brand ID: <input type="text" name="cardBrandId" required/></label><br/>
-        <label>Security Code: <input type="text" name="securityCode" required/></label><br/>
-        <label>Preferred: <input type="checkbox" name="isPreferred" value="true"/></label><br/>
-        <button type="submit">Add Credit Card</button>
-    </form>
-</body>
+    <div class="card">
+        <div class="card-header">Cartoes de Credito</div>
+        <div th:if="${customer.creditCards() != null and !customer.creditCards().isEmpty()}">
+            <table>
+                <thead><tr><th>Numero</th><th>Nome Impresso</th><th>Bandeira</th><th>Preferencial</th></tr></thead>
+                <tbody>
+                    <tr th:each="card : ${customer.creditCards()}">
+                        <td th:text="${card.cardNumber()}"></td>
+                        <td th:text="${card.printedName()}"></td>
+                        <td th:text="${card.brand() != null ? card.brand().name() : ''}"></td>
+                        <td>
+                            <span th:if="${card.isPreferred()}" class="badge badge-active">Sim</span>
+                            <span th:unless="${card.isPreferred()}" class="badge badge-inactive">Nao</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${customer.creditCards() == null or customer.creditCards().isEmpty()}" class="empty-state">
+            <p>Nenhum cartao de credito cadastrado.</p>
+        </div>
+        <div class="form-section" style="margin-top:1rem;">
+            <div class="form-section-title">Adicionar Cartao de Credito</div>
+            <form method="post" th:action="@{/customers/{id}/credit-cards(id=${customer.id()})}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Numero do Cartao *</label>
+                        <input type="text" name="cardNumber" required placeholder="0000 0000 0000 0000"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome Impresso *</label>
+                        <input type="text" name="printedName" required placeholder="NOME COMO NO CARTAO"/>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ID da Bandeira *</label>
+                        <input type="text" name="cardBrandId" required placeholder="ID da bandeira registrada"/>
+                        <div class="form-hint">Deve ser uma bandeira registrada no sistema.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Codigo de Seguranca *</label>
+                        <input type="text" name="securityCode" required placeholder="123" maxlength="4"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferencial</label>
+                        <select name="isPreferred">
+                            <option value="false">Nao</option>
+                            <option value="true">Sim</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Adicionar Cartao</button>
+            </form>
+        </div>
+    </div>
+
+</div>
 </html>

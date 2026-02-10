@@ -38,7 +38,7 @@ public class UpdateCartItemQuantityUseCase {
     @Transactional
     public Cart execute(@Nonnull final UpdateCartItemCommand command) {
         if (command.quantity() <= 0) {
-            throw new BusinessRuleException("Quantity must be greater than zero");
+            throw new BusinessRuleException("A quantidade deve ser maior que zero");
         }
 
         final Cart cart = cartGateway.findByCustomerId(command.customerId())

@@ -27,7 +27,7 @@ public class DeactivateCustomerUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Customer", customerId));
 
         if (!customer.isActive()) {
-            throw new BusinessRuleException("Customer is already inactive");
+            throw new BusinessRuleException("O cliente ja esta inativo");
         }
 
         final Customer deactivated = customer.toBuilder()

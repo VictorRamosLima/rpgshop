@@ -35,7 +35,7 @@ public class AuthorizeExchangeUseCase {
             .orElseThrow(() -> new EntityNotFoundException("ExchangeRequest", exchangeRequestId));
 
         if (request.status() != ExchangeStatus.REQUESTED) {
-            throw new BusinessRuleException("Only requests with status REQUESTED can be authorized");
+            throw new BusinessRuleException("Somente solicitacoes com status SOLICITADO podem ser autorizadas");
         }
 
         final ExchangeRequest authorized = request.toBuilder()

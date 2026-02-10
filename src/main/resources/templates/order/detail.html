@@ -1,92 +1,118 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Order Detail</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Order Detail</h1>
-    <a href="/">Home</a> | <a href="/orders">Back to Orders</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Detalhe do Pedido', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
-
-    <h2>Order Info</h2>
-    <p>ID: <span th:text="${order.id()}"></span></p>
-    <p>Customer: <span th:text="${order.customer() != null ? order.customer().name() : ''}"></span></p>
-    <p>Status: <span th:text="${order.status()}"></span></p>
-    <p>Subtotal: <span th:text="${order.subtotal()}"></span></p>
-    <p>Freight: <span th:text="${order.freightCost()}"></span></p>
-    <p>Total: <span th:text="${order.total()}"></span></p>
-    <p>Purchased At: <span th:text="${order.purchasedAt()}"></span></p>
-    <p th:if="${order.dispatchedAt() != null}">Dispatched At: <span th:text="${order.dispatchedAt()}"></span></p>
-    <p th:if="${order.deliveredAt() != null}">Delivered At: <span th:text="${order.deliveredAt()}"></span></p>
-
-    <h3>Delivery Address</h3>
-    <div th:if="${order.deliveryAddress() != null}">
-        <p th:text="${order.deliveryAddress().street() + ', ' + order.deliveryAddress().number() + ' - ' + order.deliveryAddress().city() + '/' + order.deliveryAddress().state()}"></p>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <a href="/orders">Pedidos</a> <span>/</span> <span>Detalhe</span>
     </div>
 
-    <h3>Actions</h3>
-    <div>
-        <form method="post" th:action="@{/orders/{id}/approve(id=${order.id()})}" style="display:inline;"
-              th:if="${order.status().name() == 'PENDING'}">
-            <button type="submit">Approve</button>
-        </form>
-        <form method="post" th:action="@{/orders/{id}/reject(id=${order.id()})}" style="display:inline;"
-              th:if="${order.status().name() == 'PENDING'}">
-            <button type="submit">Reject</button>
-        </form>
-        <form method="post" th:action="@{/orders/{id}/dispatch(id=${order.id()})}" style="display:inline;"
-              th:if="${order.status().name() == 'APPROVED'}">
-            <button type="submit">Dispatch</button>
-        </form>
-        <form method="post" th:action="@{/orders/{id}/deliver(id=${order.id()})}" style="display:inline;"
-              th:if="${order.status().name() == 'DISPATCHED'}">
-            <button type="submit">Deliver</button>
-        </form>
+    <div class="page-header">
+        <h1>Pedido</h1>
+        <span class="badge" th:classappend="${order.status().name() == 'APPROVED' ? 'badge-active' : (order.status().name() == 'REJECTED' ? 'badge-inactive' : 'badge-warning')}" th:text="${order.status()}"></span>
     </div>
 
-    <h3>Items</h3>
-    <table border="1" th:if="${order.items() != null && !order.items().isEmpty()}">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="item : ${order.items()}">
-                <td th:text="${item.product() != null ? item.product().name() : ''}"></td>
-                <td th:text="${item.quantity()}"></td>
-                <td th:text="${item.unitPrice()}"></td>
-                <td th:text="${item.totalPrice()}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <h3>Payments</h3>
-    <table border="1" th:if="${order.payments() != null && !order.payments().isEmpty()}">
-        <thead>
-            <tr>
-                <th>Card</th>
-                <th>Coupon</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="payment : ${order.payments()}">
-                <td th:text="${payment.creditCard() != null ? payment.creditCard().printedName() : ''}"></td>
-                <td th:text="${payment.coupon() != null ? payment.coupon().code() : ''}"></td>
-                <td th:text="${payment.amount()}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="detail-grid">
+        <div class="card">
+            <div class="card-header">Informacoes do Pedido</div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">ID</div>
+                    <div class="info-value" th:text="${order.id()}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Cliente</div>
+                    <div class="info-value" th:text="${order.customer() != null ? order.customer().name() : 'N/A'}"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">Data da Compra</div>
+                    <div class="info-value" th:text="${order.purchasedAt()}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Data de Despacho</div>
+                    <div class="info-value" th:text="${order.dispatchedAt() != null ? order.dispatchedAt() : 'Pendente'}"></div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Data de Entrega</div>
+                <div class="info-value" th:text="${order.deliveredAt() != null ? order.deliveredAt() : 'Pendente'}"></div>
+            </div>
+        </div>
 
-    <h3>Exchange</h3>
-    <a th:href="@{/exchanges/new(orderId=${order.id()})}"
-       th:if="${order.status().name() == 'DELIVERED'}">Request Exchange</a>
-    <a th:href="@{/exchanges(orderId=${order.id()})}">View Exchanges</a>
-</body>
+        <div class="card">
+            <div class="card-header">Valores</div>
+            <div class="form-row">
+                <div class="info-group">
+                    <div class="info-label">Subtotal</div>
+                    <div class="info-value" th:text="'R$ ' + ${#numbers.formatDecimal(order.subtotal(), 1, 2)}"></div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Frete (R$ 2,50/kg)</div>
+                    <div class="info-value" th:text="'R$ ' + ${#numbers.formatDecimal(order.freightCost(), 1, 2)}"></div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Total</div>
+                <div class="info-value price" th:text="'R$ ' + ${#numbers.formatDecimal(order.total(), 1, 2)}"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Itens do Pedido</div>
+        <table th:if="${order.items() != null and !order.items().isEmpty()}">
+            <thead>
+                <tr><th>Produto</th><th>Quantidade</th><th>Preco Unitario</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${order.items()}">
+                    <td th:text="${item.product() != null ? item.product().name() : 'N/A'}"></td>
+                    <td th:text="${item.quantity()}"></td>
+                    <td th:text="'R$ ' + ${#numbers.formatDecimal(item.unitPrice(), 1, 2)}"></td>
+                    <td class="price" th:text="'R$ ' + ${#numbers.formatDecimal(item.totalPrice(), 1, 2)}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Pagamentos</div>
+        <table th:if="${order.payments() != null and !order.payments().isEmpty()}">
+            <thead>
+                <tr><th>Cartao</th><th>Cupom</th><th>Valor</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="payment : ${order.payments()}">
+                    <td th:text="${payment.creditCard() != null ? payment.creditCard().cardNumber() : 'N/A'}"></td>
+                    <td th:text="${payment.coupon() != null ? payment.coupon().code() : '-'}"></td>
+                    <td class="price" th:text="'R$ ' + ${#numbers.formatDecimal(payment.amount(), 1, 2)}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Acoes do Pedido</div>
+        <div class="btn-group">
+            <form method="post" th:action="@{/orders/{id}/approve(id=${order.id()})}" th:if="${order.status().name() == 'PENDING'}" style="display:inline;">
+                <button type="submit" class="btn btn-success">Aprovar</button>
+            </form>
+            <form method="post" th:action="@{/orders/{id}/reject(id=${order.id()})}" th:if="${order.status().name() == 'PENDING'}" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Rejeitar</button>
+            </form>
+            <form method="post" th:action="@{/orders/{id}/dispatch(id=${order.id()})}" th:if="${order.status().name() == 'APPROVED'}" style="display:inline;">
+                <button type="submit" class="btn btn-primary">Despachar</button>
+            </form>
+            <form method="post" th:action="@{/orders/{id}/deliver(id=${order.id()})}" th:if="${order.status().name() == 'DISPATCHED'}" style="display:inline;">
+                <button type="submit" class="btn btn-success">Confirmar Entrega</button>
+            </form>
+            <a th:href="@{/exchanges/new(orderId=${order.id()})}" class="btn btn-warning" th:if="${order.status().name() == 'DELIVERED'}">Solicitar Troca</a>
+        </div>
+    </div>
+
+</div>
 </html>

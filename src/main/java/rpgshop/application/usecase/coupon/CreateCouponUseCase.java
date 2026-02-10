@@ -28,16 +28,16 @@ public class CreateCouponUseCase {
     @Transactional
     public Coupon execute(@Nonnull final CreateCouponCommand command) {
         if (command.code() == null || command.code().isBlank()) {
-            throw new BusinessRuleException("Coupon code is required");
+            throw new BusinessRuleException("O codigo do cupom e obrigatorio");
         }
         if (command.type() == null) {
-            throw new BusinessRuleException("Coupon type is required");
+            throw new BusinessRuleException("O tipo do cupom e obrigatorio");
         }
         if (command.value() == null || command.value().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessRuleException("Coupon value must be greater than zero");
+            throw new BusinessRuleException("O valor do cupom deve ser maior que zero");
         }
         if (couponGateway.existsByCode(command.code())) {
-            throw new BusinessRuleException("Coupon code '%s' already exists".formatted(command.code()));
+            throw new BusinessRuleException("O codigo do cupom '%s' ja existe".formatted(command.code()));
         }
 
         Customer customer = null;

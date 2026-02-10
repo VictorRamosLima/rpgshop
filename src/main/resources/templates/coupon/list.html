@@ -1,42 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Coupons</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Coupons</h1>
-    <a href="/">Home</a>
-    <span th:if="${customerId != null}"> | <a th:href="@{/customers/{id}(id=${customerId})}">Back to Customer</a></span>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Cupons', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Code</th>
-                <th>Type</th>
-                <th>Value</th>
-                <th>Used</th>
-                <th>Expires At</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="coupon : ${coupons.content}">
-                <td th:text="${coupon.code()}"></td>
-                <td th:text="${coupon.type()}"></td>
-                <td th:text="${coupon.value()}"></td>
-                <td th:text="${coupon.isUsed()}"></td>
-                <td th:text="${coupon.expiresAt()}"></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div th:if="${coupons.totalPages > 1}">
-        <span th:each="i : ${#numbers.sequence(0, coupons.totalPages - 1)}">
-            <a th:href="@{/coupons/customer/{customerId}(customerId=${customerId}, page=${i})}"
-               th:text="${i + 1}"
-               th:if="${i != coupons.number}"></a>
-            <strong th:text="${i + 1}" th:if="${i == coupons.number}"></strong>
-        </span>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <a href="/customers">Clientes</a> <span>/</span> <span>Cupons</span>
     </div>
-</body>
+
+    <div class="page-header">
+        <h1>&#127915; Cupons do Cliente</h1>
+        <a href="/coupons/new" class="btn btn-primary">Novo Cupom</a>
+    </div>
+
+    <div th:if="${coupons != null and !coupons.content.isEmpty()}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Codigo</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Utilizado</th>
+                    <th>Expiracao</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="coupon : ${coupons.content}">
+                    <td th:text="${coupon.code()}"></td>
+                    <td>
+                        <span class="badge" th:classappend="${coupon.type().name() == 'PROMOTIONAL' ? 'badge-active' : 'badge-warning'}" th:text="${coupon.type()}"></span>
+                    </td>
+                    <td class="price" th:text="'R$ ' + ${#numbers.formatDecimal(coupon.value(), 1, 2)}"></td>
+                    <td>
+                        <span th:if="${coupon.isUsed()}" class="badge badge-inactive">Sim</span>
+                        <span th:unless="${coupon.isUsed()}" class="badge badge-active">Nao</span>
+                    </td>
+                    <td th:text="${coupon.expiresAt() != null ? coupon.expiresAt() : 'Sem expiracao'}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination" th:if="${coupons.totalPages > 1}">
+            <span th:each="i : ${#numbers.sequence(0, coupons.totalPages - 1)}">
+                <a th:href="@{/coupons/customer/{cid}(cid=${customerId}, page=${i})}" th:text="${i + 1}" th:if="${i != coupons.number}"></a>
+                <strong th:text="${i + 1}" th:if="${i == coupons.number}"></strong>
+            </span>
+        </div>
+    </div>
+
+    <div th:if="${coupons == null or coupons.content.isEmpty()}" class="empty-state">
+        <div class="empty-state-icon">&#127915;</div>
+        <div class="empty-state-text">Nenhum cupom encontrado</div>
+        <p><a href="/coupons/new">Criar novo cupom</a></p>
+    </div>
+
+</div>
 </html>

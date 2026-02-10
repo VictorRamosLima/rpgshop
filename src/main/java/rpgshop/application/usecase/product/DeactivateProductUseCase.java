@@ -22,10 +22,10 @@ public class DeactivateProductUseCase {
     @Transactional
     public Product execute(@Nonnull final DeactivateProductCommand command) {
         if (command.reason() == null || command.reason().isBlank()) {
-            throw new BusinessRuleException("Inactivation reason is required for manual deactivation");
+            throw new BusinessRuleException("O motivo da inativacao e obrigatorio para inativacao manual");
         }
         if (command.category() == null) {
-            throw new BusinessRuleException("Inactivation category is required for manual deactivation");
+            throw new BusinessRuleException("A categoria da inativacao e obrigatoria para inativacao manual");
         }
 
         final Product product = productGateway
@@ -33,7 +33,7 @@ public class DeactivateProductUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Product", command.productId()));
 
         if (!product.isActive()) {
-            throw new BusinessRuleException("Product is already inactive");
+            throw new BusinessRuleException("O produto ja esta inativo");
         }
 
         Product deactivated = product.deactivate(command.reason(), command.category());

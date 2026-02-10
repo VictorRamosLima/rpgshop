@@ -46,7 +46,7 @@ public class AddCartItemUseCase {
     @Transactional
     public Cart execute(@Nonnull final AddCartItemCommand command) {
         if (command.quantity() <= 0) {
-            throw new BusinessRuleException("Quantity must be greater than zero");
+            throw new BusinessRuleException("A quantidade deve ser maior que zero");
         }
 
         final Customer customer = customerGateway.findById(command.customerId())
@@ -56,7 +56,7 @@ public class AddCartItemUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Product", command.productId()));
 
         if (!product.isActive()) {
-            throw new BusinessRuleException("Cannot add inactive product to cart");
+            throw new BusinessRuleException("Nao e possivel adicionar produto inativo ao carrinho");
         }
 
         final int blockedQuantity = cartItemGateway.sumBlockedQuantityByProductId(product.id());

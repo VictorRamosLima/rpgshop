@@ -21,13 +21,13 @@ public class UpdateCustomerUseCase {
     @Transactional
     public Customer execute(@Nonnull final UpdateCustomerCommand command) {
         if (command.name() == null || command.name().isBlank()) {
-            throw new BusinessRuleException("Name is required");
+            throw new BusinessRuleException("O nome e obrigatorio");
         }
         if (command.gender() == null) {
-            throw new BusinessRuleException("Gender is required");
+            throw new BusinessRuleException("O genero e obrigatorio");
         }
         if (command.dateOfBirth() == null) {
-            throw new BusinessRuleException("Date of birth is required");
+            throw new BusinessRuleException("A data de nascimento e obrigatoria");
         }
 
         final Customer existing = customerGateway
@@ -35,7 +35,7 @@ public class UpdateCustomerUseCase {
             .orElseThrow(() -> new EntityNotFoundException("Customer", command.id()));
 
         if (!existing.isActive()) {
-            throw new BusinessRuleException("Cannot update an inactive customer");
+            throw new BusinessRuleException("Nao e possivel atualizar um cliente inativo");
         }
 
         final Customer updated = existing.toBuilder()

@@ -42,7 +42,7 @@ public class CreateCreditCardUseCase {
             .orElseThrow(() -> new EntityNotFoundException("CardBrand", command.cardBrandId()));
 
         if (creditCardGateway.existsByCustomerIdAndCardNumber(command.customerId(), command.cardNumber())) {
-            throw new BusinessRuleException("This card number is already registered for this customer");
+            throw new BusinessRuleException("Este numero de cartao ja esta cadastrado para este cliente");
         }
 
         if (command.isPreferred()) {
@@ -64,16 +64,16 @@ public class CreateCreditCardUseCase {
 
     private void validateRequiredFields(final CreateCreditCardCommand command) {
         if (command.cardNumber() == null || command.cardNumber().isBlank()) {
-            throw new BusinessRuleException("Card number is required");
+            throw new BusinessRuleException("O numero do cartao e obrigatorio");
         }
         if (command.printedName() == null || command.printedName().isBlank()) {
-            throw new BusinessRuleException("Printed name is required");
+            throw new BusinessRuleException("O nome impresso e obrigatorio");
         }
         if (command.cardBrandId() == null) {
-            throw new BusinessRuleException("Card brand is required");
+            throw new BusinessRuleException("A bandeira do cartao e obrigatoria");
         }
         if (command.securityCode() == null || command.securityCode().isBlank()) {
-            throw new BusinessRuleException("Security code is required");
+            throw new BusinessRuleException("O codigo de seguranca e obrigatorio");
         }
     }
 }

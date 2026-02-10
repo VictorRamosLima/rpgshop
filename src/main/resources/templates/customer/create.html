@@ -1,43 +1,127 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>New Customer</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>New Customer</h1>
-    <a href="/">Home</a> | <a href="/customers">Back to List</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Novo Cliente', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+    <div class="breadcrumb">
+        <a href="/">Início</a> <span>/</span> <a href="/customers">Clientes</a> <span>/</span> <span>Novo Cliente</span>
+    </div>
 
-    <form method="post" action="/customers">
-        <fieldset>
-            <legend>Personal Info</legend>
-            <label>Gender:
-                <select name="gender" required>
-                    <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
-                </select>
-            </label><br/>
-            <label>Name: <input type="text" name="name" required/></label><br/>
-            <label>Date of Birth: <input type="date" name="dateOfBirth" required/></label><br/>
-            <label>CPF: <input type="text" name="cpf" required/></label><br/>
-            <label>Email: <input type="email" name="email" required/></label><br/>
-            <label>Password: <input type="password" name="password" required/></label><br/>
-            <label>Confirm Password: <input type="password" name="confirmPassword" required/></label><br/>
-        </fieldset>
+    <div class="page-header">
+        <h1>Cadastrar Novo Cliente</h1>
+    </div>
 
-        <fieldset>
-            <legend>Phone</legend>
-            <label>Type:
-                <select name="phoneType" required>
-                    <option th:each="t : ${phoneTypes}" th:value="${t}" th:text="${t}"></option>
-                </select>
-            </label><br/>
-            <label>Area Code: <input type="text" name="phoneAreaCode" required/></label><br/>
-            <label>Number: <input type="text" name="phoneNumber" required/></label><br/>
-        </fieldset>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-        <button type="submit">Create Customer</button>
+    <form method="post" action="/customers" id="createCustomerForm">
+        <div class="form-section">
+            <div class="form-section-title">Dados Pessoais (RN0026)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Gênero *</label>
+                    <select name="gender" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
+                    </select>
+                    <div class="form-hint">Campo obrigatório.</div>
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo *</label>
+                    <input type="text" name="name" required placeholder="Nome completo do cliente"/>
+                    <div class="form-hint">Campo obrigatório.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Data de Nascimento *</label>
+                    <input type="date" name="dateOfBirth" required/>
+                    <div class="form-hint">Campo obrigatório.</div>
+                </div>
+                <div class="form-group">
+                    <label>CPF *</label>
+                    <input type="text" name="cpf" required placeholder="000.000.000-00"/>
+                    <div class="form-hint">Campo obrigatório. Documento único.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>E-mail *</label>
+                    <input type="email" name="email" required placeholder="email@exemplo.com"/>
+                    <div class="form-hint">Campo obrigatório.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Senha *</label>
+                    <input type="password" name="password" required minlength="8" id="password"/>
+                    <div class="form-hint">Mínimo 8 caracteres, com letras maiúsculas, minúsculas e caracteres especiais (RNF0031).</div>
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Senha *</label>
+                    <input type="password" name="confirmPassword" required minlength="8" id="confirmPassword"/>
+                    <div class="form-hint">Repita a mesma senha (RNF0032).</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-title">Telefone (RN0026)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo *</label>
+                    <select name="phoneType" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="t : ${phoneTypes}" th:value="${t}" th:text="${t}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>DDD *</label>
+                    <input type="text" name="phoneAreaCode" required placeholder="11" maxlength="3"/>
+                </div>
+                <div class="form-group">
+                    <label>Número *</label>
+                    <input type="text" name="phoneNumber" required placeholder="99999-9999"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top:1rem;">
+            <button type="submit" class="btn btn-primary btn-lg">Cadastrar Cliente</button>
+            <a href="/customers" class="btn btn-outline">Cancelar</a>
+        </div>
     </form>
-</body>
+
+    <script>
+        document.getElementById('createCustomerForm').addEventListener('submit', function(e) {
+            var pw = document.getElementById('password').value;
+            var cpw = document.getElementById('confirmPassword').value;
+            if (pw !== cpw) {
+                e.preventDefault();
+                alert('As senhas não coincidem. Por favor, verifique.');
+                return false;
+            }
+            if (pw.length < 8) {
+                e.preventDefault();
+                alert('A senha deve ter no mínimo 8 caracteres.');
+                return false;
+            }
+            if (!/[A-Z]/.test(pw)) {
+                e.preventDefault();
+                alert('A senha deve conter pelo menos uma letra maiúscula.');
+                return false;
+            }
+            if (!/[a-z]/.test(pw)) {
+                e.preventDefault();
+                alert('A senha deve conter pelo menos uma letra minúscula.');
+                return false;
+            }
+            if (!/[^a-zA-Z0-9]/.test(pw)) {
+                e.preventDefault();
+                alert('A senha deve conter pelo menos um caractere especial.');
+                return false;
+            }
+        });
+    </script>
+
+</div>
 </html>

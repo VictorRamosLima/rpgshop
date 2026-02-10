@@ -1,21 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Request Exchange</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-</head>
-<body>
-    <h1>Request Exchange</h1>
-    <a href="/">Home</a> | <a th:href="@{/orders/{id}(id=${orderId})}">Back to Order</a>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Solicitar Troca', ~{::main-content})}">
+<div th:fragment="main-content">
 
-    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <a href="/exchanges">Trocas</a> <span>/</span> <span>Nova Solicitacao</span>
+    </div>
+
+    <div class="page-header">
+        <h1>Solicitar Troca de Item</h1>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
     <form method="post" action="/exchanges">
         <input type="hidden" name="orderId" th:value="${orderId}"/>
-        <label>Order Item ID: <input type="text" name="orderItemId" required/></label><br/>
-        <label>Quantity: <input type="number" name="quantity" min="1" required/></label><br/>
-        <label>Reason: <textarea name="reason" required></textarea></label><br/>
-        <button type="submit">Request Exchange</button>
+
+        <div class="card">
+            <div class="card-header">Dados da Troca</div>
+            <div class="info-group" style="margin-bottom:1rem;">
+                <div class="info-label">Pedido</div>
+                <div class="info-value" th:text="${orderId}"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ID do Item do Pedido *</label>
+                    <input type="text" name="orderItemId" required placeholder="UUID do item do pedido"/>
+                    <div class="form-hint">Informe o ID do item que deseja trocar.</div>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade *</label>
+                    <input type="number" name="quantity" required min="1" value="1"/>
+                    <div class="form-hint">Quantidade de itens a trocar.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Motivo da Troca *</label>
+                <textarea name="reason" required placeholder="Descreva o motivo da troca..." rows="3"></textarea>
+                <div class="form-hint">Informe detalhadamente o motivo da solicitacao de troca.</div>
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top:1rem;">
+            <button type="submit" class="btn btn-primary btn-lg">Solicitar Troca</button>
+            <a th:href="@{/orders/{id}(id=${orderId})}" class="btn btn-outline">Cancelar</a>
+        </div>
     </form>
-</body>
+
+</div>
 </html>

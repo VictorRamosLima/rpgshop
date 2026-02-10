@@ -1,0 +1,48 @@
+package rpgshop.infraestructure.persistence.repository.customer;
+
+import jakarta.annotation.Nonnull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.RepositoryDefinition;
+import org.springframework.data.repository.query.Param;
+import rpgshop.infraestructure.persistence.entity.customer.CreditCardJpaEntity;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@RepositoryDefinition(domainClass = CreditCardJpaEntity.class, idClass = UUID.class)
+public interface CreditCardRepository {
+    @Nonnull
+    CreditCardJpaEntity save(@Nonnull final CreditCardJpaEntity entity);
+
+    @Nonnull
+    Optional<CreditCardJpaEntity> findById(@Nonnull final UUID id);
+
+    void deleteById(@Nonnull final UUID id);
+
+    boolean existsById(@Nonnull final UUID id);
+
+    @Nonnull
+    Page<CreditCardJpaEntity> findByCustomerId(
+        @Nonnull final UUID customerId,
+        @Nonnull final Pageable pageable
+    );
+
+    @Nonnull
+    List<CreditCardJpaEntity> findByCustomerIdAndIsActiveTrue(@Nonnull final UUID customerId);
+
+    @Nonnull
+    Optional<CreditCardJpaEntity> findByCustomerIdAndIsPreferredTrue(@Nonnull final UUID customerId);
+
+    @Modifying
+    @Query("UPDATE CreditCardJpaEntity cc SET cc.isPreferred = false WHERE cc.customer.id = :customerId")
+    int clearPreferredByCustomerId(@Param("customerId") @Nonnull final UUID customerId);
+
+    boolean existsByCustomerIdAndCardNumber(
+        @Nonnull final UUID customerId,
+        @Nonnull final String cardNumber
+    );
+}

@@ -70,10 +70,6 @@ public class ProductGatewayJpa implements ProductGateway {
 
     @Override
     public int deactivateOutOfMarket(final List<UUID> ids, final Instant now) {
-        var changed = productRepository.bulkDeactivateByIds(ids, now);
-
-
-
-        return 0;
+        return productRepository.bulkDeactivateByIds(ids, now);
     }
 }

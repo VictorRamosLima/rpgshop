@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transaction Logs</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Transaction Logs</h1>
+    <a href="/">Home</a>
+
+    <h2>Filter</h2>
+    <form method="get" action="/logs">
+        <label>Entity Name: <input type="text" name="entityName" th:value="${param.entityName}"/></label>
+        <label>Entity ID: <input type="text" name="entityId" th:value="${param.entityId}"/></label>
+        <label>Operation:
+            <select name="operation">
+                <option value="">All</option>
+                <option th:each="op : ${operations}" th:value="${op}" th:text="${op}" th:selected="${param.operation != null && param.operation.toString() == op.toString()}"></option>
+            </select>
+        </label>
+        <label>User: <input type="text" name="responsibleUser" th:value="${param.responsibleUser}"/></label>
+        <label>Start Date: <input type="date" name="startDate" th:value="${param.startDate}"/></label>
+        <label>End Date: <input type="date" name="endDate" th:value="${param.endDate}"/></label>
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Results</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Entity</th>
+                <th>Entity ID</th>
+                <th>Operation</th>
+                <th>User</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="log : ${logs.content}">
+                <td th:text="${log.entityName()}"></td>
+                <td th:text="${log.entityId() != null ? #strings.substring(log.entityId().toString(), 0, 8) : ''}"></td>
+                <td th:text="${log.operation()}"></td>
+                <td th:text="${log.responsibleUser()}"></td>
+                <td th:text="${log.createdAt()}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${logs.totalPages > 1}">
+        <span th:each="i : ${#numbers.sequence(0, logs.totalPages - 1)}">
+            <a th:href="@{/logs(page=${i}, entityName=${param.entityName}, entityId=${param.entityId}, operation=${param.operation}, responsibleUser=${param.responsibleUser}, startDate=${param.startDate}, endDate=${param.endDate})}"
+               th:text="${i + 1}"
+               th:if="${i != logs.number}"></a>
+            <strong th:text="${i + 1}" th:if="${i == logs.number}"></strong>
+        </span>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Stock Entries</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Stock Entries</h1>
+    <a href="/">Home</a> | <a href="/products">Products</a>
+    | <a th:href="@{/stock/new(productId=${productId})}">New Entry</a>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Quantity</th>
+                <th>Cost Value</th>
+                <th>Supplier</th>
+                <th>Entry Date</th>
+                <th>Reentry</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="entry : ${entries.content}">
+                <td th:text="${#strings.substring(entry.id().toString(), 0, 8)}"></td>
+                <td th:text="${entry.quantity()}"></td>
+                <td th:text="${entry.costValue()}"></td>
+                <td th:text="${entry.supplier() != null ? entry.supplier().tradeName() : ''}"></td>
+                <td th:text="${entry.entryDate()}"></td>
+                <td th:text="${entry.isReentry()}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${entries.totalPages > 1}">
+        <span th:each="i : ${#numbers.sequence(0, entries.totalPages - 1)}">
+            <a th:href="@{/stock/product/{productId}(productId=${productId}, page=${i})}"
+               th:text="${i + 1}"
+               th:if="${i != entries.number}"></a>
+            <strong th:text="${i + 1}" th:if="${i == entries.number}"></strong>
+        </span>
+    </div>
+</body>
+</html>

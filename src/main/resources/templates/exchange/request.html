@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Request Exchange</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Request Exchange</h1>
+    <a href="/">Home</a> | <a th:href="@{/orders/{id}(id=${orderId})}">Back to Order</a>
+
+    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+    <form method="post" action="/exchanges">
+        <input type="hidden" name="orderId" th:value="${orderId}"/>
+        <label>Order Item ID: <input type="text" name="orderItemId" required/></label><br/>
+        <label>Quantity: <input type="number" name="quantity" min="1" required/></label><br/>
+        <label>Reason: <textarea name="reason" required></textarea></label><br/>
+        <button type="submit">Request Exchange</button>
+    </form>
+</body>
+</html>

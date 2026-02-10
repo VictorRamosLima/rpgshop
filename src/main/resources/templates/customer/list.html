@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customers</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Customers</h1>
+    <a href="/">Home</a> | <a href="/customers/new">New Customer</a>
+
+    <h2>Filter</h2>
+    <form method="get" action="/customers">
+        <label>Name: <input type="text" name="name" th:value="${param.name}"/></label>
+        <label>CPF: <input type="text" name="cpf" th:value="${param.cpf}"/></label>
+        <label>Email: <input type="text" name="email" th:value="${param.email}"/></label>
+        <label>Gender:
+            <select name="gender">
+                <option value="">All</option>
+                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}" th:selected="${param.gender != null && param.gender.toString() == g.toString()}"></option>
+            </select>
+        </label>
+        <label>Active:
+            <select name="isActive">
+                <option value="">All</option>
+                <option value="true" th:selected="${param.isActive != null && param.isActive.toString() == 'true'}">Yes</option>
+                <option value="false" th:selected="${param.isActive != null && param.isActive.toString() == 'false'}">No</option>
+            </select>
+        </label>
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Results</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>CPF</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="customer : ${customers.content}">
+                <td th:text="${customer.name()}"></td>
+                <td th:text="${customer.cpf()}"></td>
+                <td th:text="${customer.email()}"></td>
+                <td th:text="${customer.gender()}"></td>
+                <td th:text="${customer.isActive()}"></td>
+                <td>
+                    <a th:href="@{/customers/{id}(id=${customer.id()})}">View</a>
+                    <a th:href="@{/cart/{id}(id=${customer.id()})}">Cart</a>
+                    <a th:href="@{/orders/customer/{id}(id=${customer.id()})}">Orders</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${customers.totalPages > 1}">
+        <span th:each="i : ${#numbers.sequence(0, customers.totalPages - 1)}">
+            <a th:href="@{/customers(page=${i}, name=${param.name}, cpf=${param.cpf}, email=${param.email}, gender=${param.gender}, isActive=${param.isActive})}"
+               th:text="${i + 1}"
+               th:if="${i != customers.number}"></a>
+            <strong th:text="${i + 1}" th:if="${i == customers.number}"></strong>
+        </span>
+    </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New Customer</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>New Customer</h1>
+    <a href="/">Home</a> | <a href="/customers">Back to List</a>
+
+    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+    <form method="post" action="/customers">
+        <fieldset>
+            <legend>Personal Info</legend>
+            <label>Gender:
+                <select name="gender" required>
+                    <option th:each="g : ${genders}" th:value="${g}" th:text="${g}"></option>
+                </select>
+            </label><br/>
+            <label>Name: <input type="text" name="name" required/></label><br/>
+            <label>Date of Birth: <input type="date" name="dateOfBirth" required/></label><br/>
+            <label>CPF: <input type="text" name="cpf" required/></label><br/>
+            <label>Email: <input type="email" name="email" required/></label><br/>
+            <label>Password: <input type="password" name="password" required/></label><br/>
+            <label>Confirm Password: <input type="password" name="confirmPassword" required/></label><br/>
+        </fieldset>
+
+        <fieldset>
+            <legend>Phone</legend>
+            <label>Type:
+                <select name="phoneType" required>
+                    <option th:each="t : ${phoneTypes}" th:value="${t}" th:text="${t}"></option>
+                </select>
+            </label><br/>
+            <label>Area Code: <input type="text" name="phoneAreaCode" required/></label><br/>
+            <label>Number: <input type="text" name="phoneNumber" required/></label><br/>
+        </fieldset>
+
+        <button type="submit">Create Customer</button>
+    </form>
+</body>
+</html>

@@ -1,7 +1,6 @@
 package rpgshop.domain.entity.product;
 
 import lombok.Builder;
-import org.hibernate.metamodel.spi.EntityInstantiator;
 import rpgshop.domain.entity.product.constant.StatusChangeCategory;
 import rpgshop.domain.entity.product.constant.StatusChangeType;
 

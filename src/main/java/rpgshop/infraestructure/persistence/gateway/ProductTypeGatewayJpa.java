@@ -1,9 +1,9 @@
 package rpgshop.infraestructure.persistence.gateway;
 
-import rpgshop.application.gateway.ProductTypeGateway;
+import rpgshop.application.gateway.product.ProductTypeGateway;
 import rpgshop.domain.entity.product.ProductType;
-import rpgshop.infraestructure.persistence.jpa.mapper.product.ProductTypeMapper;
-import rpgshop.infraestructure.persistence.jpa.repository.product.ProductTypeRepository;
+import rpgshop.infraestructure.mapper.product.ProductTypeMapper;
+import rpgshop.infraestructure.persistence.repository.product.ProductTypeRepository;
 
 import org.springframework.stereotype.Component;
 

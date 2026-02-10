@@ -45,8 +45,6 @@ public final class ProductMapper {
             .stockQuantity(entity.getStockQuantity())
             .statusChanges(statusChanges)
             .minimumSaleThreshold(entity.getMinimumSaleThreshold())
-            .isActive(entity.isActive())
-            .deactivatedAt(entity.getDeactivatedAt())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();
@@ -71,8 +69,6 @@ public final class ProductMapper {
             .costPrice(domain.costPrice())
             .stockQuantity(domain.stockQuantity())
             .minimumSaleThreshold(domain.minimumSaleThreshold())
-            .isActive(domain.isActive())
-            .deactivatedAt(domain.deactivatedAt())
             .createdAt(domain.createdAt())
             .updatedAt(domain.updatedAt())
             .build();

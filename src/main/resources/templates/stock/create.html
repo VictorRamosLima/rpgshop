@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New Stock Entry</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>New Stock Entry</h1>
+    <a href="/">Home</a> | <a href="/products">Products</a>
+
+    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+    <form method="post" action="/stock">
+        <label>Product ID: <input type="text" name="productId" th:value="${productId}" required/></label><br/>
+        <label>Quantity: <input type="number" name="quantity" min="1" required/></label><br/>
+        <label>Cost Value: <input type="number" step="0.01" name="costValue" required/></label><br/>
+        <label>Supplier ID: <input type="text" name="supplierId" required/></label><br/>
+        <label>Entry Date: <input type="date" name="entryDate" required/></label><br/>
+        <button type="submit">Create Entry</button>
+    </form>
+</body>
+</html>

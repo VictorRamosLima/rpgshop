@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sales by Period</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Sales by Period</h1>
+    <a href="/">Home</a> | <a href="/analysis">Back to Analysis</a>
+
+    <form method="get" action="/analysis/sales">
+        <label>Start Date: <input type="date" name="startDate" th:value="${param.startDate}" required/></label>
+        <label>End Date: <input type="date" name="endDate" th:value="${param.endDate}" required/></label>
+        <button type="submit">Search</button>
+    </form>
+
+    <div th:if="${sales != null}">
+        <h2>Results</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Purchased At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${sales.content}">
+                    <td><a th:href="@{/orders/{id}(id=${order.id()})}" th:text="${#strings.substring(order.id().toString(), 0, 8)}"></a></td>
+                    <td th:text="${order.customer() != null ? order.customer().name() : ''}"></td>
+                    <td th:text="${order.total()}"></td>
+                    <td th:text="${order.status()}"></td>
+                    <td th:text="${order.purchasedAt()}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

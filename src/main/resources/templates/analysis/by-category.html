@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sales by Category</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Sales by Category</h1>
+    <a href="/">Home</a> | <a href="/analysis">Back to Analysis</a>
+
+    <form method="get" action="/analysis/by-category">
+        <label>Category ID: <input type="text" name="categoryId" th:value="${param.categoryId}" required/></label>
+        <label>Start Date: <input type="date" name="startDate" th:value="${param.startDate}" required/></label>
+        <label>End Date: <input type="date" name="endDate" th:value="${param.endDate}" required/></label>
+        <button type="submit">Search</button>
+    </form>
+
+    <div th:if="${items != null}">
+        <h2>Results</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${items.content}">
+                    <td th:text="${item.product() != null ? item.product().name() : ''}"></td>
+                    <td th:text="${item.quantity()}"></td>
+                    <td th:text="${item.unitPrice()}"></td>
+                    <td th:text="${item.totalPrice()}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

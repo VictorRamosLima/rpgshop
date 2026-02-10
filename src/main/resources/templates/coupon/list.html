@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Coupons</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Coupons</h1>
+    <a href="/">Home</a>
+    <span th:if="${customerId != null}"> | <a th:href="@{/customers/{id}(id=${customerId})}">Back to Customer</a></span>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Used</th>
+                <th>Expires At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="coupon : ${coupons.content}">
+                <td th:text="${coupon.code()}"></td>
+                <td th:text="${coupon.type()}"></td>
+                <td th:text="${coupon.value()}"></td>
+                <td th:text="${coupon.isUsed()}"></td>
+                <td th:text="${coupon.expiresAt()}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${coupons.totalPages > 1}">
+        <span th:each="i : ${#numbers.sequence(0, coupons.totalPages - 1)}">
+            <a th:href="@{/coupons/customer/{customerId}(customerId=${customerId}, page=${i})}"
+               th:text="${i + 1}"
+               th:if="${i != coupons.number}"></a>
+            <strong th:text="${i + 1}" th:if="${i == coupons.number}"></strong>
+        </span>
+    </div>
+</body>
+</html>

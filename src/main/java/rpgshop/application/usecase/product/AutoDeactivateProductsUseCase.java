@@ -32,6 +32,6 @@ public class AutoDeactivateProductsUseCase {
             return 0;
         }
 
-        return productGateway.deactivateOutOfMarket(threshold, Instant.now());
+        return productGateway.deactivateOutOfMarket(ids, Instant.now());
     }
 }

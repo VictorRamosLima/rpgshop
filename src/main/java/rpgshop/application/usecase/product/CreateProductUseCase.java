@@ -62,31 +62,23 @@ public class CreateProductUseCase {
             pricingGroup.marginPercentage()
         );
 
-        Product product = new Product(
-            UUID.randomUUID(),
-            command.name(),
-            productType,
-            categories,
-            command.height(),
-            command.width(),
-            command.depth(),
-            command.weight(),
-            pricingGroup,
-            command.barcode(),
-            command.sku(),
-            salePrice,
-            command.costPrice(),
-            0,
-            null,
-            null,
-            null,
-            null,
-            null,
-            true,
-            null,
-            null,
-            null
-        );
+        Product product = Product.builder()
+            .id(UUID.randomUUID())
+            .name(command.name())
+            .productType(productType)
+            .categories(categories)
+            .height(command.height())
+            .width(command.width())
+            .depth(command.depth())
+            .weight(command.weight())
+            .pricingGroup(pricingGroup)
+            .barcode(command.barcode())
+            .sku(command.sku())
+            .salePrice(salePrice)
+            .costPrice(command.costPrice())
+            .stockQuantity(0)
+            .statusChanges(List.of())
+            .build();
 
         return productGateway.save(product);
     }

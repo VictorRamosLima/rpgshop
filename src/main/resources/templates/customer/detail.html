@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customer Detail</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Customer Detail</h1>
+    <a href="/">Home</a> | <a href="/customers">Back to List</a>
+    | <a th:href="@{/cart/{id}(id=${customer.id()})}">View Cart</a>
+    | <a th:href="@{/orders/customer/{id}(id=${customer.id()})}">View Orders</a>
+    | <a th:href="@{/coupons/customer/{id}(id=${customer.id()})}">View Coupons</a>
+
+    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+    <h2>Info</h2>
+    <p>ID: <span th:text="${customer.id()}"></span></p>
+    <p>Customer Code: <span th:text="${customer.customerCode()}"></span></p>
+    <p>Ranking: <span th:text="${customer.ranking()}"></span></p>
+    <p>Active: <span th:text="${customer.isActive()}"></span></p>
+
+    <h3>Update Info</h3>
+    <form method="post" th:action="@{/customers/{id}/update(id=${customer.id()})}">
+        <label>Gender:
+            <select name="gender">
+                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}" th:selected="${customer.gender() == g}"></option>
+            </select>
+        </label><br/>
+        <label>Name: <input type="text" name="name" th:value="${customer.name()}" required/></label><br/>
+        <label>Date of Birth: <input type="date" name="dateOfBirth" th:value="${customer.dateOfBirth()}" required/></label><br/>
+        <label>Email: <input type="email" name="email" th:value="${customer.email()}" required/></label><br/>
+        <button type="submit">Update</button>
+    </form>
+
+    <h3>Change Password</h3>
+    <form method="post" th:action="@{/customers/{id}/change-password(id=${customer.id()})}">
+        <label>New Password: <input type="password" name="newPassword" required/></label><br/>
+        <label>Confirm: <input type="password" name="confirmPassword" required/></label><br/>
+        <button type="submit">Change Password</button>
+    </form>
+
+    <form method="post" th:action="@{/customers/{id}/deactivate(id=${customer.id()})}" th:if="${customer.isActive()}">
+        <button type="submit">Deactivate Customer</button>
+    </form>
+
+    <hr/>
+    <h2>Phones</h2>
+    <table border="1" th:if="${customer.phones() != null && !customer.phones().isEmpty()}">
+        <thead><tr><th>Type</th><th>Area Code</th><th>Number</th></tr></thead>
+        <tbody>
+            <tr th:each="phone : ${customer.phones()}">
+                <td th:text="${phone.type()}"></td>
+                <td th:text="${phone.areaCode()}"></td>
+                <td th:text="${phone.number()}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Add Phone</h3>
+    <form method="post" th:action="@{/customers/{id}/phones(id=${customer.id()})}">
+        <label>Type:
+            <select name="type">
+                <option th:each="t : ${phoneTypes}" th:value="${t}" th:text="${t}"></option>
+            </select>
+        </label>
+        <label>Area Code: <input type="text" name="areaCode" required/></label>
+        <label>Number: <input type="text" name="phoneNumber" required/></label>
+        <button type="submit">Add Phone</button>
+    </form>
+
+    <hr/>
+    <h2>Addresses</h2>
+    <table border="1" th:if="${customer.addresses() != null && !customer.addresses().isEmpty()}">
+        <thead><tr><th>Purpose</th><th>Label</th><th>Street</th><th>Number</th><th>City</th><th>State</th><th>Active</th></tr></thead>
+        <tbody>
+            <tr th:each="addr : ${customer.addresses()}">
+                <td th:text="${addr.purpose()}"></td>
+                <td th:text="${addr.label()}"></td>
+                <td th:text="${addr.street()}"></td>
+                <td th:text="${addr.number()}"></td>
+                <td th:text="${addr.city()}"></td>
+                <td th:text="${addr.state()}"></td>
+                <td th:text="${addr.isActive()}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Add Address</h3>
+    <form method="post" th:action="@{/customers/{id}/addresses(id=${customer.id()})}">
+        <label>Purpose:
+            <select name="purpose">
+                <option th:each="p : ${addressPurposes}" th:value="${p}" th:text="${p}"></option>
+            </select>
+        </label><br/>
+        <label>Label: <input type="text" name="label"/></label><br/>
+        <label>Residence Type:
+            <select name="residenceType">
+                <option th:each="r : ${residenceTypes}" th:value="${r}" th:text="${r}"></option>
+            </select>
+        </label><br/>
+        <label>Street Type:
+            <select name="streetType">
+                <option th:each="s : ${streetTypes}" th:value="${s}" th:text="${s}"></option>
+            </select>
+        </label><br/>
+        <label>Street: <input type="text" name="street" required/></label><br/>
+        <label>Number: <input type="text" name="number" required/></label><br/>
+        <label>Neighborhood: <input type="text" name="neighborhood" required/></label><br/>
+        <label>Zip Code: <input type="text" name="zipCode" required/></label><br/>
+        <label>City: <input type="text" name="city" required/></label><br/>
+        <label>State: <input type="text" name="state" required/></label><br/>
+        <label>Country: <input type="text" name="country" required/></label><br/>
+        <label>Observations: <textarea name="observations"></textarea></label><br/>
+        <button type="submit">Add Address</button>
+    </form>
+
+    <hr/>
+    <h2>Credit Cards</h2>
+    <table border="1" th:if="${customer.creditCards() != null && !customer.creditCards().isEmpty()}">
+        <thead><tr><th>Number</th><th>Printed Name</th><th>Brand</th><th>Preferred</th></tr></thead>
+        <tbody>
+            <tr th:each="card : ${customer.creditCards()}">
+                <td th:text="${card.cardNumber()}"></td>
+                <td th:text="${card.printedName()}"></td>
+                <td th:text="${card.brand() != null ? card.brand().name() : ''}"></td>
+                <td th:text="${card.isPreferred()}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Add Credit Card</h3>
+    <form method="post" th:action="@{/customers/{id}/credit-cards(id=${customer.id()})}">
+        <label>Card Number: <input type="text" name="cardNumber" required/></label><br/>
+        <label>Printed Name: <input type="text" name="printedName" required/></label><br/>
+        <label>Card Brand ID: <input type="text" name="cardBrandId" required/></label><br/>
+        <label>Security Code: <input type="text" name="securityCode" required/></label><br/>
+        <label>Preferred: <input type="checkbox" name="isPreferred" value="true"/></label><br/>
+        <button type="submit">Add Credit Card</button>
+    </form>
+</body>
+</html>

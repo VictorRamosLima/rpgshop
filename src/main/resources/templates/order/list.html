@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Orders</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Orders</h1>
+    <a href="/">Home</a>
+
+    <h2>Filter</h2>
+    <form method="get" action="/orders">
+        <label>Status:
+            <select name="status">
+                <option value="">All</option>
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${param.status != null && param.status.toString() == s.toString()}"></option>
+            </select>
+        </label>
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Results</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Purchased At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="order : ${orders.content}">
+                <td th:text="${#strings.substring(order.id().toString(), 0, 8)}"></td>
+                <td th:text="${order.customer() != null ? order.customer().name() : ''}"></td>
+                <td th:text="${order.status()}"></td>
+                <td th:text="${order.total()}"></td>
+                <td th:text="${order.purchasedAt()}"></td>
+                <td>
+                    <a th:href="@{/orders/{id}(id=${order.id()})}">View</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${orders.totalPages > 1}">
+        <span th:each="i : ${#numbers.sequence(0, orders.totalPages - 1)}">
+            <a th:href="@{/orders(page=${i}, status=${param.status})}"
+               th:text="${i + 1}"
+               th:if="${i != orders.number}"></a>
+            <strong th:text="${i + 1}" th:if="${i == orders.number}"></strong>
+        </span>
+    </div>
+</body>
+</html>

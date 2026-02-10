@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Shopping Cart</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+    <h1>Shopping Cart</h1>
+    <a href="/">Home</a> | <a th:href="@{/customers/{id}(id=${customerId})}">Back to Customer</a>
+    | <a href="/products">Browse Products</a>
+
+    <div th:if="${error}" style="color:red;" th:text="${error}"></div>
+
+    <div th:if="${cart != null}">
+        <h2>Items</h2>
+        <table border="1" th:if="${cart.items() != null && !cart.items().isEmpty()}">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                    <th>Blocked</th>
+                    <th>Expires At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${cart.items()}">
+                    <td th:text="${item.product() != null ? item.product().name() : ''}"></td>
+                    <td th:text="${item.quantity()}"></td>
+                    <td th:text="${item.unitPrice()}"></td>
+                    <td th:text="${item.totalPrice()}"></td>
+                    <td th:text="${item.isBlocked()}"></td>
+                    <td th:text="${item.expiresAt()}"></td>
+                    <td>
+                        <form method="post" th:action="@{/cart/{customerId}/update(customerId=${customerId})}" style="display:inline;">
+                            <input type="hidden" name="productId" th:value="${item.product().id()}"/>
+                            <input type="number" name="quantity" th:value="${item.quantity()}" min="1" style="width:50px;"/>
+                            <button type="submit">Update</button>
+                        </form>
+                        <form method="post" th:action="@{/cart/{customerId}/remove(customerId=${customerId})}" style="display:inline;">
+                            <input type="hidden" name="productId" th:value="${item.product().id()}"/>
+                            <button type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p th:if="${cart.items() == null || cart.items().isEmpty()}">Cart is empty.</p>
+
+        <form method="post" th:action="@{/cart/{customerId}/clear(customerId=${customerId})}"
+              th:if="${cart.items() != null && !cart.items().isEmpty()}">
+            <button type="submit">Clear Cart</button>
+        </form>
+
+        <hr/>
+        <a th:href="@{/orders/checkout/{customerId}(customerId=${customerId})}"
+           th:if="${cart.items() != null && !cart.items().isEmpty()}">Proceed to Checkout</a>
+    </div>
+
+    <div th:if="${cart == null}">
+        <p>No cart found. Add items to start shopping.</p>
+    </div>
+
+    <hr/>
+    <h3>Add Item to Cart</h3>
+    <form method="post" th:action="@{/cart/{customerId}/add(customerId=${customerId})}">
+        <label>Product ID: <input type="text" name="productId" required/></label>
+        <label>Quantity: <input type="number" name="quantity" min="1" value="1" required/></label>
+        <button type="submit">Add to Cart</button>
+    </form>
+</body>
+</html>

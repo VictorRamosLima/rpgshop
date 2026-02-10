@@ -16,6 +16,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static java.math.BigDecimal.ONE;
+import static java.math.RoundingMode.HALF_UP;
+
 @Service
 public class CreateStockReentryUseCase {
     private final StockEntryGateway stockEntryGateway;
@@ -40,8 +43,17 @@ public class CreateStockReentryUseCase {
         @Nonnull final BigDecimal costValue,
         @Nonnull final UUID supplierId
     ) {
+        if (productId == null) {
+            throw new BusinessRuleException("O produto e obrigatorio");
+        }
         if (quantity <= 0) {
             throw new BusinessRuleException("A quantidade deve ser maior que zero");
+        }
+        if (costValue == null || costValue.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("O valor de custo deve ser maior que zero");
+        }
+        if (supplierId == null) {
+            throw new BusinessRuleException("O fornecedor e obrigatorio");
         }
 
         final Product product = productGateway.findById(productId)
@@ -63,8 +75,16 @@ public class CreateStockReentryUseCase {
         final StockEntry saved = stockEntryGateway.save(entry);
 
         final int totalStock = stockEntryGateway.sumQuantityByProductId(product.id());
+        final BigDecimal maxCostValue = stockEntryGateway.findMaxCostValueByProductId(product.id()).orElse(costValue);
+        final BigDecimal margin = product.pricingGroup().marginPercentage();
+        final BigDecimal salePrice = maxCostValue
+            .multiply(ONE.add(margin.divide(new BigDecimal("100"), 4, HALF_UP)))
+            .setScale(2, HALF_UP);
+
         final Product updated = product.toBuilder()
             .stockQuantity(totalStock)
+            .costPrice(maxCostValue)
+            .salePrice(salePrice)
             .build();
         productGateway.save(updated);
 

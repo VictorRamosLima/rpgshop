@@ -40,7 +40,7 @@ import static org.hibernate.annotations.UuidGenerator.Style.VERSION_7;
     @Index(name = "idx_products_type_id", columnList = "type_id"),
     @Index(name = "idx_products_pricing_group_id", columnList = "pricing_group_id"),
     @Index(name = "idx_products_sale_price", columnList = "sale_price"),
-    @Index(name = "idx_products_name_lower", columnList = "LOWER(name)"),
+    @Index(name = "idx_products_name_lower", columnList = "name"),
     @Index(
         name = "idx_products_auto_inactivation",
         columnList = "is_active, stock_quantity, sale_price",

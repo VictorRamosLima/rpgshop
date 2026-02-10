@@ -3,12 +3,15 @@
       th:replace="~{fragments/layout :: page('Pedidos', ~{::main-content})}">
 <div th:fragment="main-content">
 
-    <div class="breadcrumb">
-        <a href="/">Inicio</a> <span>/</span> <span>Pedidos</span>
-    </div>
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item" aria-current="page">Pedidos</li>
+        </ol>
+    </nav>
 
     <div class="page-header">
-        <h1>&#128230; Pedidos</h1>
+        <h1 class="page-title">Pedidos</h1>
     </div>
 
     <div class="filter-bar">
@@ -26,7 +29,7 @@
         </form>
     </div>
 
-    <div th:if="${orders != null and !orders.content.isEmpty()}">
+    <div th:if="${orders != null and !orders.content.isEmpty()}" class="table-wrap">
         <table>
             <thead>
                 <tr>
@@ -52,7 +55,15 @@
                     <td class="price" th:text="'R$ ' + ${#numbers.formatDecimal(order.total(), 1, 2)}"></td>
                     <td th:text="${order.purchasedAt()}"></td>
                     <td>
-                        <a th:href="@{/orders/{id}(id=${order.id()})}" class="btn btn-sm btn-outline">Detalhes</a>
+                        <div class="btn-group">
+                            <a th:href="@{/orders/{id}(id=${order.id()})}" class="btn btn-sm btn-outline">Detalhes</a>
+                            <form method="post" th:action="@{/orders/{id}/dispatch(id=${order.id()})}" th:if="${order.status().name() == 'APPROVED'}" class="inline-actions">
+                                <button type="submit" class="btn btn-sm btn-primary">Despachar</button>
+                            </form>
+                            <form method="post" th:action="@{/orders/{id}/deliver(id=${order.id()})}" th:if="${order.status().name() == 'IN_TRANSIT'}" class="inline-actions">
+                                <button type="submit" class="btn btn-sm btn-success">Confirmar Entrega</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -60,16 +71,16 @@
 
         <div class="pagination" th:if="${orders.totalPages > 1}">
             <span th:each="i : ${#numbers.sequence(0, orders.totalPages - 1)}">
-                <a th:href="@{/orders(page=${i}, status=${param.status})}" th:text="${i + 1}" th:if="${i != orders.number}"></a>
+                <a th:href="${customerId != null} ? @{/orders/customer/{id}(id=${customerId}, page=${i}, status=${param.status})} : @{/orders(page=${i}, status=${param.status})}" th:text="${i + 1}" th:if="${i != orders.number}"></a>
                 <strong th:text="${i + 1}" th:if="${i == orders.number}"></strong>
             </span>
         </div>
     </div>
 
     <div th:if="${orders == null or orders.content.isEmpty()}" class="empty-state">
-        <div class="empty-state-icon">&#128230;</div>
-        <div class="empty-state-text">Nenhum pedido encontrado</div>
+        <div class="empty-state-icon">??</div>
+        <h2 class="empty-state-title">Sem Pedidos</h2>
+        <div class="empty-state-text">Nenhum pedido foi localizado para os filtros atuais.</div>
     </div>
-
 </div>
 </html>

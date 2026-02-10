@@ -22,6 +22,9 @@ public interface OrderRepository {
     Optional<OrderJpaEntity> findById(@Nonnull final UUID id);
 
     @Nonnull
+    Page<OrderJpaEntity> findAll(@Nonnull final Pageable pageable);
+
+    @Nonnull
     Page<OrderJpaEntity> findByCustomerId(final UUID customerId, final Pageable pageable);
 
     @Nonnull

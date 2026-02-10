@@ -19,6 +19,9 @@ public interface ExchangeRequestRepository {
     Optional<ExchangeRequestJpaEntity> findById(@Nonnull final UUID id);
 
     @Nonnull
+    Page<ExchangeRequestJpaEntity> findAll(@Nonnull final Pageable pageable);
+
+    @Nonnull
     Page<ExchangeRequestJpaEntity> findByStatus(
         @Nonnull final ExchangeStatus status,
         @Nonnull final Pageable pageable

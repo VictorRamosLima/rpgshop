@@ -25,6 +25,11 @@ public class QueryExchangesUseCase {
     }
 
     @Transactional(readOnly = true)
+    public Page<ExchangeRequest> findAll(final Pageable pageable) {
+        return exchangeRequestGateway.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<ExchangeRequest> findByStatus(final ExchangeStatus status, final Pageable pageable) {
         return exchangeRequestGateway.findByStatus(status, pageable);
     }

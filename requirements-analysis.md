@@ -1,47 +1,58 @@
 # Analise de Aderencia de Requisitos
 
 Data da analise: 2026-02-10
-Fonte de requisitos: `rpg_requirements.json` (arquivo encontrado no projeto)
-Escopo avaliado: codigo em `src/main/java` e telas em `src/main/resources/templates`
+Fonte de requisitos: `rpg_requirements.json`
+Documento revisado: `requirements-analysis.md` (versao anterior)
+Escopo avaliado:
+- Backend em `src/main/java`
+- Telas em `src/main/resources/templates`
+- Execucao de testes: `.\gradlew.bat test` (falhou por ausencia de Docker/Testcontainers)
 
 ## Criterio de classificacao
 
-- `Contemplado`: implementacao existe e fluxo principal esta disponivel.
-- `Parcial`: implementacao incompleta, sem integracao fim-a-fim, ou cobrindo apenas parte do requisito.
+- `Contemplado`: implementacao existe e cobre o fluxo principal esperado.
+- `Parcial`: requisito implementado em parte, com lacuna funcional ou de comportamento.
 - `Nao contemplado`: nao ha implementacao efetiva do requisito.
-- `Errado`: existe implementacao, mas com comportamento incorreto frente ao requisito.
+- `Errado`: existe implementacao, mas com comportamento incorreto no fluxo.
 
 ## Resumo geral
 
 | Tipo | Total | Contemplado | Parcial | Nao contemplado | Errado |
 |---|---:|---:|---:|---:|---:|
-| Funcionais (FR) | 33 | 14 | 15 | 0 | 4 |
-| Nao funcionais (NFR) | 11 | 4 | 2 | 5 | 0 |
-| Regras de negocio (BR) | 36 | 16 | 12 | 5 | 3 |
-| **Total** | **80** | **34** | **29** | **10** | **7** |
+| Funcionais (FR) | 33 | 27 | 4 | 0 | 2 |
+| Nao funcionais (NFR) | 11 | 4 | 3 | 4 | 0 |
+| Regras de negocio (BR) | 36 | 30 | 2 | 4 | 0 |
+| **Total** | **80** | **61** | **9** | **8** | **2** |
 
-## Requisitos com status `Errado`
+## Itens com status Errado
 
-| ID | Motivo principal | Evidencia |
+| ID | Motivo | Evidencia principal |
 |---|---|---|
-| RF0033 | Checkout quebra em cenarios comuns com cupom opcional nulo por mapeamento sem null-safety | `src/main/java/rpgshop/infraestructure/mapper/order/OrderPaymentMapper.java:37`, `src/main/java/rpgshop/infraestructure/mapper/coupon/CouponMapper.java:35` |
-| RF0039 | Botao de entrega usa status inexistente `DISPATCHED`, impedindo fluxo pela UI | `src/main/resources/templates/order/detail.html:110`, `src/main/java/rpgshop/domain/entity/order/constant/OrderStatus.java:3` |
-| RF0040 | Solicitacao de troca tende a falhar com cupom nulo no mapeamento | `src/main/java/rpgshop/infraestructure/mapper/exchange/ExchangeRequestMapper.java:51`, `src/main/java/rpgshop/infraestructure/mapper/coupon/CouponMapper.java:35` |
-| RF0055 | Telas de analise por produto/categoria usam propriedade inexistente `item.order()` | `src/main/resources/templates/analysis/by-product.html:53`, `src/main/resources/templates/analysis/by-category.html:45`, `src/main/java/rpgshop/domain/entity/order/OrderItem.java:10` |
-| RN0016 | Inativacao automatica nao registra motivo/categoria FORA DE MERCADO; faz apenas update bruto | `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsUseCase.java:35`, `src/main/java/rpgshop/infraestructure/persistence/repository/product/ProductRepository.java:70` |
-| RN0041 | Geracao de pedido de troca fica comprometida pelo erro estrutural de RF0040 | `src/main/java/rpgshop/application/usecase/exchange/RequestExchangeUseCase.java:68`, `src/main/java/rpgshop/infraestructure/mapper/exchange/ExchangeRequestMapper.java:51` |
-| RNF0045 | Liberacao de expirados usa `item.id()` como `cartId` no delete (parametro errado) | `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java:25`, `src/main/java/rpgshop/infraestructure/persistence/repository/cart/CartItemRepository.java:39` |
+| RF0012 | Inativacao funciona no backend, mas o fluxo de tela quebra ao abrir detalhe com historico por uso de propriedade inexistente `sc.changedAt()`. | `src/main/resources/templates/product/detail.html`, `src/main/java/rpgshop/domain/entity/product/StatusChange.java` |
+| RF0016 | Reativacao sofre o mesmo problema do RF0012, quebrando o retorno para a pagina de detalhe quando ha historico de status. | `src/main/resources/templates/product/detail.html`, `src/main/java/rpgshop/domain/entity/product/StatusChange.java` |
+
+## Itens com status Parcial
+
+| ID | Lacuna principal | Evidencia principal |
+|---|---|---|
+| RF0015 | Consulta por status ativo/inativo fica inconsistente: filtro usa coluna `is_active`, mas o mapeador de produto nao sincroniza esse campo com o historico de status. | `src/main/java/rpgshop/infraestructure/persistence/repository/product/ProductRepository.java`, `src/main/java/rpgshop/infraestructure/mapper/product/ProductMapper.java` |
+| RF0027 | Regra de cartao preferencial e multiplos cartoes existe no backend, mas a tela de detalhe usa `card.brand()` (inexistente), comprometendo a visualizacao apos cadastro de cartao. | `src/main/java/rpgshop/application/usecase/customer/CreateCreditCardUseCase.java`, `src/main/resources/templates/customer/detail.html`, `src/main/java/rpgshop/domain/entity/customer/CreditCard.java` |
+| RF0035 | Checkout aceita endereco novo, mas mesmo quando "nao salvar no perfil" o endereco e persistido para o cliente (inativo), nao sendo um fluxo totalmente separado do perfil. | `src/main/java/rpgshop/presentation/controller/order/OrderController.java`, `src/main/java/rpgshop/infraestructure/persistence/gateway/AddressGatewayJpa.java` |
+| RF0037 | Pedido nao fica em `PROCESSING` ao finalizar compra; vai direto para `APPROVED` ou `REJECTED` conforme retorno da operadora. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java`, `src/main/java/rpgshop/domain/entity/order/constant/OrderStatus.java` |
+| RNF0012 | Estrutura de log existe, mas nao ha integracao sistematica para registrar automaticamente toda operacao de escrita. | `src/main/java/rpgshop/application/usecase/log/CreateTransactionLogUseCase.java`, `src/main/java/rpgshop/application/usecase/log/QueryTransactionLogsUseCase.java` |
+| RNF0034 | Existe inclusao de novos enderecos sem editar outros dados, mas nao ha fluxo dedicado para alterar endereco existente de forma isolada. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java`, `src/main/java/rpgshop/application/usecase/customer/CreateAddressUseCase.java` |
+| RNF0042 | Ha caso de uso para liberar itens expirados, mas sem agendamento/acionamento automatico e sem listagem clara de itens removidos para o usuario. | `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java`, `src/main/resources/templates/cart/view.html` |
+| RN0035 | Permite cupom + cartao e cartao abaixo de R$10 nessa combinacao, mas nao implementa priorizacao automatica de cupons por maior valor. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RNF0045 | A remocao por desbloqueio existe no caso de uso, mas nao esta conectada a execucao automatica por timeout no fluxo da aplicacao. | `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java` |
 
 ## Mapeamento detalhado
 
-### 1) Geral
-
-#### Nao funcionais
+### 1) Geral - Nao funcionais
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RNF0011 | Nao contemplado | Nao ha metrica/SLO automatizado para garantir <= 1s. | Ausencia de instrumentacao especifica no projeto |
-| RNF0012 | Parcial | Estrutura de log existe, mas nao ha integracao para registrar toda escrita automaticamente. | `src/main/java/rpgshop/application/usecase/log/CreateTransactionLogUseCase.java:15`, `src/main/java/rpgshop/infraestructure/persistence/repository/log/TransactionLogRepository.java:15`, `src/main/java/rpgshop/application/usecase/log/CreateTransactionLogUseCase.java:24` |
+| RNF0011 | Nao contemplado | Nao ha monitoramento/SLO para comprovar resposta <= 1 segundo em todas as consultas. | `src/main/java`, `src/main/resources` |
+| RNF0012 | Parcial | Entidade/repositorio/log de consulta existem, mas nao ha amarracao transversal com todos os fluxos de escrita. | `src/main/java/rpgshop/application/usecase/log/CreateTransactionLogUseCase.java` |
 
 ### 2) Cadastro de Itens de RPG
 
@@ -49,31 +60,31 @@ Escopo avaliado: codigo em `src/main/java` e telas em `src/main/resources/templa
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RF0011 | Parcial | Caso de uso de cadastro existe, mas nao ha rota/tela de criacao no controller de produto. | `src/main/java/rpgshop/application/usecase/product/CreateProductUseCase.java:26`, `src/main/java/rpgshop/presentation/controller/product/ProductController.java:51` |
-| RF0012 | Parcial | Caso de uso de inativacao existe, mas nao ha endpoint exposto para inativar produto. | `src/main/java/rpgshop/application/usecase/product/DeactivateProductUseCase.java:13`, `src/main/java/rpgshop/presentation/controller/product/ProductController.java:79` |
-| RF0013 | Parcial | Logica existe, mas nao ha disparo automatico (scheduler/job/endpoint operacional). | `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsUseCase.java:16`, `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsUseCase.java:24` |
-| RF0014 | Parcial | Caso de uso de alteracao existe, sem endpoint/tela de edicao no fluxo atual. | `src/main/java/rpgshop/application/usecase/product/UpdateProductUseCase.java:25`, `src/main/java/rpgshop/presentation/controller/product/ProductController.java:68` |
-| RF0015 | Parcial | Backend aceita filtros ricos, mas UI expoe somente subconjunto (nome/status/faixa de preco). | `src/main/java/rpgshop/infraestructure/persistence/repository/product/ProductRepository.java:28`, `src/main/java/rpgshop/presentation/controller/product/ProductController.java:60` |
-| RF0016 | Contemplado | Reativacao implementada com endpoint e validacoes. | `src/main/java/rpgshop/presentation/controller/product/ProductController.java:79`, `src/main/java/rpgshop/application/usecase/product/ActivateProductUseCase.java:22` |
+| RF0011 | Contemplado | Cadastro de produto com tela, controller e use case implementados. | `src/main/resources/templates/product/create.html`, `src/main/java/rpgshop/presentation/controller/product/ProductController.java`, `src/main/java/rpgshop/application/usecase/product/CreateProductUseCase.java` |
+| RF0012 | Errado | Inativacao executa, mas fluxo de retorno para detalhe quebra por propriedade inexistente na tela de historico. | `src/main/resources/templates/product/detail.html`, `src/main/java/rpgshop/domain/entity/product/StatusChange.java` |
+| RF0013 | Contemplado | Inativacao automatica existe por caso de uso, scheduler e acao manual. | `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsUseCase.java`, `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsScheduler.java`, `src/main/resources/templates/product/list.html` |
+| RF0014 | Contemplado | Alteracao cadastral implementada com formulario e use case dedicado. | `src/main/resources/templates/product/edit.html`, `src/main/java/rpgshop/application/usecase/product/UpdateProductUseCase.java` |
+| RF0015 | Parcial | Filtros combinados existem, mas filtro por ativo/inativo fica inconsistente por dessintonia entre coluna `is_active` e historico de status. | `src/main/java/rpgshop/infraestructure/persistence/repository/product/ProductRepository.java`, `src/main/java/rpgshop/infraestructure/mapper/product/ProductMapper.java` |
+| RF0016 | Errado | Reativacao sofre o mesmo problema de renderizacao da pagina de detalhe com historico. | `src/main/resources/templates/product/detail.html`, `src/main/java/rpgshop/domain/entity/product/StatusChange.java` |
 
 #### Nao funcionais
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RNF0021 | Contemplado | Produto possui identificador unico (UUID). | `src/main/java/rpgshop/infraestructure/persistence/entity/product/ProductJpaEntity.java:51` |
-| RNF0013 | Nao contemplado | Nao existe script de carga inicial de dominios (data seed). | Recursos mostram apenas `application.properties` e `schema.sql` |
+| RNF0021 | Contemplado | Item recebe identificador unico e validacao de unicidade de SKU/codigo de barras. | `src/main/java/rpgshop/application/usecase/product/CreateProductUseCase.java`, `src/main/java/rpgshop/infraestructure/persistence/entity/product/ProductJpaEntity.java` |
+| RNF0013 | Nao contemplado | Nao existe script de carga inicial de dominios (grupo de precificacao, fornecedor, tipos etc). | `src/main/resources`, `src/main/java` |
 
 #### Regras de negocio
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RN0011 | Parcial | Nome/tipo/categoria/grupo/identificador/peso sao validados; dimensoes nao sao obrigatorias. | `src/main/java/rpgshop/application/usecase/product/CreateProductUseCase.java:86` |
-| RN0012 | Contemplado | Relacao muitos-para-muitos entre produto e categorias. | `src/main/java/rpgshop/infraestructure/persistence/entity/product/ProductJpaEntity.java:80` |
-| RN0013 | Contemplado | Preco de venda calculado pela margem do grupo de precificacao. | `src/main/java/rpgshop/application/usecase/product/CreateProductUseCase.java:60`, `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:92` |
-| RN0014 | Contemplado | Preco abaixo da margem exige `managerAuthorized`. | `src/main/java/rpgshop/application/usecase/product/UpdateProductUseCase.java:107` |
-| RN0015 | Parcial | Validacao de motivo/categoria existe no caso de uso, mas sem endpoint de inativacao no fluxo atual. | `src/main/java/rpgshop/application/usecase/product/DeactivateProductUseCase.java:24`, `src/main/java/rpgshop/presentation/controller/product/ProductController.java:79` |
-| RN0016 | Errado | Inativacao automatica nao classifica via historico de status como `OUT_OF_MARKET`; so desliga flag. | `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsUseCase.java:35`, `src/main/java/rpgshop/infraestructure/persistence/repository/product/ProductRepository.java:70` |
-| RN0017 | Contemplado | Reativacao exige motivo e categoria. | `src/main/java/rpgshop/application/usecase/product/ActivateProductUseCase.java:23` |
+| RN0011 | Contemplado | Dados obrigatorios do item (incluindo dimensoes/peso e identificador) sao validados no cadastro e alteracao. | `src/main/java/rpgshop/application/usecase/product/CreateProductUseCase.java`, `src/main/java/rpgshop/application/usecase/product/UpdateProductUseCase.java` |
+| RN0012 | Contemplado | Produto pode estar em multiplas categorias (relacao N:N). | `src/main/java/rpgshop/infraestructure/persistence/entity/product/ProductJpaEntity.java` |
+| RN0013 | Contemplado | Preco de venda e calculado pela margem do grupo de precificacao. | `src/main/java/rpgshop/application/usecase/product/CreateProductUseCase.java`, `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java` |
+| RN0014 | Contemplado | Preco abaixo da margem exige autorizacao gerencial. | `src/main/java/rpgshop/application/usecase/product/UpdateProductUseCase.java` |
+| RN0015 | Contemplado | Inativacao manual exige motivo e categoria. | `src/main/java/rpgshop/application/usecase/product/DeactivateProductUseCase.java` |
+| RN0016 | Contemplado | Inativacao automatica usa categoria `OUT_OF_MARKET`. | `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsUseCase.java`, `src/main/java/rpgshop/domain/entity/product/constant/StatusChangeCategory.java` |
+| RN0017 | Contemplado | Reativacao exige motivo e categoria. | `src/main/java/rpgshop/application/usecase/product/ActivateProductUseCase.java` |
 
 ### 3) Cadastro de Clientes
 
@@ -81,37 +92,37 @@ Escopo avaliado: codigo em `src/main/java` e telas em `src/main/resources/templa
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RF0021 | Contemplado | Cadastro de cliente implementado. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java:94` |
-| RF0022 | Contemplado | Alteracao de dados cadastrais implementada. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java:138` |
-| RF0023 | Contemplado | Inativacao de cliente implementada. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java:157` |
-| RF0024 | Contemplado | Consulta com filtros combinaveis (nome/cpf/email/genero/status). | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java:70`, `src/main/java/rpgshop/infraestructure/persistence/repository/customer/CustomerRepository.java:24` |
-| RF0025 | Contemplado | Consulta de transacoes via pedidos do cliente. | `src/main/java/rpgshop/presentation/controller/order/OrderController.java:72`, `src/main/resources/templates/customer/detail.html:15` |
-| RF0026 | Contemplado | Multiplos enderecos com label curta. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java:180`, `src/main/java/rpgshop/application/usecase/customer/CreateAddressUseCase.java:32` |
-| RF0027 | Contemplado | Multiplos cartoes com preferencial. | `src/main/java/rpgshop/application/usecase/customer/CreateCreditCardUseCase.java:48` |
-| RF0028 | Contemplado | Alteracao isolada de senha implementada. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java:163`, `src/main/java/rpgshop/application/usecase/customer/ChangePasswordUseCase.java:24` |
+| RF0021 | Contemplado | Cadastro de cliente implementado com validacoes. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java`, `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java` |
+| RF0022 | Contemplado | Alteracao de dados cadastrais implementada. | `src/main/java/rpgshop/application/usecase/customer/UpdateCustomerUseCase.java` |
+| RF0023 | Contemplado | Inativacao de cliente implementada. | `src/main/java/rpgshop/application/usecase/customer/DeactivateCustomerUseCase.java` |
+| RF0024 | Contemplado | Consulta por filtros combinaveis implementada. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java`, `src/main/java/rpgshop/infraestructure/persistence/repository/customer/CustomerRepository.java` |
+| RF0025 | Contemplado | Transacoes do cliente podem ser consultadas via lista de pedidos do cliente. | `src/main/resources/templates/customer/detail.html`, `src/main/java/rpgshop/presentation/controller/order/OrderController.java` |
+| RF0026 | Contemplado | Inclusao de multiplos enderecos de entrega com identificacao (label). | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java`, `src/main/java/rpgshop/application/usecase/customer/CreateAddressUseCase.java` |
+| RF0027 | Parcial | Backend suporta cartoes multiplos e preferencial, mas tela de detalhe usa metodo inexistente para bandeira do cartao. | `src/main/java/rpgshop/application/usecase/customer/CreateCreditCardUseCase.java`, `src/main/resources/templates/customer/detail.html` |
+| RF0028 | Contemplado | Alteracao isolada de senha implementada. | `src/main/java/rpgshop/application/usecase/customer/ChangePasswordUseCase.java` |
 
 #### Nao funcionais
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RNF0031 | Contemplado | Regra de senha forte no backend (regex) e validacao no frontend. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:20`, `src/main/resources/templates/customer/create.html:105` |
-| RNF0032 | Contemplado | Confirmacao de senha validada no backend e frontend. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:109`, `src/main/java/rpgshop/application/usecase/customer/ChangePasswordUseCase.java:35` |
-| RNF0033 | Nao contemplado | Senha e armazenada e atualizada em texto puro. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:46`, `src/main/java/rpgshop/infraestructure/persistence/repository/customer/CustomerRepository.java:48` |
-| RNF0034 | Parcial | Ha endpoint para adicionar endereco, mas nao para editar endereco existente isoladamente. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java:180` |
-| RNF0035 | Contemplado | Codigo unico de cliente e gerado no cadastro. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:48`, `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:123` |
+| RNF0031 | Contemplado | Senha forte validada em backend e frontend. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java`, `src/main/resources/templates/customer/create.html` |
+| RNF0032 | Contemplado | Confirmacao de senha em cadastro e troca de senha. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java`, `src/main/java/rpgshop/application/usecase/customer/ChangePasswordUseCase.java` |
+| RNF0033 | Nao contemplado | Senha e persistida em texto puro, sem hash/criptografia. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java`, `src/main/java/rpgshop/application/usecase/customer/ChangePasswordUseCase.java` |
+| RNF0034 | Parcial | Inclusao de endereco isolada existe, mas nao ha fluxo de alteracao isolada de endereco existente. | `src/main/java/rpgshop/presentation/controller/customer/CustomerController.java` |
+| RNF0035 | Contemplado | Codigo unico do cliente e gerado no cadastro. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java` |
 
 #### Regras de negocio
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RN0021 | Nao contemplado | Cadastro inicial nao exige endereco de cobranca. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:50` |
-| RN0022 | Nao contemplado | Cadastro inicial nao exige endereco de entrega. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:50` |
-| RN0023 | Contemplado | Campos obrigatorios de endereco sao validados. | `src/main/java/rpgshop/application/usecase/customer/CreateAddressUseCase.java:48` |
-| RN0024 | Contemplado | Campos obrigatorios de cartao sao validados. | `src/main/java/rpgshop/application/usecase/customer/CreateCreditCardUseCase.java:62` |
-| RN0025 | Contemplado | Bandeira deve existir no sistema (lookup por id). | `src/main/java/rpgshop/application/usecase/customer/CreateCreditCardUseCase.java:41` |
-| RN0026 | Parcial | Dados obrigatorios do cliente sao validados, exceto endereco residencial obrigatorio no cadastro inicial. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:73`, `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:50` |
-| RN0027 | Parcial | Campo ranking existe, mas nao ha algoritmo de evolucao por perfil de compra. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java:47`, `src/main/java/rpgshop/domain/entity/customer/Customer.java:21` |
-| RN0028 | Parcial | Baixa de estoque ocorre apos aprovacao, mas sem integracao de operadora para aprovacao/reprovação real. | `src/main/java/rpgshop/application/usecase/order/ApproveOrderUseCase.java:36`, `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:74` |
+| RN0021 | Nao contemplado | Nao e exigido endereco de cobranca no cadastro inicial. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java` |
+| RN0022 | Nao contemplado | Nao e exigido endereco de entrega no cadastro inicial. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java` |
+| RN0023 | Contemplado | Composicao obrigatoria de endereco validada. | `src/main/java/rpgshop/application/usecase/customer/CreateAddressUseCase.java` |
+| RN0024 | Contemplado | Composicao obrigatoria de cartao validada. | `src/main/java/rpgshop/application/usecase/customer/CreateCreditCardUseCase.java` |
+| RN0025 | Contemplado | Bandeira precisa existir no sistema (lookup por ID). | `src/main/java/rpgshop/application/usecase/customer/CreateCreditCardUseCase.java` |
+| RN0026 | Contemplado | Dados obrigatorios do cliente (incluindo endereco residencial) sao exigidos no cadastro. | `src/main/java/rpgshop/application/usecase/customer/CreateCustomerUseCase.java`, `src/main/resources/templates/customer/create.html` |
+| RN0027 | Contemplado | Ranking numerico existe e e atualizado com base no comportamento de compra. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java`, `src/main/java/rpgshop/application/usecase/order/ApproveOrderUseCase.java` |
+| RN0028 | Contemplado | Validacao de operadora ocorre antes de efeitos de aprovacao; baixa de estoque so para aprovados. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java`, `src/main/java/rpgshop/infraestructure/integration/order/SimulatedCardOperatorGateway.java` |
 
 ### 4) Gerenciar Vendas Eletronicas
 
@@ -119,47 +130,47 @@ Escopo avaliado: codigo em `src/main/java` e telas em `src/main/resources/templa
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RF0031 | Contemplado | Adicionar/alterar/remover/visualizar carrinho implementado. | `src/main/java/rpgshop/presentation/controller/cart/CartController.java:46` |
-| RF0032 | Contemplado | Alteracao de quantidade implementada. | `src/main/java/rpgshop/application/usecase/cart/UpdateCartItemQuantityUseCase.java:35` |
-| RF0033 | Errado | Checkout com cupom opcional tende a falhar por mapeamento sem null-safety. | `src/main/java/rpgshop/infraestructure/mapper/order/OrderPaymentMapper.java:37`, `src/main/java/rpgshop/infraestructure/mapper/coupon/CouponMapper.java:35`, `src/main/java/rpgshop/presentation/controller/order/OrderController.java:107` |
-| RF0034 | Parcial | Frete considera peso, mas nao endereco. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:144` |
-| RF0035 | Parcial | So aceita endereco ja existente por UUID; nao cadastra novo no checkout. | `src/main/resources/templates/order/checkout.html:20`, `src/main/java/rpgshop/presentation/controller/order/OrderController.java:104` |
-| RF0036 | Parcial | So ha um cartao + um cupom no fluxo de tela; sem cadastro de novo pagamento no checkout. | `src/main/java/rpgshop/presentation/controller/order/OrderController.java:111`, `src/main/resources/templates/order/checkout.html:31` |
-| RF0037 | Parcial | Pedido inicia em `PROCESSING`, mas fluxo de compra sofre os problemas de RF0033. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:104` |
-| RF0038 | Parcial | Use case de despacho existe, mas UI de aprovacao tem divergencia de status (`PENDING` vs `PROCESSING`). | `src/main/java/rpgshop/application/usecase/order/DispatchOrderUseCase.java:34`, `src/main/resources/templates/order/detail.html:101` |
-| RF0039 | Errado | Confirmacao de entrega na UI depende de status inexistente `DISPATCHED`. | `src/main/resources/templates/order/detail.html:110`, `src/main/java/rpgshop/domain/entity/order/constant/OrderStatus.java:3` |
-| RF0040 | Errado | Solicitacao de troca comprometida por mapeamento de cupom nulo. | `src/main/java/rpgshop/application/usecase/exchange/RequestExchangeUseCase.java:68`, `src/main/java/rpgshop/infraestructure/mapper/exchange/ExchangeRequestMapper.java:51` |
-| RF0041 | Parcial | Autorizacao existe no caso de uso, mas depende da criacao correta da troca (RF0040). | `src/main/java/rpgshop/application/usecase/exchange/AuthorizeExchangeUseCase.java:33` |
-| RF0042 | Parcial | Consulta por status existe, mas listagem sem filtro usa `findByStatus(null)` e pode retornar vazio. | `src/main/java/rpgshop/presentation/controller/exchange/ExchangeController.java:58`, `src/main/java/rpgshop/infraestructure/persistence/repository/exchange/ExchangeRequestRepository.java:22` |
-| RF0043 | Parcial | Recebimento implementado, mas depende de fluxo de troca anterior. | `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java:44` |
-| RF0044 | Parcial | Cupom de troca e gerado, mas fluxo completo depende de RF0040/0043 e cupom nao e associado ao request. | `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java:89`, `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java:59` |
+| RF0031 | Contemplado | Carrinho permite adicionar, editar, remover e visualizar itens. | `src/main/java/rpgshop/presentation/controller/cart/CartController.java` |
+| RF0032 | Contemplado | Quantidade pode ser definida no add e alterada no carrinho. | `src/main/java/rpgshop/application/usecase/cart/AddCartItemUseCase.java`, `src/main/java/rpgshop/application/usecase/cart/UpdateCartItemQuantityUseCase.java` |
+| RF0033 | Contemplado | Compra a partir do carrinho implementada no checkout. | `src/main/java/rpgshop/presentation/controller/order/OrderController.java`, `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RF0034 | Contemplado | Frete considera itens (peso) e endereco (estado/pais). | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RF0035 | Parcial | Selecao de endereco existente/novo existe, mas endereco novo sempre e persistido para o cliente (mesmo quando nao deveria entrar no perfil). | `src/main/java/rpgshop/presentation/controller/order/OrderController.java` |
+| RF0036 | Contemplado | Checkout permite cartao existente, novo cartao, cupons e combinacoes de pagamento. | `src/main/resources/templates/order/checkout.html`, `src/main/java/rpgshop/presentation/controller/order/OrderController.java` |
+| RF0037 | Parcial | Finalizacao nao deixa pedido em `PROCESSING`; status final e imediato (`APPROVED`/`REJECTED`). | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RF0038 | Contemplado | Despacho de pedidos aprovados para `IN_TRANSIT`. | `src/main/java/rpgshop/application/usecase/order/DispatchOrderUseCase.java` |
+| RF0039 | Contemplado | Confirmacao de entrega para `DELIVERED`. | `src/main/java/rpgshop/application/usecase/order/DeliverOrderUseCase.java` |
+| RF0040 | Contemplado | Solicitacao de troca implementada para item de pedido entregue. | `src/main/java/rpgshop/application/usecase/exchange/RequestExchangeUseCase.java` |
+| RF0041 | Contemplado | Autorizacao de troca implementada. | `src/main/java/rpgshop/application/usecase/exchange/AuthorizeExchangeUseCase.java` |
+| RF0042 | Contemplado | Visualizacao de trocas por filtro/status implementada. | `src/main/java/rpgshop/presentation/controller/exchange/ExchangeController.java` |
+| RF0043 | Contemplado | Recebimento de itens de troca com decisao de retorno a estoque implementado. | `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java` |
+| RF0044 | Contemplado | Geracao de cupom de troca apos recebimento implementada. | `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java` |
 
 #### Nao funcionais
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RNF0042 | Nao contemplado | Nao ha tela/lista de itens removidos por expiracao nem bloqueio explicito de compra por esse motivo. | `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java:20`, `src/main/resources/templates/cart/view.html:18` |
+| RNF0042 | Parcial | Caso de uso de expiracao existe, mas nao esta automatizado e nao ha apresentacao clara dos itens removidos ao usuario. | `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java`, `src/main/resources/templates/cart/view.html` |
 
 #### Regras de negocio
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RN0031 | Contemplado | Valida indisponibilidade e quantidade maxima ao adicionar carrinho. | `src/main/java/rpgshop/application/usecase/cart/AddCartItemUseCase.java:58` |
-| RN0032 | Contemplado | Revalida estoque no fechamento do pedido. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:121` |
-| RN0033 | Contemplado | Limite de um cupom promocional por pedido implementado. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:179` |
-| RN0034 | Parcial | Modelo suporta multiplos pagamentos, mas nao valida minimo de R$ 10 por cartao. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:40`, `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:169` |
-| RN0035 | Nao contemplado | Nao ha priorizacao explicita de cupons nem regra de cartao < R$10 nessa combinacao. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:169` |
-| RN0036 | Nao contemplado | Nao ha geracao de cupom de troco quando pagamento excede total do pedido. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:219` |
-| RN0037 | Parcial | Valida cupons, mas sem aprovacao de operadora de cartao. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java:185` |
-| RN0038 | Parcial | Ha transicao manual para aprovado/reprovado, sem decisao automatica por operadora. | `src/main/java/rpgshop/application/usecase/order/ApproveOrderUseCase.java:27`, `src/main/java/rpgshop/application/usecase/order/RejectOrderUseCase.java:25` |
-| RN0039 | Parcial | Regra de transporte existe, mas fluxo de UI de status esta inconsistente. | `src/main/java/rpgshop/application/usecase/order/DispatchOrderUseCase.java:34`, `src/main/resources/templates/order/detail.html:101` |
-| RN0040 | Parcial | Regra de entregue existe, mas gatilho de UI usa status errado. | `src/main/java/rpgshop/application/usecase/order/DeliverOrderUseCase.java:34`, `src/main/resources/templates/order/detail.html:110` |
-| RN0041 | Errado | Pedido de troca deveria ser gerado, mas criacao do request esta comprometida por erro de mapeamento. | `src/main/java/rpgshop/application/usecase/exchange/RequestExchangeUseCase.java:68`, `src/main/java/rpgshop/infraestructure/mapper/exchange/ExchangeRequestMapper.java:51` |
-| RN0042 | Parcial | Atualizacao para trocado existe no receive, mas depende de fluxo de troca previamente funcional. | `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java:65` |
-| RN0043 | Contemplado | Apenas pedidos entregues podem solicitar troca. | `src/main/java/rpgshop/application/usecase/exchange/RequestExchangeUseCase.java:49` |
-| RN0044 | Parcial | Bloqueio existe, mas timeout e fixo (nao parametrizado). | `src/main/java/rpgshop/application/usecase/cart/AddCartItemUseCase.java:26`, `src/main/java/rpgshop/application/usecase/cart/UpdateCartItemQuantityUseCase.java:21` |
-| RNF0045 | Errado | Liberacao remove com parametro de carrinho incorreto e sem acionamento automatico. | `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java:25`, `src/main/java/rpgshop/infraestructure/persistence/repository/cart/CartItemRepository.java:39` |
-| RNF0046 | Nao contemplado | Nao existe mecanismo de notificacao na autorizacao de troca. | `src/main/java/rpgshop/application/usecase/exchange/AuthorizeExchangeUseCase.java:33` |
+| RN0031 | Contemplado | Nao permite adicionar indisponivel e valida quantidade contra estoque disponivel. | `src/main/java/rpgshop/application/usecase/cart/AddCartItemUseCase.java` |
+| RN0032 | Contemplado | Revalida estoque no momento da compra. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RN0033 | Contemplado | Limite de um cupom promocional por pedido implementado. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RN0034 | Contemplado | Multiplo cartao suportado; regra de minimo por cartao sem cupom implementada. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java`, `src/main/resources/templates/order/checkout.html` |
+| RN0035 | Parcial | Cartao com cupom e aceito, mas nao ha priorizacao automatica de cupons por maior valor. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RN0036 | Nao contemplado | Nao ha geracao de cupom de troco quando total pago por cupons supera o valor do pedido. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RN0037 | Contemplado | Validacao de cupons + aprovacao da operadora antes da conclusao. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java`, `src/main/java/rpgshop/infraestructure/integration/order/SimulatedCardOperatorGateway.java` |
+| RN0038 | Contemplado | Status do pedido muda conforme aprovacao/reprovacao da operadora. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java` |
+| RN0039 | Contemplado | Pedido despachado muda para `IN_TRANSIT`. | `src/main/java/rpgshop/application/usecase/order/DispatchOrderUseCase.java` |
+| RN0040 | Contemplado | Pedido entregue muda para `DELIVERED`. | `src/main/java/rpgshop/application/usecase/order/DeliverOrderUseCase.java` |
+| RN0041 | Contemplado | Solicitacao de troca gera fluxo com pedido em `IN_EXCHANGE`. | `src/main/java/rpgshop/application/usecase/exchange/RequestExchangeUseCase.java` |
+| RN0042 | Contemplado | Recebimento de troca altera pedido para `EXCHANGED`. | `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java` |
+| RN0043 | Contemplado | Troca permitida apenas para pedido entregue. | `src/main/java/rpgshop/application/usecase/exchange/RequestExchangeUseCase.java` |
+| RN0044 | Contemplado | Bloqueio de carrinho com timeout parametrizado por propriedade. | `src/main/java/rpgshop/application/config/CartBlockingProperties.java`, `src/main/java/rpgshop/application/usecase/cart/AddCartItemUseCase.java` |
+| RNF0045 | Parcial | Regra de retirada existe no caso de uso, mas falta execucao automatica vinculada ao timeout. | `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java` |
+| RNF0046 | Nao contemplado | Nao ha mecanismo de notificacao ao cliente quando troca e autorizada. | `src/main/java/rpgshop/application/usecase/exchange/AuthorizeExchangeUseCase.java` |
 
 ### 5) Controle de Estoque
 
@@ -167,20 +178,20 @@ Escopo avaliado: codigo em `src/main/java` e telas em `src/main/resources/templa
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RF0051 | Contemplado | Entrada de estoque implementada. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:38`, `src/main/java/rpgshop/presentation/controller/stock/StockController.java:54` |
-| RF0052 | Contemplado | Valor de venda recalculado com margem do grupo. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:92` |
-| RF0053 | Contemplado | Baixa de estoque ocorre na aprovacao do pedido. | `src/main/java/rpgshop/application/usecase/order/ApproveOrderUseCase.java:36` |
-| RF0054 | Parcial | Existe use case dedicado, mas nao exposto nem integrado ao fluxo de troca (que so incrementa estoque). | `src/main/java/rpgshop/application/usecase/stock/CreateStockReentryUseCase.java:20`, `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java:76` |
+| RF0051 | Contemplado | Entrada de estoque implementada com validacoes. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java`, `src/main/resources/templates/stock/create.html` |
+| RF0052 | Contemplado | Calculo de valor de venda por custo + margem implementado. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java` |
+| RF0053 | Contemplado | Baixa de estoque em venda aprovada implementada. | `src/main/java/rpgshop/application/usecase/order/CreateOrderUseCase.java`, `src/main/java/rpgshop/application/usecase/order/ApproveOrderUseCase.java` |
+| RF0054 | Contemplado | Reentrada apos troca implementada e integrada ao recebimento de troca. | `src/main/java/rpgshop/application/usecase/stock/CreateStockReentryUseCase.java`, `src/main/java/rpgshop/application/usecase/exchange/ReceiveExchangeItemsUseCase.java` |
 
 #### Regras de negocio
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RN0051 | Contemplado | Validacao dos dados obrigatorios de entrada de estoque. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:63` |
-| RN005x | Contemplado | Usa maior custo historico para recalcular preco de venda. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:95` |
-| RN0061 | Contemplado | Nao permite quantidade <= 0. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:67` |
-| RN0062 | Contemplado | Nao permite custo nulo ou <= 0. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:70` |
-| RNF0064 | Contemplado | Data de entrada obrigatoria. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java:76` |
+| RN0051 | Contemplado | Produto, quantidade, custo, fornecedor e data obrigatorios na entrada. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java` |
+| RN005x | Contemplado | Recalculo usa maior custo historico para definir preco. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java`, `src/main/java/rpgshop/infraestructure/persistence/repository/stock/StockEntryRepository.java` |
+| RN0061 | Contemplado | Quantidade zero/negativa bloqueada. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java` |
+| RN0062 | Contemplado | Valor de custo obrigatorio e maior que zero. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java` |
+| RNF0064 | Contemplado | Data de entrada obrigatoria. | `src/main/java/rpgshop/application/usecase/stock/CreateStockEntryUseCase.java` |
 
 ### 6) Analise
 
@@ -188,23 +199,22 @@ Escopo avaliado: codigo em `src/main/java` e telas em `src/main/resources/templa
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RF0055 | Errado | Casos de uso existem, mas telas principais de comparacao usam campo inexistente `item.order()` e queries com literais improprios em aspas duplas. | `src/main/resources/templates/analysis/by-product.html:53`, `src/main/resources/templates/analysis/by-category.html:45`, `src/main/java/rpgshop/infraestructure/persistence/repository/order/OrderItemRepository.java:31` |
+| RF0055 | Contemplado | Consulta de historico por periodo, produto e categoria implementada. | `src/main/java/rpgshop/presentation/controller/analysis/AnalysisController.java`, `src/main/java/rpgshop/application/usecase/analysis/SalesAnalysisUseCase.java` |
 
 #### Nao funcionais
 
 | ID | Status | Analise | Evidencia |
 |---|---|---|---|
-| RNF0043 | Nao contemplado | Nao ha grafico de linhas, apenas tabelas textuais. | `src/main/resources/templates/analysis/sales.html:30`, `src/main/resources/templates/analysis/by-product.html:39` |
+| RNF0043 | Nao contemplado | Nao ha grafico de linhas nas telas de analise; apenas tabelas. | `src/main/resources/templates/analysis/sales.html`, `src/main/resources/templates/analysis/by-product.html`, `src/main/resources/templates/analysis/by-category.html` |
 
 ## Observacoes tecnicas adicionais
 
-- Ha varios `@Query` com comparacao de enum/status usando aspas duplas (ex.: `"REJECTED"`, `"DELIVERED"`, `"EXCHANGE"`, `"PROMOTIONAL"`), o que e arriscado/incorreto em JPQL e pode quebrar em runtime.
-  - `src/main/java/rpgshop/infraestructure/persistence/repository/order/OrderRepository.java:36`
-  - `src/main/java/rpgshop/infraestructure/persistence/repository/order/OrderItemRepository.java:31`
-  - `src/main/java/rpgshop/infraestructure/persistence/repository/coupon/CouponRepository.java:50`
-  - `src/main/java/rpgshop/infraestructure/persistence/repository/order/OrderPaymentRepository.java:28`
-- Casos de uso desenhados para automacao nao estao conectados a nenhum agendador/chamador no projeto:
-  - `src/main/java/rpgshop/application/usecase/product/AutoDeactivateProductsUseCase.java:16`
-  - `src/main/java/rpgshop/application/usecase/cart/ReleaseExpiredCartItemsUseCase.java:12`
-  - `src/main/java/rpgshop/application/usecase/stock/CreateStockReentryUseCase.java:20`
-- Execucao de testes (`.\gradlew.bat test`) falhou por dependencia de Docker/Testcontainers indisponivel no ambiente atual; nao foi uma validacao funcional completa de runtime.
+- Ha dessintonia entre status de produto por historico e coluna `is_active` persistida:
+  - `Product.isActive()` depende de `statusChanges`.
+  - filtros de repositorio usam `products.is_active`.
+  - `ProductMapper.toEntity()` nao grava `isActive`.
+  - Evidencias: `src/main/java/rpgshop/domain/entity/product/Product.java`, `src/main/java/rpgshop/infraestructure/mapper/product/ProductMapper.java`, `src/main/java/rpgshop/infraestructure/persistence/repository/product/ProductRepository.java`.
+- Erros de template impactam fluxos de produto e cliente:
+  - `sc.changedAt()` em historico de status de produto (metodo inexistente).
+  - `card.brand()` em detalhe de cliente (metodo inexistente).
+- Teste automatizado executado (`.\gradlew.bat test`) falhou por dependencia de Docker/Testcontainers indisponivel no ambiente atual; nao houve validacao funcional completa de runtime.

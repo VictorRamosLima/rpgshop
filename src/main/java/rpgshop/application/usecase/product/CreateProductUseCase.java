@@ -102,6 +102,15 @@ public class CreateProductUseCase {
         if (command.weight() == null || command.weight().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessRuleException("O peso e obrigatorio e deve ser maior que zero");
         }
+        if (command.height() == null || command.height().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("A altura e obrigatoria e deve ser maior que zero");
+        }
+        if (command.width() == null || command.width().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("A largura e obrigatoria e deve ser maior que zero");
+        }
+        if (command.depth() == null || command.depth().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("A profundidade e obrigatoria e deve ser maior que zero");
+        }
         if ((command.barcode() == null || command.barcode().isBlank())
                 && (command.sku() == null || command.sku().isBlank())) {
             throw new BusinessRuleException("Pelo menos um identificador e obrigatorio: codigo de barras ou SKU");

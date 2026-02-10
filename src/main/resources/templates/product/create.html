@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('Novo Produto', ~{::main-content})}">
+<div th:fragment="main-content">
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="/products">Produtos</a></li>
+            <li class="breadcrumb-item" aria-current="page">Novo</li>
+        </ol>
+    </nav>
+
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Cadastrar Produto</h1>
+            <p class="page-subtitle">Cadastro unico de item com tipo, categorias, precificacao e identificadores.</p>
+        </div>
+    </header>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <form method="post" action="/products">
+        <section class="card">
+            <div class="card-title">Dados principais</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Nome (obrigatorio)</label>
+                    <input id="name" type="text" name="name" required />
+                </div>
+                <div class="form-group">
+                    <label for="productTypeId">Tipo (obrigatorio)</label>
+                    <select id="productTypeId" name="productTypeId" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="pt : ${productTypes}" th:value="${pt.id()}" th:text="${pt.name()}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="categoryIds">Categorias (obrigatorio)</label>
+                    <select id="categoryIds" name="categoryIds" multiple required size="6">
+                        <option th:each="cat : ${categories}" th:value="${cat.id()}" th:text="${cat.name()}"></option>
+                    </select>
+                    <span class="form-hint">Use Ctrl/Cmd para selecionar mais de uma categoria.</span>
+                </div>
+                <div class="form-group">
+                    <label for="pricingGroupId">Grupo de precificacao (obrigatorio)</label>
+                    <select id="pricingGroupId" name="pricingGroupId" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="pg : ${pricingGroups}" th:value="${pg.id()}" th:text="${pg.name()}"></option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">Especificacoes</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="height">Altura (obrigatorio)</label>
+                    <input id="height" type="number" step="0.01" min="0.01" name="height" required />
+                </div>
+                <div class="form-group">
+                    <label for="width">Largura (obrigatorio)</label>
+                    <input id="width" type="number" step="0.01" min="0.01" name="width" required />
+                </div>
+                <div class="form-group">
+                    <label for="depth">Profundidade (obrigatorio)</label>
+                    <input id="depth" type="number" step="0.01" min="0.01" name="depth" required />
+                </div>
+                <div class="form-group">
+                    <label for="weight">Peso (obrigatorio)</label>
+                    <input id="weight" type="number" step="0.01" min="0.01" name="weight" required />
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-title">Identificadores e custo</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sku">SKU</label>
+                    <input id="sku" type="text" name="sku" />
+                </div>
+                <div class="form-group">
+                    <label for="barcode">Codigo de barras</label>
+                    <input id="barcode" type="text" name="barcode" />
+                </div>
+                <div class="form-group">
+                    <label for="costPrice">Preco de custo (obrigatorio)</label>
+                    <input id="costPrice" type="number" step="0.01" min="0.01" name="costPrice" required />
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">Cadastrar Produto</button>
+            <a href="/products" class="btn btn-outline btn-lg">Cancelar</a>
+        </div>
+    </form>
+</div>
+</html>

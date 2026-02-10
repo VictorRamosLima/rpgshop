@@ -12,82 +12,101 @@ import org.springframework.web.bind.annotation.RequestParam;
 import rpgshop.application.command.exchange.ReceiveExchangeItemsCommand;
 import rpgshop.application.command.exchange.RequestExchangeCommand;
 import rpgshop.application.exception.BusinessRuleException;
+import rpgshop.application.gateway.order.OrderItemGateway;
+import rpgshop.application.gateway.supplier.SupplierGateway;
 import rpgshop.application.usecase.exchange.AuthorizeExchangeUseCase;
 import rpgshop.application.usecase.exchange.DenyExchangeUseCase;
 import rpgshop.application.usecase.exchange.QueryExchangesUseCase;
 import rpgshop.application.usecase.exchange.ReceiveExchangeItemsUseCase;
 import rpgshop.application.usecase.exchange.RequestExchangeUseCase;
+import rpgshop.application.usecase.order.QueryOrdersUseCase;
 import rpgshop.domain.entity.exchange.ExchangeRequest;
 import rpgshop.domain.entity.exchange.constant.ExchangeStatus;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Controller
 @RequestMapping("/exchanges")
-public class ExchangeController {
+public final class ExchangeController {
     private final RequestExchangeUseCase requestExchangeUseCase;
     private final AuthorizeExchangeUseCase authorizeExchangeUseCase;
     private final DenyExchangeUseCase denyExchangeUseCase;
     private final ReceiveExchangeItemsUseCase receiveExchangeItemsUseCase;
     private final QueryExchangesUseCase queryExchangesUseCase;
+    private final QueryOrdersUseCase queryOrdersUseCase;
+    private final OrderItemGateway orderItemGateway;
+    private final SupplierGateway supplierGateway;
 
     public ExchangeController(
         final RequestExchangeUseCase requestExchangeUseCase,
         final AuthorizeExchangeUseCase authorizeExchangeUseCase,
         final DenyExchangeUseCase denyExchangeUseCase,
         final ReceiveExchangeItemsUseCase receiveExchangeItemsUseCase,
-        final QueryExchangesUseCase queryExchangesUseCase
+        final QueryExchangesUseCase queryExchangesUseCase,
+        final QueryOrdersUseCase queryOrdersUseCase,
+        final OrderItemGateway orderItemGateway,
+        final SupplierGateway supplierGateway
     ) {
         this.requestExchangeUseCase = requestExchangeUseCase;
         this.authorizeExchangeUseCase = authorizeExchangeUseCase;
         this.denyExchangeUseCase = denyExchangeUseCase;
         this.receiveExchangeItemsUseCase = receiveExchangeItemsUseCase;
         this.queryExchangesUseCase = queryExchangesUseCase;
+        this.queryOrdersUseCase = queryOrdersUseCase;
+        this.orderItemGateway = orderItemGateway;
+        this.supplierGateway = supplierGateway;
     }
 
     @GetMapping
     public String list(
-        @RequestParam(required = false) ExchangeStatus status,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(required = false) final ExchangeStatus status,
+        @RequestParam(defaultValue = "0") final int page,
         Model model
     ) {
-        Page<ExchangeRequest> exchanges;
-        if (status != null) {
-            exchanges = queryExchangesUseCase.findByStatus(status, PageRequest.of(page, 10));
-        } else {
-            exchanges = queryExchangesUseCase.findByStatus(null, PageRequest.of(page, 10));
-        }
+        final Page<ExchangeRequest> exchanges = status != null
+            ? queryExchangesUseCase.findByStatus(status, PageRequest.of(page, 10))
+            : queryExchangesUseCase.findAll(PageRequest.of(page, 10));
+
         model.addAttribute("exchanges", exchanges);
         model.addAttribute("statuses", ExchangeStatus.values());
         return "exchange/list";
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable UUID id, Model model) {
+    public String detail(@PathVariable final UUID id, final Model model) {
         final var exchange = queryExchangesUseCase.findById(id);
         if (exchange.isEmpty()) {
             return "redirect:/exchanges";
         }
         model.addAttribute("exchange", exchange.get());
+        model.addAttribute("activeSuppliers", supplierGateway.findActiveSuppliers(PageRequest.of(0, 100)).getContent());
         return "exchange/detail";
     }
 
     @GetMapping("/new")
     public String showRequestForm(
-        @RequestParam UUID orderId,
-        Model model
+        @RequestParam final UUID orderId,
+        final Model model
     ) {
+        final var order = queryOrdersUseCase.findById(orderId);
+        if (order.isEmpty()) {
+            return "redirect:/orders";
+        }
+
+        model.addAttribute("order", order.get());
         model.addAttribute("orderId", orderId);
+        model.addAttribute("orderItems", orderItemGateway.findDeliveredItemsByOrderId(orderId));
         return "exchange/request";
     }
 
     @PostMapping
     public String request(
-        @RequestParam UUID orderId,
-        @RequestParam UUID orderItemId,
-        @RequestParam int quantity,
-        @RequestParam String reason,
-        Model model
+        @RequestParam final UUID orderId,
+        @RequestParam final UUID orderItemId,
+        @RequestParam final int quantity,
+        @RequestParam final String reason,
+        final Model model
     ) {
         try {
             final var command = new RequestExchangeCommand(orderId, orderItemId, quantity, reason);
@@ -96,12 +115,13 @@ public class ExchangeController {
         } catch (BusinessRuleException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("orderId", orderId);
+            model.addAttribute("orderItems", orderItemGateway.findDeliveredItemsByOrderId(orderId));
             return "exchange/request";
         }
     }
 
     @PostMapping("/{id}/authorize")
-    public String authorize(@PathVariable UUID id, Model model) {
+    public String authorize(@PathVariable final UUID id, final Model model) {
         try {
             authorizeExchangeUseCase.execute(id);
             return "redirect:/exchanges/" + id;
@@ -112,7 +132,7 @@ public class ExchangeController {
     }
 
     @PostMapping("/{id}/deny")
-    public String deny(@PathVariable UUID id, Model model) {
+    public String deny(@PathVariable final UUID id, final Model model) {
         try {
             denyExchangeUseCase.execute(id);
             return "redirect:/exchanges/" + id;
@@ -124,12 +144,14 @@ public class ExchangeController {
 
     @PostMapping("/{id}/receive")
     public String receive(
-        @PathVariable UUID id,
-        @RequestParam(defaultValue = "false") boolean returnToStock,
-        Model model
+        @PathVariable final UUID id,
+        @RequestParam(defaultValue = "false") final boolean returnToStock,
+        @RequestParam(required = false) final UUID supplierId,
+        @RequestParam(required = false) final BigDecimal costValue,
+        final Model model
     ) {
         try {
-            final var command = new ReceiveExchangeItemsCommand(id, returnToStock);
+            final var command = new ReceiveExchangeItemsCommand(id, returnToStock, supplierId, costValue);
             receiveExchangeItemsUseCase.execute(command);
             return "redirect:/exchanges/" + id;
         } catch (BusinessRuleException e) {

@@ -3,12 +3,16 @@
       th:replace="~{fragments/layout :: page('Detalhe do Pedido', ~{::main-content})}">
 <div th:fragment="main-content">
 
-    <div class="breadcrumb">
-        <a href="/">Inicio</a> <span>/</span> <a href="/orders">Pedidos</a> <span>/</span> <span>Detalhe</span>
-    </div>
+    <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="/orders">Pedidos</a></li>
+            <li class="breadcrumb-item" aria-current="page">Detalhe</li>
+        </ol>
+    </nav>
 
     <div class="page-header">
-        <h1>Pedido</h1>
+        <h1 class="page-title">Detalhe do Pedido</h1>
         <span class="badge" th:classappend="${order.status().name() == 'APPROVED' ? 'badge-active' : (order.status().name() == 'REJECTED' ? 'badge-inactive' : 'badge-warning')}" th:text="${order.status()}"></span>
     </div>
 
@@ -51,7 +55,7 @@
                     <div class="info-value" th:text="'R$ ' + ${#numbers.formatDecimal(order.subtotal(), 1, 2)}"></div>
                 </div>
                 <div class="info-group">
-                    <div class="info-label">Frete (R$ 2,50/kg)</div>
+                    <div class="info-label">Frete (peso + fator regional)</div>
                     <div class="info-value" th:text="'R$ ' + ${#numbers.formatDecimal(order.freightCost(), 1, 2)}"></div>
                 </div>
             </div>
@@ -64,7 +68,8 @@
 
     <div class="card">
         <div class="card-header">Itens do Pedido</div>
-        <table th:if="${order.items() != null and !order.items().isEmpty()}">
+        <div th:if="${order.items() != null and !order.items().isEmpty()}" class="table-wrap">
+            <table>
             <thead>
                 <tr><th>Produto</th><th>Quantidade</th><th>Preco Unitario</th><th>Total</th></tr>
             </thead>
@@ -76,12 +81,14 @@
                     <td class="price" th:text="'R$ ' + ${#numbers.formatDecimal(item.totalPrice(), 1, 2)}"></td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <div class="card">
         <div class="card-header">Pagamentos</div>
-        <table th:if="${order.payments() != null and !order.payments().isEmpty()}">
+        <div th:if="${order.payments() != null and !order.payments().isEmpty()}" class="table-wrap">
+            <table>
             <thead>
                 <tr><th>Cartao</th><th>Cupom</th><th>Valor</th></tr>
             </thead>
@@ -92,27 +99,24 @@
                     <td class="price" th:text="'R$ ' + ${#numbers.formatDecimal(payment.amount(), 1, 2)}"></td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <div class="card">
         <div class="card-header">Acoes do Pedido</div>
         <div class="btn-group">
-            <form method="post" th:action="@{/orders/{id}/approve(id=${order.id()})}" th:if="${order.status().name() == 'PROCESSING'}" style="display:inline;">
-                <button type="submit" class="btn btn-success">Aprovar</button>
+            <form method="post" th:action="@{/orders/{id}/approve(id=${order.id()})}" th:if="${order.status().name() == 'PROCESSING'}" class="inline-actions">
+                <button type="submit" class="btn btn-success">Processar Pagamento</button>
             </form>
-            <form method="post" th:action="@{/orders/{id}/reject(id=${order.id()})}" th:if="${order.status().name() == 'PROCESSING'}" style="display:inline;">
-                <button type="submit" class="btn btn-danger">Rejeitar</button>
-            </form>
-            <form method="post" th:action="@{/orders/{id}/dispatch(id=${order.id()})}" th:if="${order.status().name() == 'APPROVED'}" style="display:inline;">
+            <form method="post" th:action="@{/orders/{id}/dispatch(id=${order.id()})}" th:if="${order.status().name() == 'APPROVED'}" class="inline-actions">
                 <button type="submit" class="btn btn-primary">Despachar</button>
             </form>
-            <form method="post" th:action="@{/orders/{id}/deliver(id=${order.id()})}" th:if="${order.status().name() == 'IN_TRANSIT'}" style="display:inline;">
+            <form method="post" th:action="@{/orders/{id}/deliver(id=${order.id()})}" th:if="${order.status().name() == 'IN_TRANSIT'}" class="inline-actions">
                 <button type="submit" class="btn btn-success">Confirmar Entrega</button>
             </form>
             <a th:href="@{/exchanges/new(orderId=${order.id()})}" class="btn btn-warning" th:if="${order.status().name() == 'DELIVERED'}">Solicitar Troca</a>
         </div>
     </div>
-
 </div>
 </html>

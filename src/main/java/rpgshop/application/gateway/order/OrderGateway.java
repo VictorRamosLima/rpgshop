@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface OrderGateway {
     Order save(final Order order);
     Optional<Order> findById(final UUID id);
+    Page<Order> findAll(final Pageable pageable);
     Page<Order> findByCustomerId(final UUID customerId, final Pageable pageable);
     Page<Order> findByStatus(final OrderStatus status, final Pageable pageable);
     Page<Order> findSalesInPeriod(final Instant startDate, final Instant endDate, final Pageable pageable);

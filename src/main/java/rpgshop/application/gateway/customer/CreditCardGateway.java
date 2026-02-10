@@ -11,6 +11,7 @@ public interface CreditCardGateway {
     Optional<CreditCard> findById(final UUID id);
     List<CreditCard> findActiveByCustomerId(final UUID customerId);
     Optional<CreditCard> findPreferredByCustomerId(final UUID customerId);
-    int clearPreferredByCustomerId(final UUID customerId);
+    void clearPreferredByCustomerId(final UUID customerId);
     boolean existsByCustomerIdAndCardNumber(final UUID customerId, final String cardNumber);
+    boolean existsByIdAndCustomerId(final UUID creditCardId, final UUID customerId);
 }

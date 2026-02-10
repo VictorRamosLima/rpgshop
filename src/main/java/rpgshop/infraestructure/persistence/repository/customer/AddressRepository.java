@@ -1,7 +1,9 @@
 package rpgshop.infraestructure.persistence.repository.customer;
 
 import jakarta.annotation.Nonnull;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
+import org.springframework.data.repository.query.Param;
 import rpgshop.domain.entity.customer.constant.AddressPurpose;
 import rpgshop.infraestructure.persistence.entity.customer.AddressJpaEntity;
 
@@ -29,5 +31,25 @@ public interface AddressRepository {
     boolean existsByCustomerIdAndPurposeAndIsActiveTrue(
         @Nonnull final UUID customerId,
         @Nonnull final AddressPurpose purpose
+    );
+
+    boolean existsByIdAndCustomerId(
+        @Nonnull final UUID addressId,
+        @Nonnull final UUID customerId
+    );
+
+    @Query("""
+        SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END
+        FROM AddressJpaEntity a
+        LEFT JOIN a.customer c
+        WHERE a.id = :addressId
+            AND (
+                c.id = :customerId
+                OR c IS NULL
+            )
+        """)
+    boolean existsByIdAndCustomerIdOrWithoutCustomer(
+        @Param("addressId") @Nonnull final UUID addressId,
+        @Param("customerId") @Nonnull final UUID customerId
     );
 }

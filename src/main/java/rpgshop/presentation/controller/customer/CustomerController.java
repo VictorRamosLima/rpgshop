@@ -37,7 +37,7 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/customers")
-public class CustomerController {
+public final class CustomerController {
     private final CreateCustomerUseCase createCustomerUseCase;
     private final UpdateCustomerUseCase updateCustomerUseCase;
     private final DeactivateCustomerUseCase deactivateCustomerUseCase;
@@ -69,13 +69,13 @@ public class CustomerController {
 
     @GetMapping
     public String list(
-        @RequestParam(required = false) String name,
-        @RequestParam(required = false) String cpf,
-        @RequestParam(required = false) String email,
-        @RequestParam(required = false) Gender gender,
-        @RequestParam(required = false) Boolean isActive,
-        @RequestParam(defaultValue = "0") int page,
-        Model model
+        @RequestParam(required = false) final String name,
+        @RequestParam(required = false) final String cpf,
+        @RequestParam(required = false) final String email,
+        @RequestParam(required = false) final Gender gender,
+        @RequestParam(required = false) final Boolean isActive,
+        @RequestParam(defaultValue = "0") final int page,
+        final Model model
     ) {
         final var filter = new CustomerFilter(name, cpf, email, null, gender, isActive);
         final Page<Customer> customers = queryCustomersUseCase.execute(filter, PageRequest.of(page, 10));
@@ -85,30 +85,45 @@ public class CustomerController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(Model model) {
+    public String showCreateForm(final Model model) {
         model.addAttribute("genders", Gender.values());
         model.addAttribute("phoneTypes", PhoneType.values());
+        model.addAttribute("residenceTypes", ResidenceType.values());
+        model.addAttribute("streetTypes", StreetType.values());
         return "customer/create";
     }
 
     @PostMapping
     public String create(
-        @RequestParam Gender gender,
-        @RequestParam String name,
-        @RequestParam String dateOfBirth,
-        @RequestParam String cpf,
-        @RequestParam String email,
-        @RequestParam String password,
-        @RequestParam String confirmPassword,
-        @RequestParam PhoneType phoneType,
-        @RequestParam String phoneAreaCode,
-        @RequestParam String phoneNumber,
-        Model model
+        @RequestParam final Gender gender,
+        @RequestParam final String name,
+        @RequestParam final String dateOfBirth,
+        @RequestParam final String cpf,
+        @RequestParam final String email,
+        @RequestParam final String password,
+        @RequestParam final String confirmPassword,
+        @RequestParam final PhoneType phoneType,
+        @RequestParam final String phoneAreaCode,
+        @RequestParam final String phoneNumber,
+        @RequestParam final ResidenceType residentialResidenceType,
+        @RequestParam final StreetType residentialStreetType,
+        @RequestParam final String residentialStreet,
+        @RequestParam final String residentialNumber,
+        @RequestParam final String residentialNeighborhood,
+        @RequestParam final String residentialZipCode,
+        @RequestParam final String residentialCity,
+        @RequestParam final String residentialState,
+        @RequestParam final String residentialCountry,
+        @RequestParam(required = false) final String residentialObservations,
+        final Model model
     ) {
         try {
             final var command = new CreateCustomerCommand(
                 gender, name, LocalDate.parse(dateOfBirth), cpf, email,
-                password, confirmPassword, phoneType, phoneAreaCode, phoneNumber
+                password, confirmPassword, phoneType, phoneAreaCode, phoneNumber,
+                residentialResidenceType, residentialStreetType, residentialStreet, residentialNumber,
+                residentialNeighborhood, residentialZipCode, residentialCity, residentialState,
+                residentialCountry, residentialObservations
             );
             createCustomerUseCase.execute(command);
             return "redirect:/customers";
@@ -116,12 +131,14 @@ public class CustomerController {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("genders", Gender.values());
             model.addAttribute("phoneTypes", PhoneType.values());
+            model.addAttribute("residenceTypes", ResidenceType.values());
+            model.addAttribute("streetTypes", StreetType.values());
             return "customer/create";
         }
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable UUID id, Model model) {
+    public String detail(@PathVariable final UUID id, final Model model) {
         final var customer = queryCustomersUseCase.findById(id);
         if (customer.isEmpty()) {
             return "redirect:/customers";
@@ -137,12 +154,12 @@ public class CustomerController {
 
     @PostMapping("/{id}/update")
     public String update(
-        @PathVariable UUID id,
-        @RequestParam Gender gender,
-        @RequestParam String name,
-        @RequestParam String dateOfBirth,
-        @RequestParam String email,
-        Model model
+        @PathVariable final UUID id,
+        @RequestParam final Gender gender,
+        @RequestParam final String name,
+        @RequestParam final String dateOfBirth,
+        @RequestParam final String email,
+        final Model model
     ) {
         try {
             final var command = new UpdateCustomerCommand(id, gender, name, LocalDate.parse(dateOfBirth), email);
@@ -155,17 +172,17 @@ public class CustomerController {
     }
 
     @PostMapping("/{id}/deactivate")
-    public String deactivate(@PathVariable UUID id) {
+    public String deactivate(@PathVariable final UUID id) {
         deactivateCustomerUseCase.execute(id);
         return "redirect:/customers/" + id;
     }
 
     @PostMapping("/{id}/change-password")
     public String changePassword(
-        @PathVariable UUID id,
-        @RequestParam String newPassword,
-        @RequestParam String confirmPassword,
-        Model model
+        @PathVariable final UUID id,
+        @RequestParam final String newPassword,
+        @RequestParam final String confirmPassword,
+        final Model model
     ) {
         try {
             final var command = new ChangePasswordCommand(id, newPassword, confirmPassword);
@@ -179,20 +196,20 @@ public class CustomerController {
 
     @PostMapping("/{id}/addresses")
     public String addAddress(
-        @PathVariable UUID id,
-        @RequestParam AddressPurpose purpose,
-        @RequestParam(required = false) String label,
-        @RequestParam ResidenceType residenceType,
-        @RequestParam StreetType streetType,
-        @RequestParam String street,
-        @RequestParam String number,
-        @RequestParam String neighborhood,
-        @RequestParam String zipCode,
-        @RequestParam String city,
-        @RequestParam String state,
-        @RequestParam String country,
-        @RequestParam(required = false) String observations,
-        Model model
+        @PathVariable final UUID id,
+        @RequestParam final AddressPurpose purpose,
+        @RequestParam(required = false) final String label,
+        @RequestParam final ResidenceType residenceType,
+        @RequestParam final StreetType streetType,
+        @RequestParam final String street,
+        @RequestParam final String number,
+        @RequestParam final String neighborhood,
+        @RequestParam final String zipCode,
+        @RequestParam final String city,
+        @RequestParam final String state,
+        @RequestParam final String country,
+        @RequestParam(required = false) final String observations,
+        final Model model
     ) {
         try {
             final var command = new CreateAddressCommand(
@@ -209,13 +226,13 @@ public class CustomerController {
 
     @PostMapping("/{id}/credit-cards")
     public String addCreditCard(
-        @PathVariable UUID id,
-        @RequestParam String cardNumber,
-        @RequestParam String printedName,
-        @RequestParam UUID cardBrandId,
-        @RequestParam String securityCode,
-        @RequestParam(defaultValue = "false") boolean isPreferred,
-        Model model
+        @PathVariable final UUID id,
+        @RequestParam final String cardNumber,
+        @RequestParam final String printedName,
+        @RequestParam final UUID cardBrandId,
+        @RequestParam final String securityCode,
+        @RequestParam(defaultValue = "false") final boolean isPreferred,
+        final Model model
     ) {
         try {
             final var command = new CreateCreditCardCommand(
@@ -231,11 +248,11 @@ public class CustomerController {
 
     @PostMapping("/{id}/phones")
     public String addPhone(
-        @PathVariable UUID id,
-        @RequestParam PhoneType type,
-        @RequestParam String areaCode,
-        @RequestParam String phoneNumber,
-        Model model
+        @PathVariable final UUID id,
+        @RequestParam final PhoneType type,
+        @RequestParam final String areaCode,
+        @RequestParam final String phoneNumber,
+        final Model model
     ) {
         try {
             final var command = new CreatePhoneCommand(id, type, areaCode, phoneNumber);

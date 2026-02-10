@@ -263,7 +263,7 @@
                     <tr th:each="card : ${customer.creditCards()}">
                         <td th:text="${card.cardNumber()}"></td>
                         <td th:text="${card.printedName()}"></td>
-                        <td th:text="${card.brand() != null ? card.brand().name() : ''}"></td>
+                        <td th:text="${card.cardBrand() != null ? card.cardBrand().name() : ''}"></td>
                         <td>
                             <span th:if="${card.isPreferred()}" class="badge badge-active">Sim</span>
                             <span th:unless="${card.isPreferred()}" class="badge badge-inactive">Nao</span>

@@ -4,6 +4,7 @@ import jakarta.annotation.Nonnull;
 import org.springframework.data.repository.RepositoryDefinition;
 import rpgshop.infraestructure.persistence.entity.product.ProductTypeJpaEntity;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,4 +12,7 @@ import java.util.UUID;
 public interface ProductTypeRepository {
     @Nonnull
     Optional<ProductTypeJpaEntity> findById(@Nonnull final UUID id);
+
+    @Nonnull
+    List<ProductTypeJpaEntity> findByIsActiveTrueOrderByNameAsc();
 }

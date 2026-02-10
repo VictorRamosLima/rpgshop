@@ -11,4 +11,7 @@ import java.util.UUID;
 public interface CategoryRepository {
     @Nonnull
     List<CategoryJpaEntity> findByIdIn(@Nonnull final List<UUID> ids);
+
+    @Nonnull
+    List<CategoryJpaEntity> findByIsActiveTrueOrderByNameAsc();
 }

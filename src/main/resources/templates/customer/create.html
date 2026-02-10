@@ -85,6 +85,67 @@
             </div>
         </div>
 
+        <div class="form-section">
+            <div class="form-section-title">Endereco Residencial (RN0026)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo de residencia *</label>
+                    <select name="residentialResidenceType" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="type : ${residenceTypes}" th:value="${type}" th:text="${type}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de logradouro *</label>
+                    <select name="residentialStreetType" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="type : ${streetTypes}" th:value="${type}" th:text="${type}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Logradouro *</label>
+                    <input type="text" name="residentialStreet" required placeholder="Rua, avenida, etc."/>
+                </div>
+                <div class="form-group">
+                    <label>Numero *</label>
+                    <input type="text" name="residentialNumber" required placeholder="123"/>
+                </div>
+                <div class="form-group">
+                    <label>Bairro *</label>
+                    <input type="text" name="residentialNeighborhood" required placeholder="Bairro"/>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>CEP *</label>
+                    <input type="text" name="residentialZipCode" required placeholder="00000-000"/>
+                </div>
+                <div class="form-group">
+                    <label>Cidade *</label>
+                    <input type="text" name="residentialCity" required placeholder="Cidade"/>
+                </div>
+                <div class="form-group">
+                    <label>Estado *</label>
+                    <input type="text" name="residentialState" required placeholder="UF"/>
+                </div>
+                <div class="form-group">
+                    <label>Pais *</label>
+                    <input type="text" name="residentialCountry" required value="Brasil"/>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Observacoes</label>
+                    <input type="text" name="residentialObservations" placeholder="Complemento (opcional)"/>
+                </div>
+            </div>
+        </div>
+
         <div class="btn-group" style="margin-top:1rem;">
             <button type="submit" class="btn btn-primary btn-lg">Cadastrar Cliente</button>
             <a href="/customers" class="btn btn-outline">Cancelar</a>

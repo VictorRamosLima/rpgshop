@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login | RPG Shop</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div class="site-root" style="min-height:100vh; display:flex; align-items:center; justify-content:center;">
+        <div class="container" style="max-width:440px; width:100%;">
+
+            <div style="text-align:center; margin-bottom:2rem;">
+                <a href="/" class="site-logo" aria-label="RPG Shop - inicio" style="display:inline-flex; text-decoration:none;">
+                    <span class="site-logo-mark">&#9876;</span>
+                    <span>RPG Shop</span>
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header" style="text-align:center;">
+                    <h2>Entrar na Guilda</h2>
+                </div>
+                <div class="card-body">
+
+                    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+                    <form method="post" action="/login" id="loginForm">
+                        <div class="form-section" style="border:none; padding:0; margin:0;">
+                            <div class="form-group" style="margin-bottom:1rem;">
+                                <label for="email">E-mail</label>
+                                <input type="email" id="email" name="email" required
+                                       placeholder="seu@email.com"
+                                       th:value="${email}"
+                                       autocomplete="email"/>
+                            </div>
+                            <div class="form-group" style="margin-bottom:1.5rem;">
+                                <label for="password">Senha</label>
+                                <input type="password" id="password" name="password" required
+                                       placeholder="Sua senha"
+                                       autocomplete="current-password"/>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Entrar</button>
+                    </form>
+
+                    <div style="text-align:center; margin-top:1.5rem;">
+                        <p style="margin:0;">Ainda nao tem conta? <a href="/customers/new">Cadastre-se</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -53,9 +53,16 @@
                 </nav>
 
                 <div class="site-actions" aria-label="Atalhos de conta">
-                    <a href="/customers" class="icon-action" aria-label="Aventureiros">👤</a>
-                    <a href="/orders" class="icon-action" aria-label="Missoes">📜</a>
-                    <a href="/products" class="icon-action" aria-label="Catalogo">🛡</a>
+                    <th:block th:if="${#httpServletRequest.getAttribute('authenticatedUserEmail') != null}">
+                        <span class="nav-link" style="cursor:default; opacity:0.85;"
+                              th:text="${#httpServletRequest.getAttribute('authenticatedUserEmail')}">usuario@email.com</span>
+                        <form method="post" action="/logout" style="display:inline; margin:0;">
+                            <button type="submit" class="btn btn-outline" style="padding:0.3rem 0.8rem; font-size:0.85rem;">Sair</button>
+                        </form>
+                    </th:block>
+                    <th:block th:if="${#httpServletRequest.getAttribute('authenticatedUserEmail') == null}">
+                        <a href="/login" class="btn btn-outline" style="padding:0.3rem 0.8rem; font-size:0.85rem;">Entrar</a>
+                    </th:block>
                 </div>
             </div>
 

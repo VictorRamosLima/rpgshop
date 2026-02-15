@@ -36,7 +36,7 @@ class CustomerJpaEntityTest {
             final LocalDate dateOfBirth = LocalDate.of(1990, 5, 15);
             final String cpf = "12345678901";
             final String email = "john.doe@email.com";
-            final String password = "hashedPassword123";
+
             final BigDecimal ranking = new BigDecimal("4.50");
             final String customerCode = "CUST-001";
             final List<PhoneJpaEntity> phones = new ArrayList<>();
@@ -54,7 +54,7 @@ class CustomerJpaEntityTest {
                 .dateOfBirth(dateOfBirth)
                 .cpf(cpf)
                 .email(email)
-                .password(password)
+
                 .ranking(ranking)
                 .customerCode(customerCode)
                 .phones(phones)
@@ -72,7 +72,7 @@ class CustomerJpaEntityTest {
             assertEquals(dateOfBirth, entity.getDateOfBirth());
             assertEquals(cpf, entity.getCpf());
             assertEquals(email, entity.getEmail());
-            assertEquals(password, entity.getPassword());
+
             assertEquals(ranking, entity.getRanking());
             assertEquals(customerCode, entity.getCustomerCode());
             assertEquals(phones, entity.getPhones());
@@ -121,7 +121,7 @@ class CustomerJpaEntityTest {
             assertNull(entity.getDateOfBirth());
             assertNull(entity.getCpf());
             assertNull(entity.getEmail());
-            assertNull(entity.getPassword());
+
             assertNull(entity.getCustomerCode());
         }
     }
@@ -145,7 +145,7 @@ class CustomerJpaEntityTest {
             assertNull(entity.getDateOfBirth());
             assertNull(entity.getCpf());
             assertNull(entity.getEmail());
-            assertNull(entity.getPassword());
+
             assertEquals(BigDecimal.ZERO, entity.getRanking());
             assertNull(entity.getCustomerCode());
             assertNotNull(entity.getPhones());
@@ -171,7 +171,6 @@ class CustomerJpaEntityTest {
             final LocalDate dateOfBirth = LocalDate.of(1985, 3, 20);
             final String cpf = "98765432100";
             final String email = "jane.doe@email.com";
-            final String password = "anotherHashedPassword";
             final BigDecimal ranking = new BigDecimal("3.75");
             final String customerCode = "CUST-002";
             final List<PhoneJpaEntity> phones = new ArrayList<>();
@@ -180,7 +179,7 @@ class CustomerJpaEntityTest {
 
             final CustomerJpaEntity entity = new CustomerJpaEntity(
                 id, isActive, deactivatedAt, createdAt, updatedAt, gender, name, dateOfBirth,
-                cpf, email, password, ranking, customerCode, phones, addresses, creditCards
+                cpf, email, ranking, customerCode, phones, addresses, creditCards
             );
 
             assertEquals(id, entity.getId());
@@ -193,7 +192,7 @@ class CustomerJpaEntityTest {
             assertEquals(dateOfBirth, entity.getDateOfBirth());
             assertEquals(cpf, entity.getCpf());
             assertEquals(email, entity.getEmail());
-            assertEquals(password, entity.getPassword());
+
             assertEquals(ranking, entity.getRanking());
             assertEquals(customerCode, entity.getCustomerCode());
             assertEquals(phones, entity.getPhones());
@@ -220,7 +219,6 @@ class CustomerJpaEntityTest {
             final LocalDate dateOfBirth = LocalDate.of(1995, 8, 10);
             final String cpf = "11122233344";
             final String email = "alex.smith@email.com";
-            final String password = "securePassword";
             final BigDecimal ranking = new BigDecimal("5.00");
             final String customerCode = "CUST-003";
             final List<PhoneJpaEntity> phones = new ArrayList<>();
@@ -237,7 +235,7 @@ class CustomerJpaEntityTest {
             entity.setDateOfBirth(dateOfBirth);
             entity.setCpf(cpf);
             entity.setEmail(email);
-            entity.setPassword(password);
+
             entity.setRanking(ranking);
             entity.setCustomerCode(customerCode);
             entity.setPhones(phones);
@@ -254,7 +252,7 @@ class CustomerJpaEntityTest {
             assertEquals(dateOfBirth, entity.getDateOfBirth());
             assertEquals(cpf, entity.getCpf());
             assertEquals(email, entity.getEmail());
-            assertEquals(password, entity.getPassword());
+
             assertEquals(ranking, entity.getRanking());
             assertEquals(customerCode, entity.getCustomerCode());
             assertEquals(phones, entity.getPhones());

@@ -50,7 +50,7 @@ class CustomerGatewayJpaTest {
             .name("John Doe")
             .cpf("12345678901")
             .email("john@example.com")
-            .password("password123")
+
             .gender(Gender.MALE)
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .customerCode("CUST001")
@@ -65,7 +65,7 @@ class CustomerGatewayJpaTest {
             .name("John Doe")
             .cpf("12345678901")
             .email("john@example.com")
-            .password("password123")
+
             .gender(Gender.MALE)
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .customerCode("CUST001")
@@ -97,7 +97,7 @@ class CustomerGatewayJpaTest {
             .name("John Doe")
             .cpf("12345678901")
             .email("john@example.com")
-            .password("password123")
+
             .gender(Gender.MALE)
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .customerCode("CUST001")
@@ -143,7 +143,7 @@ class CustomerGatewayJpaTest {
             .name("John Doe")
             .cpf("12345678901")
             .email("john@example.com")
-            .password("password123")
+
             .gender(Gender.MALE)
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .customerCode("CUST001")
@@ -224,29 +224,4 @@ class CustomerGatewayJpaTest {
         verify(customerRepository, times(1)).existsByEmail(email);
     }
 
-    @Test
-    void shouldUpdatePassword() {
-        final UUID customerId = UUID.randomUUID();
-        final String newPassword = "newPassword123";
-
-        when(customerRepository.updatePasswordById(customerId, newPassword)).thenReturn(1);
-
-        final int result = customerGatewayJpa.updatePassword(customerId, newPassword);
-
-        assertEquals(1, result);
-        verify(customerRepository, times(1)).updatePasswordById(customerId, newPassword);
-    }
-
-    @Test
-    void shouldReturnZeroWhenUpdatePasswordFailsForNonExistentCustomer() {
-        final UUID customerId = UUID.randomUUID();
-        final String newPassword = "newPassword123";
-
-        when(customerRepository.updatePasswordById(customerId, newPassword)).thenReturn(0);
-
-        final int result = customerGatewayJpa.updatePassword(customerId, newPassword);
-
-        assertEquals(0, result);
-        verify(customerRepository, times(1)).updatePasswordById(customerId, newPassword);
-    }
 }

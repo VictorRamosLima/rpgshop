@@ -14,5 +14,4 @@ public interface CustomerGateway {
     Page<Customer> findByFilters(final CustomerFilter filter, final Pageable pageable);
     boolean existsByCpf(final String cpf);
     boolean existsByEmail(final String email);
-    int updatePassword(final UUID id, final String encodedPassword);
 }

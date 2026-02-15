@@ -54,7 +54,7 @@ class OrderGatewayJpaTest {
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .cpf("12345678901")
             .email("test@example.com")
-            .password("password123")
+
             .ranking(BigDecimal.ZERO)
             .customerCode("CUST001")
             .isActive(true)
@@ -94,7 +94,7 @@ class OrderGatewayJpaTest {
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .cpf("12345678901")
             .email("test@example.com")
-            .password("password123")
+
             .ranking(BigDecimal.ZERO)
             .customerCode("CUST001")
             .isActive(true)

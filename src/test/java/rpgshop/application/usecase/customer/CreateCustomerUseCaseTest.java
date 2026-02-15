@@ -6,10 +6,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import rpgshop.application.command.customer.CreateCustomerCommand;
 import rpgshop.application.gateway.customer.AddressGateway;
 import rpgshop.application.gateway.customer.CustomerGateway;
 import rpgshop.application.gateway.customer.PhoneGateway;
+import rpgshop.application.gateway.user.UserGateway;
 import rpgshop.domain.entity.customer.Address;
 import rpgshop.domain.entity.customer.Customer;
 import rpgshop.domain.entity.customer.Phone;
@@ -18,6 +20,7 @@ import rpgshop.domain.entity.customer.constant.Gender;
 import rpgshop.domain.entity.customer.constant.PhoneType;
 import rpgshop.domain.entity.customer.constant.ResidenceType;
 import rpgshop.domain.entity.customer.constant.StreetType;
+import rpgshop.domain.entity.user.User;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -47,6 +50,12 @@ class CreateCustomerUseCaseTest {
     @Mock
     private PhoneGateway phoneGateway;
 
+    @Mock
+    private UserGateway userGateway;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private CreateCustomerUseCase useCase;
 
@@ -62,9 +71,11 @@ class CreateCustomerUseCaseTest {
             .build();
 
         when(customerGateway.existsByCpf(command.cpf())).thenReturn(false);
-        when(customerGateway.existsByEmail(command.email())).thenReturn(false);
+        when(userGateway.existsByEmail(command.email())).thenReturn(false);
         when(customerGateway.save(any(Customer.class))).thenReturn(savedCustomer);
         when(customerGateway.findById(customerId)).thenReturn(Optional.of(savedCustomer));
+        when(passwordEncoder.encode(command.password())).thenReturn("encodedPassword");
+        when(userGateway.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         when(phoneGateway.save(any(Phone.class), eq(customerId))).thenAnswer(invocation -> invocation.getArgument(0));
         when(addressGateway.existsByCustomerIdAndPurpose(customerId, BILLING)).thenReturn(true);
@@ -83,6 +94,8 @@ class CreateCustomerUseCaseTest {
         assertEquals(Set.of(RESIDENTIAL, BILLING, DELIVERY), createdPurposes);
         assertTrue(createdPurposes.contains(BILLING));
         assertTrue(createdPurposes.contains(DELIVERY));
+        verify(userGateway).save(any(User.class));
+        verify(passwordEncoder).encode(command.password());
     }
 
     private CreateCustomerCommand buildCommand() {

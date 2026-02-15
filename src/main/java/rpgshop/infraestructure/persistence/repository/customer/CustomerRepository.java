@@ -3,7 +3,6 @@ package rpgshop.infraestructure.persistence.repository.customer;
 import jakarta.annotation.Nonnull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 import org.springframework.data.repository.query.Param;
@@ -43,11 +42,4 @@ public interface CustomerRepository {
     boolean existsByCpf(@Nonnull final String cpf);
 
     boolean existsByEmail(@Nonnull final String email);
-
-    @Modifying
-    @Query("UPDATE CustomerJpaEntity c SET c.password = :password WHERE c.id = :id")
-    int updatePasswordById(
-        @Param("id") @Nonnull final UUID id,
-        @Param("password") @Nonnull final String password
-    );
 }

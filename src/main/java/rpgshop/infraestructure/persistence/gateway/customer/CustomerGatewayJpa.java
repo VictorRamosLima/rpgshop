@@ -54,9 +54,4 @@ public class CustomerGatewayJpa implements CustomerGateway {
     public boolean existsByEmail(final String email) {
         return customerRepository.existsByEmail(email);
     }
-
-    @Override
-    public int updatePassword(final UUID customerId, final String newPassword) {
-        return customerRepository.updatePasswordById(customerId, newPassword);
-    }
 }

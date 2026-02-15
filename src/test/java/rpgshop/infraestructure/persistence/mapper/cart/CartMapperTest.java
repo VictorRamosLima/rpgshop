@@ -191,7 +191,7 @@ class CartMapperTest {
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .cpf("12345678901")
             .email("test@example.com")
-            .password("password")
+
             .ranking(BigDecimal.ZERO)
             .customerCode("CUST001")
             .phones(Collections.emptyList())
@@ -211,7 +211,7 @@ class CartMapperTest {
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .cpf("12345678901")
             .email("test@example.com")
-            .password("password")
+
             .ranking(BigDecimal.ZERO)
             .customerCode("CUST001")
             .phones(Collections.emptyList())

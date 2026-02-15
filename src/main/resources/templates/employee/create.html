@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Novo Funcionario', ~{::main-content})}">
+<div th:fragment="main-content">
+
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <a href="/employees">Funcionarios</a> <span>/</span> <span>Novo Funcionario</span>
+    </div>
+
+    <div class="page-header">
+        <h1>Cadastrar Novo Funcionario</h1>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <form method="post" action="/employees" id="createEmployeeForm">
+        <div class="form-section">
+            <div class="form-section-title">Dados do Funcionario</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome Completo *</label>
+                    <input type="text" name="name" required placeholder="Nome completo"/>
+                    <div class="form-hint">Campo obrigatorio.</div>
+                </div>
+                <div class="form-group">
+                    <label>CPF *</label>
+                    <input type="text" name="cpf" required placeholder="00000000000" maxlength="11"/>
+                    <div class="form-hint">Campo obrigatorio. Documento unico.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-title">Dados de Acesso</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>E-mail *</label>
+                    <input type="email" name="email" required placeholder="email@exemplo.com"/>
+                    <div class="form-hint">Campo obrigatorio. Sera usado para login.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Senha *</label>
+                    <input type="password" name="password" required minlength="8" id="password"/>
+                    <div class="form-hint">Minimo 8 caracteres, com letras maiusculas, minusculas e caracteres especiais.</div>
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Senha *</label>
+                    <input type="password" name="confirmPassword" required minlength="8" id="confirmPassword"/>
+                    <div class="form-hint">Repita a mesma senha.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top:1rem;">
+            <button type="submit" class="btn btn-primary btn-lg">Cadastrar Funcionario</button>
+            <a href="/employees" class="btn btn-outline">Cancelar</a>
+        </div>
+    </form>
+
+    <script>
+        document.getElementById('createEmployeeForm').addEventListener('submit', function(e) {
+            var pw = document.getElementById('password').value;
+            var cpw = document.getElementById('confirmPassword').value;
+            if (pw !== cpw) {
+                e.preventDefault();
+                alert('As senhas nao coincidem. Por favor, verifique.');
+                return false;
+            }
+            if (pw.length < 8) {
+                e.preventDefault();
+                alert('A senha deve ter no minimo 8 caracteres.');
+                return false;
+            }
+            if (!/[A-Z]/.test(pw)) {
+                e.preventDefault();
+                alert('A senha deve conter pelo menos uma letra maiuscula.');
+                return false;
+            }
+            if (!/[a-z]/.test(pw)) {
+                e.preventDefault();
+                alert('A senha deve conter pelo menos uma letra minuscula.');
+                return false;
+            }
+            if (!/[^a-zA-Z0-9]/.test(pw)) {
+                e.preventDefault();
+                alert('A senha deve conter pelo menos um caractere especial.');
+                return false;
+            }
+        });
+    </script>
+
+</div>
+</html>

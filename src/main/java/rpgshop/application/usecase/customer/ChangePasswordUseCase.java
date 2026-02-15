@@ -1,12 +1,16 @@
 package rpgshop.application.usecase.customer;
 
 import jakarta.annotation.Nonnull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rpgshop.application.command.customer.ChangePasswordCommand;
 import rpgshop.application.exception.BusinessRuleException;
 import rpgshop.application.exception.EntityNotFoundException;
 import rpgshop.application.gateway.customer.CustomerGateway;
+import rpgshop.application.gateway.user.UserGateway;
+import rpgshop.domain.entity.user.User;
+import rpgshop.domain.entity.user.constant.UserType;
 
 import java.util.regex.Pattern;
 
@@ -17,9 +21,17 @@ public class ChangePasswordUseCase {
     );
 
     private final CustomerGateway customerGateway;
+    private final UserGateway userGateway;
+    private final PasswordEncoder passwordEncoder;
 
-    public ChangePasswordUseCase(final CustomerGateway customerGateway) {
+    public ChangePasswordUseCase(
+        final CustomerGateway customerGateway,
+        final UserGateway userGateway,
+        final PasswordEncoder passwordEncoder
+    ) {
         this.customerGateway = customerGateway;
+        this.userGateway = userGateway;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -39,7 +51,11 @@ public class ChangePasswordUseCase {
         customerGateway.findById(command.customerId())
             .orElseThrow(() -> new EntityNotFoundException("Customer", command.customerId()));
 
-        final int updated = customerGateway.updatePassword(command.customerId(), command.newPassword());
+        final User user = userGateway.findByUserTypeAndUserTypeId(UserType.CUSTOMER, command.customerId())
+            .orElseThrow(() -> new EntityNotFoundException("User for Customer", command.customerId()));
+
+        final String encodedPassword = passwordEncoder.encode(command.newPassword());
+        final int updated = userGateway.updatePassword(user.id(), encodedPassword);
         if (updated == 0) {
             throw new BusinessRuleException("Falha ao atualizar a senha");
         }

@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 import rpgshop.application.exception.IllegalInstantiationException;
 import rpgshop.domain.entity.log.TransactionLog;
 import rpgshop.infraestructure.persistence.entity.log.TransactionLogJpaEntity;
+import rpgshop.infraestructure.persistence.entity.user.UserJpaEntity;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -24,7 +25,7 @@ public final class TransactionLogMapper {
             .entityName(entity.getEntityName())
             .entityId(entity.getEntityId())
             .operation(entity.getOperation())
-            .responsibleUser(entity.getResponsibleUser())
+            .userId(entity.getUser() != null ? entity.getUser().getId() : null)
             .timestamp(entity.getTimestamp())
             .previousData(entity.getPreviousData() != null ? entity.getPreviousData().toString() : null)
             .newData(entity.getNewData() != null ? entity.getNewData().toString() : null)
@@ -35,16 +36,20 @@ public final class TransactionLogMapper {
     public static TransactionLogJpaEntity toEntity(final TransactionLog domain) {
         Assert.notNull(domain, "'TransactionLog' should not be null");
 
-        return TransactionLogJpaEntity.builder()
+        final TransactionLogJpaEntity.TransactionLogJpaEntityBuilder builder = TransactionLogJpaEntity.builder()
             .id(domain.id())
             .entityName(domain.entityName())
             .entityId(domain.entityId())
             .operation(domain.operation())
-            .responsibleUser(domain.responsibleUser())
             .timestamp(domain.timestamp())
             .previousData(parseJson(domain.previousData()))
-            .newData(parseJson(domain.newData()))
-            .build();
+            .newData(parseJson(domain.newData()));
+
+        if (domain.userId() != null) {
+            builder.user(UserJpaEntity.builder().id(domain.userId()).build());
+        }
+
+        return builder.build();
     }
 
     private static JsonNode parseJson(final String json) {

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import rpgshop.domain.entity.log.constant.OperationType;
+import rpgshop.infraestructure.persistence.entity.user.UserJpaEntity;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
@@ -28,7 +29,7 @@ class TransactionLogJpaEntityTest {
             final String entityName = "Product";
             final UUID entityId = UUID.randomUUID();
             final OperationType operation = OperationType.INSERT;
-            final String responsibleUser = "admin@rpgshop.com";
+            final UserJpaEntity user = UserJpaEntity.builder().id(UUID.randomUUID()).build();
             final Instant timestamp = Instant.now();
             final ObjectNode previousData = JsonNodeFactory.instance.objectNode();
             previousData.put("name", "Old Name");
@@ -40,7 +41,7 @@ class TransactionLogJpaEntityTest {
                 .entityName(entityName)
                 .entityId(entityId)
                 .operation(operation)
-                .responsibleUser(responsibleUser)
+                .user(user)
                 .timestamp(timestamp)
                 .previousData(previousData)
                 .newData(newData)
@@ -50,7 +51,7 @@ class TransactionLogJpaEntityTest {
             assertEquals(entityName, entity.getEntityName());
             assertEquals(entityId, entity.getEntityId());
             assertEquals(operation, entity.getOperation());
-            assertEquals(responsibleUser, entity.getResponsibleUser());
+            assertEquals(user, entity.getUser());
             assertEquals(timestamp, entity.getTimestamp());
             assertEquals(previousData, entity.getPreviousData());
             assertEquals(newData, entity.getNewData());
@@ -97,7 +98,7 @@ class TransactionLogJpaEntityTest {
             assertNull(entity.getEntityName());
             assertNull(entity.getEntityId());
             assertNull(entity.getOperation());
-            assertNull(entity.getResponsibleUser());
+            assertNull(entity.getUser());
             assertNull(entity.getTimestamp());
             assertNull(entity.getPreviousData());
             assertNull(entity.getNewData());
@@ -116,7 +117,7 @@ class TransactionLogJpaEntityTest {
             assertNull(entity.getEntityName());
             assertNull(entity.getEntityId());
             assertNull(entity.getOperation());
-            assertNull(entity.getResponsibleUser());
+            assertNull(entity.getUser());
             assertNull(entity.getTimestamp());
             assertNull(entity.getPreviousData());
             assertNull(entity.getNewData());
@@ -133,7 +134,7 @@ class TransactionLogJpaEntityTest {
             final String entityName = "Customer";
             final UUID entityId = UUID.randomUUID();
             final OperationType operation = OperationType.UPDATE;
-            final String responsibleUser = "manager@rpgshop.com";
+            final UserJpaEntity user = UserJpaEntity.builder().id(UUID.randomUUID()).build();
             final Instant timestamp = Instant.now();
             final ObjectNode previousData = JsonNodeFactory.instance.objectNode();
             previousData.put("email", "old@email.com");
@@ -141,14 +142,14 @@ class TransactionLogJpaEntityTest {
             newData.put("email", "new@email.com");
 
             final TransactionLogJpaEntity entity = new TransactionLogJpaEntity(
-                id, entityName, entityId, operation, responsibleUser, timestamp, previousData, newData
+                id, entityName, entityId, operation, user, timestamp, previousData, newData
             );
 
             assertEquals(id, entity.getId());
             assertEquals(entityName, entity.getEntityName());
             assertEquals(entityId, entity.getEntityId());
             assertEquals(operation, entity.getOperation());
-            assertEquals(responsibleUser, entity.getResponsibleUser());
+            assertEquals(user, entity.getUser());
             assertEquals(timestamp, entity.getTimestamp());
             assertEquals(previousData, entity.getPreviousData());
             assertEquals(newData, entity.getNewData());
@@ -167,7 +168,7 @@ class TransactionLogJpaEntityTest {
             final String entityName = "Order";
             final UUID entityId = UUID.randomUUID();
             final OperationType operation = OperationType.INSERT;
-            final String responsibleUser = "system@rpgshop.com";
+            final UserJpaEntity user = UserJpaEntity.builder().id(UUID.randomUUID()).build();
             final Instant timestamp = Instant.now();
             final ObjectNode previousData = JsonNodeFactory.instance.objectNode();
             final ObjectNode newData = JsonNodeFactory.instance.objectNode();
@@ -177,7 +178,7 @@ class TransactionLogJpaEntityTest {
             entity.setEntityName(entityName);
             entity.setEntityId(entityId);
             entity.setOperation(operation);
-            entity.setResponsibleUser(responsibleUser);
+            entity.setUser(user);
             entity.setTimestamp(timestamp);
             entity.setPreviousData(previousData);
             entity.setNewData(newData);
@@ -186,7 +187,7 @@ class TransactionLogJpaEntityTest {
             assertEquals(entityName, entity.getEntityName());
             assertEquals(entityId, entity.getEntityId());
             assertEquals(operation, entity.getOperation());
-            assertEquals(responsibleUser, entity.getResponsibleUser());
+            assertEquals(user, entity.getUser());
             assertEquals(timestamp, entity.getTimestamp());
             assertEquals(previousData, entity.getPreviousData());
             assertEquals(newData, entity.getNewData());

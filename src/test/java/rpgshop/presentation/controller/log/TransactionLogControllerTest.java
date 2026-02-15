@@ -36,12 +36,13 @@ class TransactionLogControllerTest {
     @Test
     void shouldQueryLogsWithParsedDateRange() {
         final UUID entityId = UUID.randomUUID();
+        final UUID userId = UUID.randomUUID();
         final Page<TransactionLog> logs = new PageImpl<>(List.of(TransactionLog.builder().id(UUID.randomUUID()).build()));
         when(queryTransactionLogsUseCase.findByFilters(
             eq("Order"),
             eq(entityId),
             eq(OperationType.UPDATE),
-            eq("admin"),
+            eq(userId),
             eq(Instant.parse("2026-01-01T00:00:00Z")),
             eq(Instant.parse("2026-01-31T23:59:59Z")),
             eq(PageRequest.of(1, 20))
@@ -51,7 +52,7 @@ class TransactionLogControllerTest {
             "Order",
             entityId,
             OperationType.UPDATE,
-            "admin",
+            userId,
             "2026-01-01",
             "2026-01-31",
             1,
@@ -61,5 +62,19 @@ class TransactionLogControllerTest {
         assertEquals("log/list", view);
         verify(model).addAttribute("logs", logs);
         verify(model).addAttribute(eq("operations"), any());
+    }
+
+    @Test
+    void shouldQueryLogsWithNullFilters() {
+        final Page<TransactionLog> logs = new PageImpl<>(List.of());
+        when(queryTransactionLogsUseCase.findByFilters(
+            eq(null), eq(null), eq(null), eq(null), eq(null), eq(null),
+            eq(PageRequest.of(0, 20))
+        )).thenReturn(logs);
+
+        final String view = controller.list(null, null, null, null, null, null, 0, model);
+
+        assertEquals("log/list", view);
+        verify(model).addAttribute("logs", logs);
     }
 }

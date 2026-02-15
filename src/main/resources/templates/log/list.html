@@ -27,8 +27,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Usuario</label>
-                <input type="text" name="responsibleUser" th:value="${param.responsibleUser}" placeholder="Nome do usuario"/>
+                <label>ID do Usuario</label>
+                <input type="text" name="userId" th:value="${param.userId}" placeholder="UUID do usuario"/>
             </div>
             <div class="form-group">
                 <label>Data Inicio</label>
@@ -52,7 +52,7 @@
                     <th>Entidade</th>
                     <th>ID da Entidade</th>
                     <th>Operacao</th>
-                    <th>Usuario</th>
+                    <th>ID do Usuario</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,16 +61,16 @@
                     <td th:text="${log.entityName()}"></td>
                     <td th:text="${#strings.abbreviate(log.entityId().toString(), 12)}"></td>
                     <td>
-                        <span class="badge" th:classappend="${log.operation().name() == 'CREATE' ? 'badge-active' : (log.operation().name() == 'DELETE' ? 'badge-inactive' : 'badge-warning')}" th:text="${log.operation()}"></span>
+                        <span class="badge" th:classappend="${log.operation().name() == 'INSERT' ? 'badge-active' : 'badge-warning'}" th:text="${log.operation()}"></span>
                     </td>
-                    <td th:text="${log.responsibleUser()}"></td>
+                    <td th:text="${log.userId() != null ? #strings.abbreviate(log.userId().toString(), 12) : 'Sistema'}"></td>
                 </tr>
             </tbody>
         </table>
 
         <div class="pagination" th:if="${logs.totalPages > 1}">
             <span th:each="i : ${#numbers.sequence(0, logs.totalPages - 1)}">
-                <a th:href="@{/logs(page=${i}, entityName=${param.entityName}, entityId=${param.entityId}, operation=${param.operation}, responsibleUser=${param.responsibleUser}, startDate=${param.startDate}, endDate=${param.endDate})}"
+                <a th:href="@{/logs(page=${i}, entityName=${param.entityName}, entityId=${param.entityId}, operation=${param.operation}, userId=${param.userId}, startDate=${param.startDate}, endDate=${param.endDate})}"
                    th:text="${i + 1}" th:if="${i != logs.number}"></a>
                 <strong th:text="${i + 1}" th:if="${i == logs.number}"></strong>
             </span>

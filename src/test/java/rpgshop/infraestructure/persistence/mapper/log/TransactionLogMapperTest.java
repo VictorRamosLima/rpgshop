@@ -7,7 +7,7 @@ import rpgshop.application.exception.IllegalInstantiationException;
 import rpgshop.domain.entity.log.TransactionLog;
 import rpgshop.domain.entity.log.constant.OperationType;
 import rpgshop.infraestructure.persistence.entity.log.TransactionLogJpaEntity;
-import tools.jackson.databind.JsonNode;
+import rpgshop.infraestructure.persistence.entity.user.UserJpaEntity;
 import tools.jackson.databind.ObjectMapper;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,17 +34,17 @@ class TransactionLogMapperTest {
             final String entityName = "Product";
             final UUID entityId = UUID.randomUUID();
             final OperationType operation = OperationType.UPDATE;
-            final String responsibleUser = "admin@example.com";
+            final UUID userId = UUID.randomUUID();
             final Instant timestamp = Instant.now();
-            final JsonNode previousData = objectMapper.readTree("{\"name\":\"Old Name\"}");
-            final JsonNode newData = objectMapper.readTree("{\"name\":\"New Name\"}");
+            final var previousData = objectMapper.readTree("{\"name\":\"Old Name\"}");
+            final var newData = objectMapper.readTree("{\"name\":\"New Name\"}");
 
             final TransactionLogJpaEntity entity = TransactionLogJpaEntity.builder()
                 .id(id)
                 .entityName(entityName)
                 .entityId(entityId)
                 .operation(operation)
-                .responsibleUser(responsibleUser)
+                .user(UserJpaEntity.builder().id(userId).build())
                 .timestamp(timestamp)
                 .previousData(previousData)
                 .newData(newData)
@@ -57,10 +57,28 @@ class TransactionLogMapperTest {
             assertEquals(entityName, domain.entityName());
             assertEquals(entityId, domain.entityId());
             assertEquals(operation, domain.operation());
-            assertEquals(responsibleUser, domain.responsibleUser());
+            assertEquals(userId, domain.userId());
             assertEquals(timestamp, domain.timestamp());
             assertEquals(previousData.toString(), domain.previousData());
             assertEquals(newData.toString(), domain.newData());
+        }
+
+        @Test
+        @DisplayName("should map entity with null user to domain")
+        void shouldMapEntityWithNullUserToDomain() {
+            final TransactionLogJpaEntity entity = TransactionLogJpaEntity.builder()
+                .id(UUID.randomUUID())
+                .entityName("Customer")
+                .entityId(UUID.randomUUID())
+                .operation(OperationType.INSERT)
+                .user(null)
+                .timestamp(Instant.now())
+                .newData(objectMapper.readTree("{\"name\":\"New Customer\"}"))
+                .build();
+
+            final TransactionLog domain = TransactionLogMapper.toDomain(entity);
+
+            assertNull(domain.userId());
         }
 
         @Test
@@ -71,7 +89,6 @@ class TransactionLogMapperTest {
                 .entityName("Customer")
                 .entityId(UUID.randomUUID())
                 .operation(OperationType.INSERT)
-                .responsibleUser("system")
                 .timestamp(Instant.now())
                 .previousData(null)
                 .newData(objectMapper.readTree("{\"name\":\"New Customer\"}"))
@@ -99,7 +116,7 @@ class TransactionLogMapperTest {
             final String entityName = "Order";
             final UUID entityId = UUID.randomUUID();
             final OperationType operation = OperationType.UPDATE;
-            final String responsibleUser = "manager@example.com";
+            final UUID userId = UUID.randomUUID();
             final Instant timestamp = Instant.now();
             final String previousData = "{\"status\":\"ACTIVE\"}";
             final String newData = "{\"status\":\"DELETED\"}";
@@ -109,7 +126,7 @@ class TransactionLogMapperTest {
                 .entityName(entityName)
                 .entityId(entityId)
                 .operation(operation)
-                .responsibleUser(responsibleUser)
+                .userId(userId)
                 .timestamp(timestamp)
                 .previousData(previousData)
                 .newData(newData)
@@ -122,10 +139,29 @@ class TransactionLogMapperTest {
             assertEquals(entityName, entity.getEntityName());
             assertEquals(entityId, entity.getEntityId());
             assertEquals(operation, entity.getOperation());
-            assertEquals(responsibleUser, entity.getResponsibleUser());
+            assertNotNull(entity.getUser());
+            assertEquals(userId, entity.getUser().getId());
             assertEquals(timestamp, entity.getTimestamp());
             assertNotNull(entity.getPreviousData());
             assertNotNull(entity.getNewData());
+        }
+
+        @Test
+        @DisplayName("should map domain with null userId to entity")
+        void shouldMapDomainWithNullUserIdToEntity() {
+            final TransactionLog domain = TransactionLog.builder()
+                .id(UUID.randomUUID())
+                .entityName("Customer")
+                .entityId(UUID.randomUUID())
+                .operation(OperationType.INSERT)
+                .userId(null)
+                .timestamp(Instant.now())
+                .newData("{\"name\":\"New Customer\"}")
+                .build();
+
+            final TransactionLogJpaEntity entity = TransactionLogMapper.toEntity(domain);
+
+            assertNull(entity.getUser());
         }
 
         @Test
@@ -136,7 +172,7 @@ class TransactionLogMapperTest {
                 .entityName("Customer")
                 .entityId(UUID.randomUUID())
                 .operation(OperationType.UPDATE)
-                .responsibleUser("system")
+                .userId(UUID.randomUUID())
                 .timestamp(Instant.now())
                 .previousData(null)
                 .newData("{\"name\":\"New Customer\"}")

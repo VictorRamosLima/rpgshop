@@ -17,7 +17,7 @@ class TransactionLogTest {
         final String entityName = "Customer";
         final UUID entityId = UUID.randomUUID();
         final OperationType operation = OperationType.INSERT;
-        final String responsibleUser = "admin";
+        final UUID userId = UUID.randomUUID();
         final Instant timestamp = Instant.now();
         final String newData = "{\"name\": \"John\"}";
 
@@ -26,7 +26,7 @@ class TransactionLogTest {
             .entityName(entityName)
             .entityId(entityId)
             .operation(operation)
-            .responsibleUser(responsibleUser)
+            .userId(userId)
             .timestamp(timestamp)
             .previousData(null)
             .newData(newData)
@@ -36,7 +36,7 @@ class TransactionLogTest {
         assertEquals(entityName, transactionLog.entityName());
         assertEquals(entityId, transactionLog.entityId());
         assertEquals(operation, transactionLog.operation());
-        assertEquals(responsibleUser, transactionLog.responsibleUser());
+        assertEquals(userId, transactionLog.userId());
         assertEquals(timestamp, transactionLog.timestamp());
         assertNull(transactionLog.previousData());
         assertEquals(newData, transactionLog.newData());
@@ -58,7 +58,7 @@ class TransactionLogTest {
         assertNull(transactionLog.entityName());
         assertNull(transactionLog.entityId());
         assertNull(transactionLog.operation());
-        assertNull(transactionLog.responsibleUser());
+        assertNull(transactionLog.userId());
         assertNull(transactionLog.timestamp());
         assertNull(transactionLog.previousData());
         assertNull(transactionLog.newData());
@@ -79,5 +79,18 @@ class TransactionLogTest {
         assertEquals(previousData, transactionLog.previousData());
         assertEquals(newData, transactionLog.newData());
     }
-}
 
+    @Test
+    void shouldCreateTransactionLogWithNullUserId() {
+        final TransactionLog transactionLog = TransactionLog.builder()
+            .entityName("Product")
+            .entityId(UUID.randomUUID())
+            .operation(OperationType.INSERT)
+            .userId(null)
+            .newData("{\"name\": \"Product A\"}")
+            .build();
+
+        assertNull(transactionLog.userId());
+        assertEquals("Product", transactionLog.entityName());
+    }
+}

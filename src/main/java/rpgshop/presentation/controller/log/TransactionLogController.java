@@ -28,7 +28,7 @@ public final class TransactionLogController {
         @RequestParam(required = false) final String entityName,
         @RequestParam(required = false) final UUID entityId,
         @RequestParam(required = false) final OperationType operation,
-        @RequestParam(required = false) final String responsibleUser,
+        @RequestParam(required = false) final UUID userId,
         @RequestParam(required = false) final String startDate,
         @RequestParam(required = false) final String endDate,
         @RequestParam(defaultValue = "0") final int page,
@@ -45,7 +45,7 @@ public final class TransactionLogController {
             entityName,
             entityId,
             operation,
-            responsibleUser,
+            userId,
             start,
             end,
             PageRequest.of(page, 20)

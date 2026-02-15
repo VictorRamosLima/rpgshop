@@ -3,10 +3,13 @@ package rpgshop.infraestructure.persistence.entity.log;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -17,6 +20,7 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
 import rpgshop.domain.entity.log.constant.OperationType;
+import rpgshop.infraestructure.persistence.entity.user.UserJpaEntity;
 import tools.jackson.databind.JsonNode;
 
 import java.time.Instant;
@@ -34,7 +38,7 @@ import static org.hibernate.type.SqlTypes.JSON;
     @Index(name = "idx_transaction_logs_timestamp", columnList = "timestamp"),
     @Index(name = "idx_transaction_logs_entity_name_entity_id", columnList = "entity_name, entity_id"),
     @Index(name = "idx_transaction_logs_operation", columnList = "operation"),
-    @Index(name = "idx_transaction_logs_responsible_user", columnList = "responsible_user")
+    @Index(name = "idx_transaction_logs_user_id", columnList = "user_id")
 })
 public final class TransactionLogJpaEntity {
     @Id
@@ -53,8 +57,9 @@ public final class TransactionLogJpaEntity {
     @Column(name = "operation", nullable = false, updatable = false)
     private OperationType operation;
 
-    @Column(name = "responsible_user", nullable = false, updatable = false)
-    private String responsibleUser;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", updatable = false)
+    private UserJpaEntity user;
 
     @Column(name = "timestamp", nullable = false, updatable = false)
     private Instant timestamp;

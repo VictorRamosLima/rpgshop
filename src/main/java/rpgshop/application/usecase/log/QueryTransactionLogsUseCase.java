@@ -33,13 +33,13 @@ public class QueryTransactionLogsUseCase {
         final String entityName,
         final UUID entityId,
         final OperationType operation,
-        final String responsibleUser,
+        final UUID userId,
         final Instant startDate,
         final Instant endDate,
         final Pageable pageable
     ) {
         return transactionLogGateway.findByFilters(
-            entityName, entityId, operation, responsibleUser, startDate, endDate, pageable
+            entityName, entityId, operation, userId, startDate, endDate, pageable
         );
     }
 }

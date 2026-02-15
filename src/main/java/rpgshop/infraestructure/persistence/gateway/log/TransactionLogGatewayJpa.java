@@ -42,7 +42,7 @@ public class TransactionLogGatewayJpa implements TransactionLogGateway {
         final String entityName,
         final UUID entityId,
         final OperationType operation,
-        final String responsibleUser,
+        final UUID userId,
         final Instant startDate,
         final Instant endDate,
         final Pageable pageable
@@ -51,7 +51,7 @@ public class TransactionLogGatewayJpa implements TransactionLogGateway {
             entityName,
             entityId,
             operation,
-            responsibleUser,
+            userId,
             startDate,
             endDate,
             pageable

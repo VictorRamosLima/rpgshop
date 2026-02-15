@@ -31,7 +31,7 @@ public interface TransactionLogRepository {
         WHERE (:entityName IS NULL OR tl.entityName = :entityName)
             AND (:entityId IS NULL OR tl.entityId = :entityId)
             AND (:operation IS NULL OR tl.operation = :operation)
-            AND (:responsibleUser IS NULL OR tl.responsibleUser = :responsibleUser)
+            AND (:userId IS NULL OR tl.user.id = :userId)
             AND tl.timestamp >= COALESCE(:startDate, tl.timestamp)
             AND tl.timestamp <= COALESCE(:endDate, tl.timestamp)
         """)
@@ -39,7 +39,7 @@ public interface TransactionLogRepository {
         @Param("entityName") @Nullable final String entityName,
         @Param("entityId") @Nullable final UUID entityId,
         @Param("operation") @Nullable final OperationType operation,
-        @Param("responsibleUser") @Nullable final String responsibleUser,
+        @Param("userId") @Nullable final UUID userId,
         @Param("startDate") @Nullable final Instant startDate,
         @Param("endDate") @Nullable final Instant endDate,
         @Nonnull final Pageable pageable

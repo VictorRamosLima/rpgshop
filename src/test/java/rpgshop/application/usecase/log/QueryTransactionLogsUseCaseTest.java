@@ -55,7 +55,7 @@ class QueryTransactionLogsUseCaseTest {
             "Order",
             UUID.randomUUID(),
             UPDATE,
-            "admin",
+            UUID.randomUUID(),
             Instant.now().minusSeconds(3600),
             Instant.now(),
             pageable

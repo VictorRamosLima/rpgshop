@@ -12,7 +12,7 @@ public record TransactionLog(
     String entityName,
     UUID entityId,
     OperationType operation,
-    String responsibleUser,
+    UUID userId,
     Instant timestamp,
     String previousData,
     String newData

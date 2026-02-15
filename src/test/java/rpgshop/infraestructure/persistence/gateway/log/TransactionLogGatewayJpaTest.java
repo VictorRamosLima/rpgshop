@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import rpgshop.domain.entity.log.TransactionLog;
 import rpgshop.domain.entity.log.constant.OperationType;
 import rpgshop.infraestructure.persistence.entity.log.TransactionLogJpaEntity;
+import rpgshop.infraestructure.persistence.entity.user.UserJpaEntity;
 import rpgshop.infraestructure.persistence.repository.log.TransactionLogRepository;
 
 import java.time.Instant;
@@ -39,6 +40,7 @@ class TransactionLogGatewayJpaTest {
     void shouldSaveTransactionLog() {
         final UUID logId = UUID.randomUUID();
         final UUID entityId = UUID.randomUUID();
+        final UUID userId = UUID.randomUUID();
         final Instant now = Instant.now();
 
         final TransactionLog log = TransactionLog.builder()
@@ -46,7 +48,7 @@ class TransactionLogGatewayJpaTest {
             .entityName("Product")
             .entityId(entityId)
             .operation(OperationType.INSERT)
-            .responsibleUser("admin")
+            .userId(userId)
             .timestamp(now)
             .previousData(null)
             .newData("{\"name\": \"Product A\"}")
@@ -57,7 +59,7 @@ class TransactionLogGatewayJpaTest {
             .entityName("Product")
             .entityId(entityId)
             .operation(OperationType.INSERT)
-            .responsibleUser("admin")
+            .user(UserJpaEntity.builder().id(userId).build())
             .timestamp(now)
             .build();
 
@@ -69,6 +71,7 @@ class TransactionLogGatewayJpaTest {
         assertEquals(logId, result.id());
         assertEquals("Product", result.entityName());
         assertEquals(OperationType.INSERT, result.operation());
+        assertEquals(userId, result.userId());
         verify(transactionLogRepository, times(1)).save(argThat(entity ->
             entity.getEntityName().equals("Product") && entity.getOperation() == OperationType.INSERT
         ));
@@ -87,7 +90,7 @@ class TransactionLogGatewayJpaTest {
             .entityName(entityName)
             .entityId(entityId)
             .operation(OperationType.UPDATE)
-            .responsibleUser("admin")
+            .user(UserJpaEntity.builder().id(UUID.randomUUID()).build())
             .timestamp(now)
             .build();
 
@@ -127,7 +130,7 @@ class TransactionLogGatewayJpaTest {
         final UUID entityId = UUID.randomUUID();
         final String entityName = "Product";
         final OperationType operation = OperationType.UPDATE;
-        final String responsibleUser = "admin";
+        final UUID userId = UUID.randomUUID();
         final Instant startDate = Instant.now().minusSeconds(86400);
         final Instant endDate = Instant.now();
         final Pageable pageable = PageRequest.of(0, 10);
@@ -137,32 +140,26 @@ class TransactionLogGatewayJpaTest {
             .entityName(entityName)
             .entityId(entityId)
             .operation(operation)
-            .responsibleUser(responsibleUser)
+            .user(UserJpaEntity.builder().id(userId).build())
             .timestamp(Instant.now().minusSeconds(3600))
             .build();
 
         final Page<TransactionLogJpaEntity> page = new PageImpl<>(List.of(entity), pageable, 1);
 
         when(transactionLogRepository.findByFilters(
-            entityName, entityId, operation, responsibleUser, startDate, endDate, pageable
+            entityName, entityId, operation, userId, startDate, endDate, pageable
         )).thenReturn(page);
 
         final Page<TransactionLog> result = transactionLogGatewayJpa.findByFilters(
-            entityName, entityId, operation, responsibleUser, startDate, endDate, pageable
+            entityName, entityId, operation, userId, startDate, endDate, pageable
         );
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(operation, result.getContent().getFirst().operation());
-        assertEquals(responsibleUser, result.getContent().getFirst().responsibleUser());
+        assertEquals(userId, result.getContent().getFirst().userId());
         verify(transactionLogRepository, times(1)).findByFilters(
-            entityName,
-            entityId,
-            operation,
-            responsibleUser,
-            startDate,
-            endDate,
-            pageable
+            entityName, entityId, operation, userId, startDate, endDate, pageable
         );
     }
 
@@ -178,7 +175,6 @@ class TransactionLogGatewayJpaTest {
             .entityName("Product")
             .entityId(entityId)
             .operation(OperationType.INSERT)
-            .responsibleUser("admin")
             .timestamp(now)
             .build();
 

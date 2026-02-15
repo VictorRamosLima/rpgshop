@@ -11,5 +11,5 @@ import java.util.UUID;
 public interface TransactionLogGateway {
     TransactionLog save(final TransactionLog log);
     Page<TransactionLog> findByEntityNameAndEntityId(final String entityName, final UUID entityId, final Pageable pageable);
-    Page<TransactionLog> findByFilters(final String entityName, final UUID entityId, final OperationType operation, final String responsibleUser, final Instant startDate, final Instant endDate, final Pageable pageable);
+    Page<TransactionLog> findByFilters(final String entityName, final UUID entityId, final OperationType operation, final UUID userId, final Instant startDate, final Instant endDate, final Pageable pageable);
 }

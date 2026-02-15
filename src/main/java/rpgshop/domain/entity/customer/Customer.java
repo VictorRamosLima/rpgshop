@@ -17,7 +17,6 @@ public record Customer(
     LocalDate dateOfBirth,
     String cpf,
     String email,
-    String password,
     BigDecimal ranking,
     String customerCode,
     List<Phone> phones,

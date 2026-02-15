@@ -23,7 +23,7 @@ class CustomerTest {
         final LocalDate dateOfBirth = LocalDate.of(1990, 1, 15);
         final String cpf = "12345678901";
         final String email = "john@example.com";
-        final String password = "hashedPassword";
+
         final BigDecimal ranking = new BigDecimal("4.5");
         final String customerCode = "CUST001";
         final List<Phone> phones = List.of();
@@ -40,7 +40,7 @@ class CustomerTest {
             .dateOfBirth(dateOfBirth)
             .cpf(cpf)
             .email(email)
-            .password(password)
+
             .ranking(ranking)
             .customerCode(customerCode)
             .phones(phones)
@@ -58,7 +58,7 @@ class CustomerTest {
         assertEquals(dateOfBirth, customer.dateOfBirth());
         assertEquals(cpf, customer.cpf());
         assertEquals(email, customer.email());
-        assertEquals(password, customer.password());
+
         assertEquals(ranking, customer.ranking());
         assertEquals(customerCode, customer.customerCode());
         assertEquals(phones, customer.phones());
@@ -88,7 +88,7 @@ class CustomerTest {
         assertNull(customer.dateOfBirth());
         assertNull(customer.cpf());
         assertNull(customer.email());
-        assertNull(customer.password());
+
         assertNull(customer.ranking());
         assertNull(customer.customerCode());
         assertNull(customer.phones());

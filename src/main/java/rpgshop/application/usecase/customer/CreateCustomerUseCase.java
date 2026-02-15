@@ -1,6 +1,7 @@
 package rpgshop.application.usecase.customer;
 
 import jakarta.annotation.Nonnull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rpgshop.application.command.customer.CreateCustomerCommand;
@@ -8,10 +9,13 @@ import rpgshop.application.exception.BusinessRuleException;
 import rpgshop.application.gateway.customer.AddressGateway;
 import rpgshop.application.gateway.customer.CustomerGateway;
 import rpgshop.application.gateway.customer.PhoneGateway;
+import rpgshop.application.gateway.user.UserGateway;
 import rpgshop.domain.entity.customer.Address;
 import rpgshop.domain.entity.customer.Customer;
 import rpgshop.domain.entity.customer.Phone;
 import rpgshop.domain.entity.customer.constant.AddressPurpose;
+import rpgshop.domain.entity.user.User;
+import rpgshop.domain.entity.user.constant.UserType;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -27,15 +31,21 @@ public class CreateCustomerUseCase {
     private final AddressGateway addressGateway;
     private final CustomerGateway customerGateway;
     private final PhoneGateway phoneGateway;
+    private final UserGateway userGateway;
+    private final PasswordEncoder passwordEncoder;
 
     public CreateCustomerUseCase(
         final AddressGateway addressGateway,
         final CustomerGateway customerGateway,
-        final PhoneGateway phoneGateway
+        final PhoneGateway phoneGateway,
+        final UserGateway userGateway,
+        final PasswordEncoder passwordEncoder
     ) {
         this.addressGateway = addressGateway;
         this.customerGateway = customerGateway;
         this.phoneGateway = phoneGateway;
+        this.userGateway = userGateway;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Nonnull
@@ -52,7 +62,6 @@ public class CreateCustomerUseCase {
             .dateOfBirth(command.dateOfBirth())
             .cpf(command.cpf())
             .email(command.email())
-            .password(command.password())
             .ranking(BigDecimal.ZERO)
             .customerCode(generateCustomerCode())
             .phones(Collections.emptyList())
@@ -65,6 +74,20 @@ public class CreateCustomerUseCase {
             .build();
 
         final Customer saved = customerGateway.save(customer);
+
+        final User user = User.builder()
+            .id(UUID.randomUUID())
+            .email(command.email())
+            .password(passwordEncoder.encode(command.password()))
+            .userType(UserType.CUSTOMER)
+            .userTypeId(saved.id())
+            .isActive(true)
+            .deactivatedAt(null)
+            .createdAt(null)
+            .updatedAt(null)
+            .build();
+
+        userGateway.save(user);
 
         final Phone phone = Phone.builder()
             .id(UUID.randomUUID())
@@ -185,8 +208,8 @@ public class CreateCustomerUseCase {
         if (customerGateway.existsByCpf(command.cpf())) {
             throw new BusinessRuleException("Ja existe um cliente com o CPF '%s'".formatted(command.cpf()));
         }
-        if (customerGateway.existsByEmail(command.email())) {
-            throw new BusinessRuleException("Ja existe um cliente com o e-mail '%s'".formatted(command.email()));
+        if (userGateway.existsByEmail(command.email())) {
+            throw new BusinessRuleException("Ja existe um usuario com o e-mail '%s'".formatted(command.email()));
         }
     }
 

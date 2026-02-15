@@ -75,9 +75,6 @@ public final class CustomerJpaEntity {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Builder.Default
     @Column(name = "ranking", nullable = false, precision = 5, scale = 2)
     private BigDecimal ranking = BigDecimal.ZERO;

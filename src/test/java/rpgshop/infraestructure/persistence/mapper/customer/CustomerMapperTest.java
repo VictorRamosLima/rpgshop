@@ -49,7 +49,7 @@ class CustomerMapperTest {
             final LocalDate dateOfBirth = LocalDate.of(1990, 5, 15);
             final String cpf = "12345678901";
             final String email = "john.doe@example.com";
-            final String password = "hashedPassword123";
+
             final BigDecimal ranking = new BigDecimal("4.50");
             final String customerCode = "CUST001";
             final boolean isActive = true;
@@ -63,7 +63,7 @@ class CustomerMapperTest {
                 .dateOfBirth(dateOfBirth)
                 .cpf(cpf)
                 .email(email)
-                .password(password)
+
                 .ranking(ranking)
                 .customerCode(customerCode)
                 .phones(Collections.emptyList())
@@ -84,7 +84,7 @@ class CustomerMapperTest {
             assertEquals(dateOfBirth, domain.dateOfBirth());
             assertEquals(cpf, domain.cpf());
             assertEquals(email, domain.email());
-            assertEquals(password, domain.password());
+
             assertEquals(ranking, domain.ranking());
             assertEquals(customerCode, domain.customerCode());
             assertTrue(domain.phones().isEmpty());
@@ -199,7 +199,7 @@ class CustomerMapperTest {
             final LocalDate dateOfBirth = LocalDate.of(1985, 10, 20);
             final String cpf = "98765432109";
             final String email = "jane.doe@example.com";
-            final String password = "anotherHash456";
+
             final BigDecimal ranking = new BigDecimal("3.75");
             final String customerCode = "CUST002";
             final boolean isActive = false;
@@ -214,7 +214,7 @@ class CustomerMapperTest {
                 .dateOfBirth(dateOfBirth)
                 .cpf(cpf)
                 .email(email)
-                .password(password)
+
                 .ranking(ranking)
                 .customerCode(customerCode)
                 .phones(Collections.emptyList())
@@ -235,7 +235,7 @@ class CustomerMapperTest {
             assertEquals(dateOfBirth, entity.getDateOfBirth());
             assertEquals(cpf, entity.getCpf());
             assertEquals(email, entity.getEmail());
-            assertEquals(password, entity.getPassword());
+
             assertEquals(ranking, entity.getRanking());
             assertEquals(customerCode, entity.getCustomerCode());
             assertEquals(isActive, entity.isActive());
@@ -366,7 +366,7 @@ class CustomerMapperTest {
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .cpf("11122233344")
             .email("test@example.com")
-            .password("password")
+
             .ranking(BigDecimal.ZERO)
             .customerCode("TEST001")
             .phones(Collections.emptyList())
@@ -386,7 +386,7 @@ class CustomerMapperTest {
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .cpf("11122233344")
             .email("test@example.com")
-            .password("password")
+
             .ranking(BigDecimal.ZERO)
             .customerCode("TEST001")
             .phones(Collections.emptyList())

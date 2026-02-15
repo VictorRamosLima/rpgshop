@@ -26,6 +26,10 @@
                        th:attr="aria-current=${#strings.startsWith(currentPath, '/customers')} ? 'page' : null">
                         Clientes
                     </a>
+                    <a href="/employees" class="nav-link"
+                       th:attr="aria-current=${#strings.startsWith(currentPath, '/employees')} ? 'page' : null">
+                        Funcionarios
+                    </a>
                     <a href="/orders" class="nav-link"
                        th:attr="aria-current=${#strings.startsWith(currentPath, '/orders')} ? 'page' : null">
                         Pedidos

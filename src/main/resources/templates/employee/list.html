@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Funcionarios', ~{::main-content})}">
+<div th:fragment="main-content">
+
+    <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>/</span> <span>Funcionarios</span>
+    </div>
+
+    <div class="page-header">
+        <h1>Funcionarios</h1>
+        <a href="/employees/new" class="btn btn-primary">Novo Funcionario</a>
+    </div>
+
+    <div class="filter-bar">
+        <form method="get" action="/employees" class="form-inline">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" name="name" th:value="${param.name}" placeholder="Buscar por nome..."/>
+            </div>
+            <div class="form-group">
+                <label>CPF</label>
+                <input type="text" name="cpf" th:value="${param.cpf}" placeholder="000.000.000-00"/>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${employees != null && !employees.content.isEmpty()}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Criado em</th>
+                    <th>Acoes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="employee : ${employees.content}">
+                    <td th:text="${employee.name()}"></td>
+                    <td th:text="${employee.cpf()}"></td>
+                    <td th:text="${employee.createdAt()}"></td>
+                    <td class="actions-cell">
+                        <a th:href="@{/employees/{id}(id=${employee.id()})}" class="btn btn-sm btn-outline">Detalhes</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination" th:if="${employees.totalPages > 1}">
+            <span th:each="i : ${#numbers.sequence(0, employees.totalPages - 1)}">
+                <a th:href="@{/employees(page=${i}, name=${param.name}, cpf=${param.cpf})}"
+                   th:text="${i + 1}"
+                   th:if="${i != employees.number}"></a>
+                <strong th:text="${i + 1}" th:if="${i == employees.number}"></strong>
+            </span>
+        </div>
+    </div>
+
+    <div th:if="${employees == null || employees.content.isEmpty()}" class="empty-state">
+        <div class="empty-state-text">Nenhum funcionario encontrado</div>
+        <p>Tente ajustar os filtros ou <a href="/employees/new">cadastre um novo funcionario</a>.</p>
+    </div>
+
+</div>
+</html>
